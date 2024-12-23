@@ -1,12 +1,18 @@
 @import './base.css';
-html {
-    overflow-x: hidden;
-}
+@import url('https://fonts.googleapis.com/css2?family=Chocolate+Classical+Sans&family=Cinzel:wght@400..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-#app {
-    font-family: 'Nunito', 'Chocolate Classical Sans', system-ui, sans-serif !important;
-    font-optical-sizing: auto;
-    font-style: normal;
-    min-height: 100vh;
-    z-index: 0;
+@layer base {
+    html {
+        overflow-x: hidden;
+        font-family: 'Nunito', 'Chocolate Classical Sans', system-ui, sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        min-height: 100vh;
+        z-index: 0;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(179, 179, 179, 0.3) transparent;
+    }
 }
