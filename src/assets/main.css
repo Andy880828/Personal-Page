@@ -1,0 +1,12 @@
+@import './base.css';
+html {
+    overflow-x: hidden;
+}
+
+#app {
+    font-family: 'Nunito', 'Chocolate Classical Sans', system-ui, sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
+    min-height: 100vh;
+    z-index: 0;
+}
