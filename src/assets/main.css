@@ -16,3 +16,12 @@
         scrollbar-color: rgba(179, 179, 179, 0.3) transparent;
     }
 }
+
+@layer utilities {
+    .text-shadow-lg {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .gradient-t-white {
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #edf8ff 100%);
+    }
+}
