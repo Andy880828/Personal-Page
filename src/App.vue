@@ -1,26 +1,122 @@
 <script setup>
+import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import Loader from './components/Layout/LoaderComponent.vue';
 import FooterComponent from '@/components/Layout/FooterComponent.vue';
 import NavComponent from './components/Layout/NavComponent.vue';
 import LogoComponent from './components/Layout/LogoComponent.vue';
+// 控制modal
+const isModalVisible = ref(false);
+const onToggle = () => {
+    isModalVisible.value = !isModalVisible.value;
+};
 </script>
 
 <template>
     <Loader />
     <div class="wrapper">
+        <!-- Modal -->
+        <section v-if="isModalVisible">
+            <!-- Backdrop -->
+            <div @click="onToggle" class="fixed inset-0 bg-black/50 z-40"></div>
+
+            <!-- Modal -->
+            <div class="fixed inset-0 z-50 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4">
+                    <div class="w-full max-w-lg relative rounded-xl shadow-lg">
+                        <!-- Content -->
+                        <section class="bg-gray-600/50 backdrop-blur-md rounded-xl">
+                            <button
+                                @click="onToggle"
+                                class="absolute bg-gray-200 right-4 top-4 rounded-full p-1 hover:bg-gray-100 transition-colors"
+                            >
+                                <i class="fa-solid fa-xmark text-gray-500"></i>
+                            </button>
+                            <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+                                <div class="grid grid-cols-1 gap-x-16 gap-y-8">
+                                    <div class="rounded-lg bg-white px-4 py-5 shadow-lg lg:col-span-3 lg:px-8">
+                                        <p class="text-gray-800 text-xl font-semibold text-center">使用社群媒體聯繫</p>
+                                        <div
+                                            class="flex justify-center items-center gap-20 text-5xl mt-4 text-gray-600"
+                                        >
+                                            <i class="fa-brands fa-facebook cursor-pointer"></i>
+                                            <i class="fa-brands fa-instagram cursor-pointer"></i>
+                                        </div>
+                                        <p class="text-gray-800 text-xl font-semibold text-center mt-5 mb-3">
+                                            或者發送信件
+                                        </p>
+                                        <form action="#" class="space-y-4">
+                                            <div>
+                                                <label class="sr-only" for="name">姓名</label>
+                                                <input
+                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                    placeholder="姓名"
+                                                    type="text"
+                                                    id="name"
+                                                />
+                                            </div>
+
+                                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                <div>
+                                                    <label class="sr-only" for="email">Email</label>
+                                                    <input
+                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                        placeholder="Email"
+                                                        type="email"
+                                                        id="email"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label class="sr-only" for="phone">行動電話</label>
+                                                    <input
+                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                        placeholder="行動電話"
+                                                        type="tel"
+                                                        id="phone"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="sr-only text-black" for="message">訊息</label>
+                                                <textarea
+                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                    placeholder="訊息"
+                                                    rows="8"
+                                                    id="message"
+                                                ></textarea>
+                                            </div>
+
+                                            <div class="mt-4 flex justify-center">
+                                                <button
+                                                    type="submit"
+                                                    class="inline-block w-full rounded-lg bg-black px-5 py-3 text-white font-semibold sm:w-auto hover:opacity-60"
+                                                >
+                                                    寄送郵件
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </section>
         <LogoComponent></LogoComponent>
-        <NavComponent></NavComponent>
+        <NavComponent @onToggle="onToggle"></NavComponent>
         <RouterView />
         <!-- footer -->
-        <section class="relative bg-gradient-to-b from-[#011b2c] to-[#000000] h-48 md:h-72">
+        <section class="relative bg-gradient-to-b from-[#011b2c] to-[#000000] h-20 md:h-72 z-0">
             <img
-                class="absolute bottom-0 w-full brightness-0 hidden md:inline-block z-0"
+                class="absolute bottom-0 w-full brightness-0 hidden md:inline-block"
                 src="/src/assets/image/footer.png"
                 alt=""
             />
             <div class="absolute bottom-7 left-1/2 transform -translate-x-1/2">
-                <FooterComponent></FooterComponent>
+                <FooterComponent @onToggle="onToggle"></FooterComponent>
             </div>
         </section>
     </div>

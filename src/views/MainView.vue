@@ -46,11 +46,11 @@ onMounted(() => {
                 class="relative flex flex-col mt-20 justify-start text-[#35556a] items-center p-8 w-4/5 rounded-[3rem] border-4 border-dashed border-[#35556a]"
             >
                 <h1 class="text-4xl md:text-5xl font-bold">嗨! 我是敬勛</h1>
-                <p class="text-3xl mt-4 md:mt-2 font-bold text-center">
+                <p class="text-3xl mt-4 md:mt-3 font-bold text-center">
                     我來自高雄，畢業於國立中山大學海洋科學系研究所，之前曾就任科技部研究助理，目前正往工程師之路邁進，如果對於我有任何好奇，就請繼續往下滑吧!
                 </p>
                 <span class="text-[#6f7e88] text-2xl font-bold my-8">-或者先查看-</span>
-                <waterButtonComponent text="關於我" class="mb-5"></waterButtonComponent>
+                <RouterLink to="about"><waterButtonComponent text="關於我"></waterButtonComponent></RouterLink>
             </div>
         </section>
         <!-- 潛水員軌道 -->
@@ -180,9 +180,8 @@ onMounted(() => {
             <div
                 class="absolute left-1/2 transform -translate-x-1/2 mt-5 flex flex-col md:flex-row gap-10 border-l-4 border-l-zinc-400 border-r-4 border-r-zinc-400 px-10"
             >
-                <waterButtonComponent text="關於我"></waterButtonComponent>
-                <waterButtonComponent text="作品集"></waterButtonComponent>
-                <waterButtonComponent text="聯絡資訊"></waterButtonComponent>
+                <RouterLink to="about"><waterButtonComponent text="關於我"></waterButtonComponent></RouterLink>
+                <RouterLink to="project"><waterButtonComponent text="作品集"></waterButtonComponent></RouterLink>
             </div>
         </div>
     </section>
