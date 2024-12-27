@@ -47,7 +47,7 @@ onMounted(() => {
             >
                 <h1 class="text-4xl md:text-5xl font-bold">嗨! 我是敬勛</h1>
                 <p class="text-3xl mt-4 md:mt-3 font-bold text-center">
-                    我來自高雄，畢業於國立中山大學海洋科學系研究所，之前曾就任科技部研究助理，目前正往工程師之路邁進，如果對於我有任何好奇，就請繼續往下滑吧!
+                    我來自高雄，是一名有海洋背景的網頁全端工程師，畢業於國立中山大學海洋科學系研究所，之前曾就任科技部研究助理，如果對於我有任何好奇，就請繼續往下滑吧!
                 </p>
                 <span class="text-[#6f7e88] text-2xl font-bold my-8">-或者先查看-</span>
                 <RouterLink to="about"><waterButtonComponent text="關於我"></waterButtonComponent></RouterLink>
@@ -71,7 +71,7 @@ onMounted(() => {
                         id="carousal"
                         class="max-w-[90%] bg-gray-600/50 mt-5 backdrop-blur-md shadow-[0_4px_6px_rgba(0,0,0,0.1)] px-10 rounded-[3rem] scroll-smooth flex items-start w-full snap-x gap-8 overflow-x-auto"
                     >
-                        <div class="min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
+                        <div class="skill min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
                             <h2
                                 class="text-3xl md:text-4xl text-center border-b-4 border-zinc-100 pb-4 bg-gradient-to-r from-zinc-100 to-blue-200 bg-clip-text text-transparent font-bold"
                             >
@@ -89,7 +89,7 @@ onMounted(() => {
                                 擅長工具: HTML5, CSS3, JavaScript, Vue3, Vite, Tailwind, Bootstrap, JQuery, Figma
                             </p>
                         </div>
-                        <div class="min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
+                        <div class="skill min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
                             <h2
                                 class="text-3xl md:text-4xl text-center border-b-4 border-zinc-100 pb-4 bg-gradient-to-r from-zinc-100 to-blue-200 bg-clip-text text-transparent font-bold"
                             >
@@ -109,7 +109,7 @@ onMounted(() => {
                                 擅長工具: C#, ASP.NET, ADO.NET, Microsoft SQL Server, MySQL
                             </p>
                         </div>
-                        <div class="min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
+                        <div class="skill min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7">
                             <h2
                                 class="text-3xl md:text-4xl text-center border-b-4 border-zinc-100 pb-4 bg-gradient-to-r from-zinc-100 to-blue-200 bg-clip-text text-transparent font-bold"
                             >
@@ -130,7 +130,7 @@ onMounted(() => {
                                 擅長工具: Google Cloud, Microsoft Azure, Linux, Python, Pandas, R, Git, Github
                             </p>
                         </div>
-                        <div class="min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7 hidden md:block">
+                        <div class="skill min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7 hidden md:block">
                             <h2
                                 class="text-4xl text-center border-b-4 border-zinc-100 pb-4 bg-gradient-to-r from-zinc-100 to-blue-200 bg-clip-text text-transparent font-bold"
                             >
@@ -145,7 +145,7 @@ onMounted(() => {
                                 除了網頁方面，我也擅長<strong>野外調查</strong>，無論是淡水魚類、海水魚類、陸蟹皆有調查經驗，由於在碩班時期經常接觸，對於<strong>海水魚類</strong>較為熟悉。另外，對於<strong>萃取</strong>及<strong>PCR</strong>等生物技術掌握度高。碩班題目為溪流的環境DNA，善於<strong>eDNA的採樣及分析</strong>，能夠利用Python及R進行資料流處理與繪製統計圖表。
                             </p>
                         </div>
-                        <div class="min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7 hidden md:block">
+                        <div class="skill min-w-[100%] md:min-w-[50%] min-h-[40vh] snap-center my-7 hidden md:block">
                             <h2
                                 class="text-4xl text-center border-b-4 border-zinc-100 pb-4 bg-gradient-to-r from-zinc-100 to-blue-200 bg-clip-text text-transparent font-bold"
                             >

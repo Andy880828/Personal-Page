@@ -39,8 +39,14 @@ const onToggle = () => {
                                         <div
                                             class="flex justify-center items-center gap-20 text-5xl mt-4 text-gray-600"
                                         >
-                                            <i class="fa-brands fa-facebook cursor-pointer"></i>
-                                            <i class="fa-brands fa-instagram cursor-pointer"></i>
+                                            <a
+                                                href="https://www.facebook.com/people/%E6%9E%97%E6%95%AC%E5%8B%9B/pfbid0zu3HuzQ6gFtLzC57gRiKSMiQKBY6b5Tj9zJmYn7UvUqx7b2P11smR9yTbqVtA4a3l/"
+                                                target="_blank"
+                                                ><i class="fa-brands fa-facebook cursor-pointer"></i
+                                            ></a>
+                                            <a href="https://www.instagram.com/c.h.linlinlin/?hl=en" target="_blank"
+                                                ><i class="fa-brands fa-instagram cursor-pointer"></i
+                                            ></a>
                                         </div>
                                         <p class="text-gray-800 text-xl font-semibold text-center mt-5 mb-3">
                                             或者發送信件
