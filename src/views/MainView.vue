@@ -2,6 +2,7 @@
 import { onMounted } from 'vue';
 import scrollDownComponent from '@/components/scrollDownComponent.vue';
 import waterButtonComponent from '@/components/waterButtonComponent.vue';
+import bg from '@/assets/image/hero-bg.png';
 onMounted(() => {
     const leftArrow = document.querySelector('#left-arrow');
     const rightArrow = document.querySelector('#right-arrow');
@@ -20,7 +21,7 @@ onMounted(() => {
     <!-- Hero -->
     <section
         class="relative h-screen w-screen text-center overflow-hidden bg-right md:bg-center bg-no-repeat bg-cover flex flex-col items-center justify-center after:content-[''] after:w-full after:h-[10%] after:absolute after:z-[1] after:-bottom-0.5 after:left-0 after:gradient-t-white"
-        style="background-image: url('@/assets/image/hero-bg.png')"
+        :style="{ backgroundImage: `url(${bg})` }"
     >
         <p class="md:h-14 text-2xl md:text-[56px] text-zinc-100 text-shadow-lg">Ching-Hsun Lin</p>
         <p class="md:h-[180px] text-8xl md:text-[152px] text-zinc-100 text-shadow-lg">林敬勛</p>

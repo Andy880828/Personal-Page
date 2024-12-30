@@ -1,4 +1,5 @@
 <script setup>
+import photo from '@/assets/image/M105090005.jpg';
 import { ref } from 'vue';
 const skill = ref(0);
 const changeSkill = (num) => {
@@ -14,7 +15,7 @@ const changeSkill = (num) => {
                     class="size-72 rounded-full bg-gradient-to-r from-[#eed991] to-[#ccf7f4] mt-20 flex justify-center items-center"
                 >
                     <div
-                        style="background-image: url('@/assets/image/M105090005.jpg')"
+                        :style="{ backgroundImage: `url(${photo})` }"
                         class="rounded-full size-[17rem] bg-top bg-cover"
                     ></div>
                 </div>
