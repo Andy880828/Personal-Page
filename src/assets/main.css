@@ -68,4 +68,7 @@
     .gradient-t-white {
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #edf8ff 100%);
     }
+    .vertical-rl {
+        writing-mode: 'vertical-rl';
+    }
 }

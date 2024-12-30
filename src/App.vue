@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterView } from 'vue-router';
+import emailjs from '@emailjs/browser';
 import Loader from './components/Layout/LoaderComponent.vue';
 import FooterComponent from '@/components/Layout/FooterComponent.vue';
 import NavComponent from './components/Layout/NavComponent.vue';
@@ -9,6 +10,23 @@ import LogoComponent from './components/Layout/LogoComponent.vue';
 const isModalVisible = ref(false);
 const onToggle = () => {
     isModalVisible.value = !isModalVisible.value;
+};
+const sendEmail = () => {
+    const form = document.querySelector('#form');
+    emailjs
+        .sendForm('service_uhk8dgb', 'personal_page', form, {
+            publicKey: 'zFWZ8gmCOI6hd493I',
+        })
+        .then(
+            () => {
+                isModalVisible.value = false;
+                console.log('發送成功!');
+            },
+            (error) => {
+                isModalVisible.value = false;
+                console.log('發送失敗...', error.text);
+            }
+        );
 };
 </script>
 
@@ -35,7 +53,7 @@ const onToggle = () => {
                             <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
                                 <div class="grid grid-cols-1 gap-x-16 gap-y-8">
                                     <div class="rounded-lg bg-white px-4 py-5 shadow-lg lg:col-span-3 lg:px-8">
-                                        <p class="text-gray-800 text-xl font-semibold text-center">使用社群媒體聯繫</p>
+                                        <p class="text-gray-800 text-xl font-semibold text-center">使用資訊媒體聯繫</p>
                                         <div
                                             class="flex justify-center items-center gap-20 text-5xl mt-4 text-gray-600"
                                         >
@@ -44,21 +62,22 @@ const onToggle = () => {
                                                 target="_blank"
                                                 ><i class="fa-brands fa-facebook cursor-pointer"></i
                                             ></a>
-                                            <a href="https://www.instagram.com/c.h.linlinlin/?hl=en" target="_blank"
-                                                ><i class="fa-brands fa-instagram cursor-pointer"></i
+                                            <a href="https://github.com/Andy880828" target="_blank"
+                                                ><i class="fa-brands fa-square-github"></i
                                             ></a>
                                         </div>
                                         <p class="text-gray-800 text-xl font-semibold text-center mt-5 mb-3">
                                             或者發送信件
                                         </p>
-                                        <form action="#" class="space-y-4">
+                                        <form id="form" @submit.prevent="sendEmail" class="space-y-4">
                                             <div>
                                                 <label class="sr-only" for="name">姓名</label>
                                                 <input
-                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm text-black"
                                                     placeholder="姓名"
                                                     type="text"
-                                                    id="name"
+                                                    name="user_name"
+                                                    required
                                                 />
                                             </div>
 
@@ -66,20 +85,21 @@ const onToggle = () => {
                                                 <div>
                                                     <label class="sr-only" for="email">Email</label>
                                                     <input
-                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm text-black"
                                                         placeholder="Email"
                                                         type="email"
-                                                        id="email"
+                                                        name="user_email"
+                                                        required
                                                     />
                                                 </div>
 
                                                 <div>
                                                     <label class="sr-only" for="phone">行動電話</label>
                                                     <input
-                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                        class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm text-black"
                                                         placeholder="行動電話"
                                                         type="tel"
-                                                        id="phone"
+                                                        name="user_phone"
                                                     />
                                                 </div>
                                             </div>
@@ -87,10 +107,11 @@ const onToggle = () => {
                                             <div>
                                                 <label class="sr-only text-black" for="message">訊息</label>
                                                 <textarea
-                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                                    class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm text-black"
                                                     placeholder="訊息"
                                                     rows="8"
-                                                    id="message"
+                                                    name="message"
+                                                    required
                                                 ></textarea>
                                             </div>
 

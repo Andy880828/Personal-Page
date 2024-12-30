@@ -13,9 +13,7 @@ const onToggle = () => {
                 target="_blank"
                 ><i class="fa-brands fa-facebook cursor-pointer"></i
             ></a>
-            <a href="https://www.instagram.com/c.h.linlinlin/?hl=en" target="_blank"
-                ><i class="fa-brands fa-instagram cursor-pointer"></i
-            ></a>
+            <a href="https://github.com/Andy880828" target="_blank"><i class="fa-brands fa-square-github"></i></a>
             <button @click="onToggle"><i class="fa-solid fa-envelope cursor-pointer"></i></button>
         </div>
         <div class="text-2xl">&copy;2024 CHING-HSUN LIN</div>
