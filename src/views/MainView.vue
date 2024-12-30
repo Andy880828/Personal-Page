@@ -30,7 +30,7 @@ onMounted(() => {
             <scrollDownComponent></scrollDownComponent>
         </div>
     </section>
-    <section class="w-full min-h-[180vh] bg-gradient-to-b from-[#edf8ff] to-[#011b2c] relative overflow-x-clip">
+    <section class="w-full pb-72 bg-gradient-to-b from-[#edf8ff] to-[#011b2c] relative overflow-x-clip">
         <img
             class="absolute w-[30%] h-[30%] translate-x-[-40%] mt-[10%] opacity-50 hidden md:inline-block"
             src="@/assets/image/fish-sides.svg"
@@ -176,7 +176,7 @@ onMounted(() => {
             </div>
         </section>
         <!-- 繼續閱讀 -->
-        <div class="relative w-full mt-5 z-10">
+        <div class="relative w-full mt-5 mb-20 z-10">
             <h1 class="text-2xl text-center font-semibold text-zinc-400">- 繼續查看 -</h1>
             <div
                 class="absolute left-1/2 transform -translate-x-1/2 mt-5 flex flex-col md:flex-row gap-10 border-l-4 border-l-zinc-400 border-r-4 border-r-zinc-400 px-10"
