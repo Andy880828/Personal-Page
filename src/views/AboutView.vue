@@ -8,13 +8,13 @@ const changeSkill = (num) => {
 
 <template>
     <section class="relative min-h-screen bg-gradient-to-b from-[#6C7F8C] to-[#011B2C]">
-        <div class="w-full bg-gray-800 md:bg-[url('./src/assets/image/bg-3.jpg')] bg-cover bg-top rounded-b-[3rem]">
+        <div class="w-full bg-gray-800 md:bg-[url('@/assets/image/bg-3.jpg')] bg-cover bg-top rounded-b-[3rem]">
             <section class="relative flex flex-col justify-center items-center gap-5">
                 <div
                     class="size-72 rounded-full bg-gradient-to-r from-[#eed991] to-[#ccf7f4] mt-20 flex justify-center items-center"
                 >
                     <div
-                        style="background-image: url('./src/assets/image/M105090005.jpg')"
+                        style="background-image: url('@/assets/image/M105090005.jpg')"
                         class="rounded-full size-[17rem] bg-top bg-cover"
                     ></div>
                 </div>
