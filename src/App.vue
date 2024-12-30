@@ -136,7 +136,7 @@ const sendEmail = () => {
         <NavComponent @onToggle="onToggle"></NavComponent>
         <RouterView />
         <!-- footer -->
-        <section class="relative bg-gradient-to-b from-[#011b2c] to-[#000000] z-0">
+        <section class="relative bg-gradient-to-b from-[#011b2c] to-[#000000] h-72 z-0">
             <img
                 class="absolute bottom-0 w-full brightness-0 hidden md:inline-block"
                 src="/src/assets/image/footer.png"
