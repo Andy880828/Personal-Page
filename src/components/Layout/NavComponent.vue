@@ -25,7 +25,7 @@ const onToggle = () => {
         </label>
         <nav
             v-show="navAppended"
-            class="bg-slate-500/50 backdrop-blur-sm fixed top-5 left-[72px] md:left-24 w-4/5 md:w-1/2 xl:w-1/4 h-12 z-50 text-zinc-100 border-4 border-dotted border-zinc-100 rounded-2xl flex justify-center items-center p-4 transition-opacity duration-300 ease-out"
+            class="bg-slate-500/50 backdrop-blur-sm fixed top-5 left-[72px] md:left-24 w-4/5 md:w-1/2 xl:w-2/5 h-12 z-50 text-zinc-100 border-4 border-dotted border-zinc-100 rounded-2xl flex justify-center items-center p-4 transition-opacity duration-300 ease-out"
             :class="{ 'opacity-100': navAppended, 'opacity-0': !navAppended }"
         >
             <ul class="flex list-none gap-10 md:gap-20 text-zinc-200 [&>li]:no-underline font-bold text-xl">
