@@ -38,9 +38,9 @@ const changeSkill = (num) => {
             </section>
         </div>
         <section class="relative mt-12 p-10">
-            <img class="absolute left-10 opacity-70 hidden md:block" src="/src/assets/image/wrasse-1.svg" alt="" />
+            <img class="absolute left-10 opacity-70 hidden xl:block" src="/src/assets/image/wrasse-1.svg" alt="" />
             <img
-                class="absolute right-[20%] top-[85%] opacity-70 hidden md:block"
+                class="absolute right-[20%] top-[85%] opacity-70 hidden xl:block"
                 src="/src/assets/image/wrasse-2.svg"
                 alt=""
             />
