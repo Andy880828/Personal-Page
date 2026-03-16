@@ -21,8 +21,7 @@ const changeSkill = (num) => {
                 </div>
                 <p class="text-center text-6xl gradient-text font-extrabold">嗨! 我是敬勛!</p>
                 <p class="text-center mt-3 font-semibold text-3xl text-white w-[70%] leading-10 text-shadow-lg">
-                    一位具備海洋背景的網頁全端工程師，專精於 C#、JavaScript、Python 和 R 等程式語言，擅長開發 RESTful
-                    API、進行前端版面設計與切版，並能熟練串接各種功能。我能獨立完成網頁開發與部署，並確保系統的穩定運行。此外，我對魚類與環境DNA也非常熟悉，若有任何<span
+                    一位具備海洋背景的網頁全端工程師，目前於台郡科技擔任數據分析工程師，專精於 C#、JavaScript、Python 和 R 等程式語言，除了可以進行數據分析與整合，也能獨立完成網頁開發與部署，並確保系統的穩定運行。此外，我對魚類與環境DNA也非常熟悉，若有任何<span
                         class="font-semibold line-through"
                         >有趣的潛水調查工作</span
                     >相關疑問，歡迎隨時來問我！
@@ -95,29 +94,30 @@ const changeSkill = (num) => {
                             擅長 前端設計、切版、功能串接、網頁互動功能、響應式設計(RWD)。
                         </p>
                         <p class="mt-4 text-2xl font-bold">
-                            會使用 JavaScript、HTML5、CSS3、VueJS、Tailwind、Vite、Bootstrap、JQuery、Figma
+                            會使用 Vue3、Tailwind、Vite
                         </p>
                     </div>
                     <div v-if="skill === 1">
                         <p class="text-3xl font-bold underline underline-offset-8">網頁後端專長</p>
                         <p class="mt-5 text-2xl font-bold">擅長 RESTful APIs建置、可擴展後端系統的設計與實作。</p>
-                        <p class="mt-4 text-2xl font-bold">會使用 C#、ASP.NET、ADO.NET</p>
+                        <p class="mt-4 text-2xl font-bold">會使用 FastAPI、ASP.NET、Express.js</p>
                     </div>
                     <div v-if="skill === 2">
                         <p class="text-3xl font-bold underline underline-offset-8">資料庫專長</p>
                         <p class="mt-5 text-2xl font-bold">
                             擅長 資料庫操作(SQL語言)、網頁資料庫設計、E-R Diagram繪製。
                         </p>
-                        <p class="mt-4 text-2xl font-bold">會使用 Microsoft SQL Server、MySQL</p>
+                        <p class="mt-4 text-2xl font-bold">會使用 MS SQL Server、MySQL、PostgreSQL
+                        </p>
                     </div>
                     <div v-if="skill === 3">
                         <p class="text-3xl font-bold underline underline-offset-8">其他資訊專長</p>
                         <p class="mt-5 text-2xl font-bold">
                             擅長
-                            雲端服務商網站部署(IaaS與SaaS皆有經驗)、Python視窗應用程式撰寫、Pandas資料處理、R語言統計分析與繪圖、Git與Github版本控制。
+                            雲端服務商網站部署(IaaS與SaaS皆有經驗)、Vibe Coding(有使用Claude Code)、Pandas資料處理、R語言統計分析與繪圖。
                         </p>
                         <p class="mt-4 text-2xl font-bold">
-                            會使用 Google Cloud, Microsoft Azure, Linux, Python, Pandas, R, Git, Github
+                            會使用 Google Cloud, Microsoft Azure, Linux, Git, Github
                         </p>
                     </div>
                     <div v-if="skill === 4">
@@ -171,6 +171,8 @@ const changeSkill = (num) => {
                     <div class="font-bold text-3xl text-white">國立中山大學研究助理</div>
                     <div class="text-zinc-200 font-semibold text-2xl">2024/06-2024/11</div>
                     <div class="font-bold text-3xl text-white">資展國際全端就業養成班學員</div>
+                    <div class="text-zinc-200 font-semibold text-2xl">2025/04-2026/03</div>
+                    <div class="font-bold text-3xl text-white">台郡科技股份有限公司數據分析工程師</div>
                 </div>
             </div>
         </section>

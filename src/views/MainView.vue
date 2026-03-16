@@ -48,7 +48,7 @@ onMounted(() => {
             >
                 <h1 class="text-4xl md:text-5xl font-bold">嗨! 我是敬勛</h1>
                 <p class="text-3xl mt-4 md:mt-3 font-bold text-center">
-                    我來自高雄，是一名有海洋背景的網頁全端工程師，畢業於國立中山大學海洋科學系研究所，之前曾就任科技部研究助理，如果對於我有任何好奇，就請繼續往下滑吧!
+                    我來自高雄，是一名有海洋背景的網頁全端工程師，目前任職於台郡科技，數據分析工程師，如果對於我有任何好奇，就請繼續往下滑吧!
                 </p>
                 <span class="text-[#6f7e88] text-2xl font-bold my-8">-或者先查看-</span>
                 <RouterLink to="about"><waterButtonComponent text="關於我"></waterButtonComponent></RouterLink>
