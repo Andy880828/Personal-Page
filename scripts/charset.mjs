@@ -25,7 +25,7 @@ export function collectSiteChars(root = process.cwd()) {
   const set = new Set();
   for (const f of files) {
     const raw = readFileSync(f, 'utf8');
-    const text = /\.(tsx?)$/.test(f) ? stripComments(raw) : raw;
+    const text = /\.(tsx?|css)$/.test(f) ? stripComments(raw) : raw;
     for (const ch of text) {
       if (ch.charCodeAt(0) > 0x7e) set.add(ch);
     }
