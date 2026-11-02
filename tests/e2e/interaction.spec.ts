@@ -44,10 +44,10 @@ test.describe('互動', () => {
   test('技能分頁：點擊與方向鍵切換', async ({ page }) => {
     await openTestMode(page);
     await scrollToPos(page, 2.5);
-    await page.getByRole('tab', { name: /資料庫/ }).click();
+    await page.getByRole('tab', { name: /工作流程數位化/ }).click();
     await expect(page.getByRole('tabpanel')).toContainText('PostgreSQL');
-    await page.getByRole('tab', { name: /資料庫/ }).press('ArrowRight');
-    await expect(page.getByRole('tab', { name: /雲端與 Agent/ })).toBeFocused();
+    await page.getByRole('tab', { name: /工作流程數位化/ }).press('ArrowRight');
+    await expect(page.getByRole('tab', { name: /Agent 應用/ })).toBeFocused();
     await expect(page.getByRole('tabpanel')).toContainText('Claude Code');
   });
 

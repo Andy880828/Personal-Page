@@ -14,6 +14,7 @@ import {
   PlaneGeometry,
   ShaderMaterial,
   Object3D,
+  Plane,
   Vector2,
   Vector3,
   type Group,
@@ -23,7 +24,48 @@ import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
 import { FLOOR_Y } from './path';
 import { floorHeight, rockJitter } from './floor';
-import { sceneTime } from './time';
+import { isFrozen, sceneTime } from './time';
+
+interface ContourUniforms {
+  uCursor: { value: Vector3 };
+  uRadius: { value: number };
+}
+const floorPlane = new Plane(new Vector3(0, 1, 0), -FLOOR_Y);
+const hitPoint = new Vector3();
+
+/**
+ * 海床材質 + 等深線：高度取模畫線（fwidth 抗鋸齒，每五條一條粗線），
+ * 游標附近像被掃描器掃過一樣亮起，其他地方只留很淡的線（Manya et al. 2013 的作法簡化）。
+ */
+function contourMaterial() {
+  const m = new MeshStandardMaterial({ color: '#2a5568', roughness: 0.95, metalness: 0.05, flatShading: true });
+  const uniforms: ContourUniforms = { uCursor: { value: new Vector3(0, 0, -20) }, uRadius: { value: 11 } };
+  m.userData.contour = uniforms;
+  m.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vLocal;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocal = position;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nvarying vec3 vLocal;\nuniform vec3 uCursor;\nuniform float uRadius;',
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        float h = vLocal.y / 0.45;
+        float minor = 1.0 - min(abs(fract(h - 0.5) - 0.5) / fwidth(h), 1.0);
+        float h5 = h / 5.0;
+        float major = 1.0 - min(abs(fract(h5 - 0.5) - 0.5) / (fwidth(h5) * 2.2), 1.0);
+        float line = max(minor * 0.55, major);
+        float scan = smoothstep(uRadius, uRadius * 0.35, distance(vLocal.xz, uCursor.xz));
+        totalEmissiveRadiance += vec3(0.31, 0.94, 0.82) * line * (0.08 + 0.85 * scan);`,
+      );
+  };
+  m.customProgramCacheKey = () => 'seafloor-contour';
+  return m;
+}
 
 const VENTS: [number, number, number][] = [
   [7, -34, 1.0],
@@ -198,7 +240,7 @@ export default function Seafloor() {
         emissive: new Color('#ff3355'),
         emissiveIntensity: 0.15,
       }),
-      floor: new MeshStandardMaterial({ color: '#2a5568', roughness: 0.95, metalness: 0.05, flatShading: true }),
+      floor: contourMaterial(),
       rock: new MeshStandardMaterial({ color: '#253a46', roughness: 0.9, flatShading: true }),
       chimney: new MeshStandardMaterial({
         color: '#14181b',
@@ -253,6 +295,16 @@ export default function Seafloor() {
     for (const m of [mats.plume, mats.dots]) {
       m.uniforms.uTime!.value = t;
       m.uniforms.uPixelRatio!.value = pr;
+    }
+    // 等深線掃描：游標在海床上的落點（與海床平面相交）；凍結模式固定在畫面中下方，基準圖才看得到
+    const u = mats.floor.userData.contour as ContourUniforms;
+    if (isFrozen()) u.uCursor.value.set(0, 0, -20);
+    else {
+      state.raycaster.setFromCamera(state.pointer, state.camera);
+      if (state.raycaster.ray.intersectPlane(floorPlane, hitPoint)) {
+        hitPoint.y -= FLOOR_Y;
+        u.uCursor.value.lerp(hitPoint, 0.25);
+      }
     }
     if (light.current) light.current.intensity = 16 + Math.sin(t * 7.3) * 2 + Math.sin(t * 2.1) * 2.5;
   });

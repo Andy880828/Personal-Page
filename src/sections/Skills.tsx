@@ -1,19 +1,20 @@
 import { useRef } from 'react';
 import { skills } from '@/content/skills';
+import { DNA_SEQUENCE, segmentRange } from '@/lib/dna';
 import { useReveal } from '@/hooks/useReveal';
 import { useSiteStore } from '@/store/useSiteStore';
 import SectionHeader from '@/components/SectionHeader';
 
-/** 用技能 id 產生一段固定的假序列（純裝飾，呼應 eDNA 的定序讀段） */
-function pseudoSequence(id: string, length = 36): string {
-  let h = 2166136261;
-  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
-  let out = '';
-  for (let i = 0; i < length; i++) {
-    h = (Math.imul(h, 1664525) + 1013904223) >>> 0;
-    out += 'ACGT'[(h >>> 24) & 3];
-  }
-  return out;
+/** 1BNA 的真序列（股 A，5′→3′），目前技能在雙螺旋上的那一段亮起 */
+function Sequence({ seg, color }: { seg: number; color: string }) {
+  const [start, end] = segmentRange(seg);
+  return (
+    <>
+      5′ {DNA_SEQUENCE.slice(0, start)}
+      <span style={{ color }}>{DNA_SEQUENCE.slice(start, end)}</span>
+      {DNA_SEQUENCE.slice(end)} 3′
+    </>
+  );
 }
 
 /**
@@ -139,7 +140,7 @@ export default function Skills() {
                 aria-hidden="true"
                 className="mt-1 hidden truncate font-mono text-[0.68rem] tracking-[0.08em] text-haze sm:block"
               >
-                5′ {pseudoSequence(current.id)} 3′
+                <Sequence seg={skills.indexOf(current)} color={current.color} />
               </p>
               <h3 className="mt-2 text-2xl font-bold text-foam sm:text-3xl">{current.name}</h3>
               <p className="mt-4 text-lg text-ink/90">{current.summary}</p>

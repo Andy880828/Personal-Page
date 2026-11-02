@@ -14,7 +14,13 @@
   {
     "name": "場景程式本體",
     "path": "dist/assets/SceneRoot-*.js",
-    "limit": "20 KB",
+    "limit": "24 KB",
+    "gzip": true
+  },
+  {
+    "name": "模型解碼器（GLTFLoader + meshopt，第一次要模型時才載入）",
+    "path": "dist/assets/gltf-*.js",
+    "limit": "40 KB",
     "gzip": true
   },
   {
@@ -40,6 +46,13 @@
     "path": "dist/assets/*.css",
     "limit": "15 KB",
     "gzip": true
+  },
+  {
+    "name": "模型（meshopt GLB，依段落鄰近才載入）",
+    "path": "dist/models/*.glb",
+    "limit": "800 KB",
+    "gzip": false,
+    "brotli": false
   },
   {
     "name": "字體",

@@ -38,6 +38,20 @@ export function createSchool(count: number, seed: number): School {
 }
 
 /**
+ * 分群（作品篩選）：tags[i] === tag 的魚被拉向 target，其他魚被推離 target，
+ * 像一張散點圖被 filter。拉力有上限、分離項照常，魚群不會擠成一顆球。
+ */
+export interface Gather {
+  tags: Uint8Array;
+  tag: number;
+  target: [number, number, number];
+  /** 0–1：段落權重，離開作品段時淡出 */
+  weight: number;
+}
+
+export const GATHER = { pull: 1.6, maxPull: 4, repel: 2.4, repelRadius: 5.5 };
+
+/**
  * 推進一步。avoid 是區域座標中要躲開的點（滑鼠），null 表示沒有；
  * avoidRadius / avoidStrength 讓「點擊驚散」用更大的範圍與更強的推力。
  */
@@ -47,6 +61,7 @@ export function stepSchool(
   avoid: [number, number, number] | null = null,
   avoidRadius = 4,
   avoidStrength = 0.9,
+  gather: Gather | null = null,
 ) {
   if (dt <= 0) return;
   const { count, pos, vel } = s;
@@ -108,6 +123,23 @@ export function stepSchool(
         ax += (dx / d) * k;
         ay += (dy / d) * k;
         az += (dz / d) * k;
+      }
+    }
+    if (gather && gather.weight > 0) {
+      const dx = gather.target[0] - px;
+      const dy = gather.target[1] - py;
+      const dz = gather.target[2] - pz;
+      const d = Math.hypot(dx, dy, dz) + 1e-3;
+      if (gather.tags[i] === gather.tag) {
+        const k = Math.min(GATHER.maxPull, d * GATHER.pull) * gather.weight;
+        ax += (dx / d) * k;
+        ay += (dy / d) * k;
+        az += (dz / d) * k;
+      } else if (d < GATHER.repelRadius) {
+        const k = (GATHER.repelRadius - d) * GATHER.repel * gather.weight;
+        ax -= (dx / d) * k;
+        ay -= (dy / d) * k;
+        az -= (dz / d) * k;
       }
     }
     let nvx = vel[ix]! + ax * dt;

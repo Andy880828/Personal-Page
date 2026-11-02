@@ -12,24 +12,46 @@ import {
   Vector3,
   type Group,
 } from 'three';
+import dna from '@/assets/dna-1bna.json';
+import { dnaSegment } from '@/lib/dna';
 import { skills } from '@/content/skills';
 import { useSiteStore } from '@/store/useSiteStore';
 import { rigY, sectionWeight } from './path';
 import { isFrozen, sceneDelta, sceneTime } from './time';
 
 const SECTION = 2;
-/** 每個技能區段的鹼基對數；整條 DNA = 5 段 */
-const BP_PER_SEGMENT = 16;
-const BP = BP_PER_SEGMENT * skills.length;
-/** 每個鹼基對沿軸上升的距離、每圈幾個鹼基對（B-DNA 約 10.5） */
-const RISE = 0.12;
-const PER_TURN = 10.5;
-const RADIUS = 0.95;
-const HEIGHT = BP * RISE;
+/** 1BNA 的座標單位是 Å；縮成場景單位（整條 36 bp 約 9.6 高、磷原子半徑約 0.8） */
+const SCALE = 0.08;
+const PAIRS = dna.pairs;
+const BP = PAIRS.length;
+/** 鹼基對 → 技能區段：由上而下（第一組技能在最上面，和左側分頁順序一樣） */
+const SEG_BP = skills.map((_, s) => PAIRS.map((_, i) => i).filter((i) => dnaSegment(i, skills.length, BP) === s));
+const HEIGHT = BP * dna.riseA * SCALE;
+const RADIUS = 0.9;
 
 const dummy = new Object3D();
 const up = new Vector3(0, 1, 0);
 const q = new Quaternion();
+const va = new Vector3();
+const vb = new Vector3();
+const dir = new Vector3();
+
+type P3 = readonly number[];
+/** Å → 場景座標；scale 是選取時的徑向「膨脹」 */
+function at(p: P3, scale: number, out: Vector3) {
+  return out.set(p[0]! * SCALE * scale, p[1]! * SCALE, p[2]! * SCALE * scale);
+}
+/** 把單位高度、沿 y 的圓柱放到 a→b 之間 */
+function stick(a: Vector3, b: Vector3) {
+  dir.subVectors(b, a);
+  const len = dir.length();
+  dummy.position.copy(a).addScaledVector(dir, 0.5);
+  q.setFromUnitVectors(up, dir.normalize());
+  dummy.quaternion.copy(q);
+  dummy.scale.set(1, len, 1);
+  dummy.updateMatrix();
+  return dummy.matrix;
+}
 
 interface Segment {
   id: string;
@@ -39,16 +61,18 @@ interface Segment {
 }
 
 /**
- * 技能的 DNA 雙螺旋（呼應 eDNA 研究）：五個技能區段像五個基因串在同一條序列上。
+ * 技能的 DNA 雙螺旋：RCSB PDB 1BNA 的真實原子座標（scripts/build-dna.mjs 產生），接三份成 36 bp；
+ * 五個技能區段像五個基因串在同一條序列上。
  * - hover 區段：變亮；點擊：切換左側分頁（共用 store 的 activeSkill）
  * - 拖曳：轉動螺旋；放開後慣性減速
- * 每個區段是兩個 InstancedMesh（鹼基球、橫向鹼基對），共 10 個 draw call。
+ * 每個區段是三個 InstancedMesh（磷原子、鹼基對、主鏈），共 15 個 draw call。
  */
 export default function SkillHelix() {
   const group = useRef<Group>(null);
   const spin = useRef<Group>(null);
   const nodeMeshes = useRef<(InstancedMesh | null)[]>([]);
   const rungMeshes = useRef<(InstancedMesh | null)[]>([]);
+  const linkMeshes = useRef<(InstancedMesh | null)[]>([]);
   const size = useThree((s) => s.size);
   const setActive = useSiteStore((s) => s.setActiveSkill);
   const setHover = useSiteStore((s) => s.setHoverSkill);
@@ -58,7 +82,8 @@ export default function SkillHelix() {
   const geo = useMemo(
     () => ({
       node: new SphereGeometry(0.11, 12, 10),
-      rung: new CylinderGeometry(0.035, 0.035, RADIUS * 2 - 0.2, 6, 1),
+      rung: new CylinderGeometry(0.035, 0.035, 1, 6, 1),
+      link: new CylinderGeometry(0.03, 0.03, 1, 5, 1),
       hit: new CylinderGeometry(RADIUS + 0.5, RADIUS + 0.5, HEIGHT + 1, 12, 1),
     }),
     [],
@@ -90,35 +115,39 @@ export default function SkillHelix() {
     [],
   );
 
-  /** 寫入某個區段的實例矩陣；scale 用來做選取時的「膨脹」 */
+  /** 寫入某個區段的實例矩陣（1BNA 真實座標）；scale 用來做選取時的「膨脹」 */
   const layout = (seg: number, scale: number) => {
     const nodes = nodeMeshes.current[seg];
     const rungs = rungMeshes.current[seg];
-    if (!nodes || !rungs) return;
-    for (let i = 0; i < BP_PER_SEGMENT; i++) {
-      const k = seg * BP_PER_SEGMENT + i;
-      // 第一個區段（前端）在最上面，和左側分頁的順序一樣
-      const y = HEIGHT / 2 - k * RISE;
-      const theta = (k / PER_TURN) * Math.PI * 2;
-      const r = RADIUS * scale;
-      for (let strand = 0; strand < 2; strand++) {
-        const a = theta + strand * Math.PI;
-        dummy.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
-        dummy.rotation.set(0, 0, 0);
+    const links = linkMeshes.current[seg];
+    if (!nodes || !rungs || !links) return;
+    SEG_BP[seg]!.forEach((i, j) => {
+      const p = PAIRS[i]!;
+      // 兩股的磷原子
+      for (const [k, pt] of [p.pA, p.pB].entries()) {
+        at(pt, scale, va);
+        dummy.position.copy(va);
+        dummy.quaternion.identity();
         dummy.scale.setScalar(0.85 + 0.35 * scale);
         dummy.updateMatrix();
-        nodes.setMatrixAt(i * 2 + strand, dummy.matrix);
+        nodes.setMatrixAt(j * 2 + k, dummy.matrix);
       }
-      dummy.position.set(0, y, 0);
-      q.setFromAxisAngle(up, -theta);
-      dummy.quaternion.copy(q);
-      dummy.rotation.set(0, dummy.rotation.y, Math.PI / 2);
-      dummy.scale.set(1, scale, 1);
-      dummy.updateMatrix();
-      rungs.setMatrixAt(i, dummy.matrix);
-    }
+      // 鹼基對：兩個 C1′ 之間
+      rungs.setMatrixAt(j, stick(at(p.cA, scale, va), at(p.cB, scale, vb)));
+      // 主鏈：每股接到下一個鹼基對的磷原子（最後一對沒有下一個，縮成 0）
+      const next = PAIRS[i + 1];
+      for (const [k, key] of (['pA', 'pB'] as const).entries()) {
+        if (next) links.setMatrixAt(j * 2 + k, stick(at(p[key], scale, va), at(next[key], scale, vb)));
+        else {
+          dummy.scale.setScalar(0);
+          dummy.updateMatrix();
+          links.setMatrixAt(j * 2 + k, dummy.matrix);
+        }
+      }
+    });
     nodes.instanceMatrix.needsUpdate = true;
     rungs.instanceMatrix.needsUpdate = true;
+    links.instanceMatrix.needsUpdate = true;
   };
 
   useEffect(() => {
@@ -192,7 +221,7 @@ export default function SkillHelix() {
               ref={(m) => {
                 nodeMeshes.current[i] = m;
               }}
-              args={[geo.node, s.nodes, BP_PER_SEGMENT * 2]}
+              args={[geo.node, s.nodes, SEG_BP[i]!.length * 2]}
               frustumCulled={false}
               onPointerOver={(e) => {
                 e.stopPropagation();
@@ -212,7 +241,15 @@ export default function SkillHelix() {
               ref={(m) => {
                 rungMeshes.current[i] = m;
               }}
-              args={[geo.rung, s.rungs, BP_PER_SEGMENT]}
+              args={[geo.rung, s.rungs, SEG_BP[i]!.length]}
+              frustumCulled={false}
+              raycast={() => null}
+            />
+            <instancedMesh
+              ref={(m) => {
+                linkMeshes.current[i] = m;
+              }}
+              args={[geo.link, s.rungs, SEG_BP[i]!.length * 2]}
               frustumCulled={false}
               raycast={() => null}
             />

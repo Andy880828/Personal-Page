@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import ReactThreeTestRenderer from '@react-three/test-renderer';
-import { createSchool, stepSchool, BOIDS } from '@/scene/boids';
+import { createSchool, stepSchool, BOIDS, type Gather } from '@/scene/boids';
 import { sceneBudget } from '@/lib/gpu';
 import { SceneContents } from '@/scene/SceneRoot';
 import { useSiteStore } from '@/store/useSiteStore';
@@ -50,6 +50,38 @@ describe('魚群模擬', () => {
     b.vel.set([3, 0, 0]);
     stepSchool(b, 1 / 30, [6, 0, 0], 9, 3);
     expect(b.vel[0]!).toBeLessThan(a.vel[0]!);
+  });
+});
+
+describe('魚群即資料（作品篩選分群）', () => {
+  const meanDist = (pos: Float32Array, idx: number[], t: [number, number, number]) =>
+    idx.reduce((a, i) => a + Math.hypot(pos[i * 3]! - t[0], pos[i * 3 + 1]! - t[1], pos[i * 3 + 2]! - t[2]), 0) /
+    idx.length;
+
+  it('符合分類的魚聚到目標點附近，其他魚散開', () => {
+    const n = 120;
+    const s = createSchool(n, 11);
+    const tags = Uint8Array.from({ length: n }, (_, i) => i % 5);
+    const gather: Gather = { tags, tag: 2, target: [0, 0, 0], weight: 1 };
+    for (let i = 0; i < 400; i++) stepSchool(s, 1 / 30, null, 4, 0.9, gather);
+    const match = [...tags.keys()].filter((i) => tags[i] === 2);
+    const rest = [...tags.keys()].filter((i) => tags[i] !== 2);
+    const dm = meanDist(s.pos, match, gather.target);
+    const dr = meanDist(s.pos, rest, gather.target);
+    expect(dm).toBeLessThan(dr * 0.6);
+    // 不會擠成一點：分離項還在
+    expect(dm).toBeGreaterThan(BOIDS.separation * 0.4);
+  });
+
+  it('weight = 0 時和沒有分群一樣', () => {
+    const a = createSchool(40, 5);
+    const b = createSchool(40, 5);
+    const tags = new Uint8Array(40);
+    for (let i = 0; i < 60; i++) {
+      stepSchool(a, 1 / 30);
+      stepSchool(b, 1 / 30, null, 4, 0.9, { tags, tag: 0, target: [0, 0, 0], weight: 0 });
+    }
+    expect(Array.from(a.pos)).toEqual(Array.from(b.pos));
   });
 });
 

@@ -4,6 +4,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
+  InstancedBufferAttribute,
   InstancedMesh,
   MeshStandardMaterial,
   Object3D,
@@ -15,8 +16,11 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
-import { createSchool, stepSchool } from './boids';
-import { cameraY } from './path';
+import { categoryColors } from '@/content/projects';
+import type { ProjectCategory } from '@/content/types';
+import { smoothstep } from '@/lib/math';
+import { createSchool, stepSchool, type Gather } from './boids';
+import { cameraY, sectionWeight } from './path';
 import { isFrozen, sceneDelta, sceneTime } from './time';
 
 /** 一條魚：拉長的身體 + 三角尾鰭，朝 +z 游 */
@@ -39,7 +43,14 @@ const hit = new Vector3();
 const center = new Vector3();
 const pointerNdc = new Vector2();
 
-/** 魚群：在「關於」與「技能」兩段陪著相機游；CPU boids + InstancedMesh + 尾巴擺動 shader */
+/** 每條魚帶一個作品分類（照順序輪流），燈籠魚模式時發光點是那個分類的顏色 */
+const CATEGORIES = Object.keys(categoryColors) as ProjectCategory[];
+const PROJECTS = 3;
+
+/**
+ * 魚群：從「關於」一路陪相機游到「作品」；CPU boids + InstancedMesh + 尾巴擺動 shader。
+ * 到了中層帶變成燈籠魚，每條魚帶一個作品分類，篩選作品時符合的魚聚成一團（像散點圖被 filter）。
+ */
 export default function Fish({ count }: { count: number }) {
   const mesh = useRef<InstancedMesh>(null);
   const school = useMemo(() => {
@@ -53,9 +64,31 @@ export default function Fish({ count }: { count: number }) {
     const m = new MeshStandardMaterial({ color: '#ffffff', metalness: 0.65, roughness: 0.32 });
     m.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = { value: 0 };
+      shader.uniforms.uLantern = { value: 0 };
       m.userData.shader = shader;
+      // 燈籠魚模式（中層帶）：身體變暗，腹側一排很淡的發光點，顏色是這條魚的分類
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          '#include <common>\nuniform float uLantern;\nvarying vec3 vTag;\nvarying float vBelly;',
+        )
+        .replace(
+          '#include <color_fragment>',
+          '#include <color_fragment>\ndiffuseColor.rgb *= mix(1.0, 0.22, uLantern);',
+        )
+        .replace(
+          '#include <emissivemap_fragment>',
+          '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vTag * uLantern * vBelly * 0.9;',
+        );
       shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', '#include <common>\nuniform float uTime;')
+        .replace(
+          '#include <common>',
+          '#include <common>\nuniform float uTime;\nattribute vec3 aTag;\nvarying vec3 vTag;\nvarying float vBelly;',
+        )
+        .replace(
+          '#include <begin_vertex>',
+          '#include <begin_vertex>\nvTag = aTag;\nvBelly = smoothstep(-0.02, -0.12, position.y) * step(abs(position.x), 0.12);',
+        )
         .replace(
           '#include <begin_vertex>',
           `#include <begin_vertex>
@@ -66,6 +99,18 @@ export default function Fish({ count }: { count: number }) {
     };
     return { geometry: fishGeometry(), material: m };
   }, []);
+
+  const tags = useMemo(() => Uint8Array.from({ length: count }, (_, i) => i % CATEGORIES.length), [count]);
+  const gather = useMemo<Gather>(() => ({ tags, tag: 0, target: [0, 0, 0], weight: 0 }), [tags]);
+
+  useEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const tagColors = new Float32Array(count * 3);
+    const c = new Color();
+    for (let i = 0; i < count; i++) c.set(categoryColors[CATEGORIES[tags[i]!]!]).toArray(tagColors, i * 3);
+    m.geometry.setAttribute('aTag', new InstancedBufferAttribute(tagColors, 3));
+  }, [count, tags]);
 
   useEffect(() => {
     const rng = createRng(SCENE_SEED + 5);
@@ -82,15 +127,20 @@ export default function Fish({ count }: { count: number }) {
     const m = mesh.current;
     if (!m) return;
     const pos = useSiteStore.getState().pos;
-    const visible = pos > 0.55 && pos < 3.3;
+    // 透光帶的魚群一路跟到中層帶，在作品段變成燈籠魚
+    const visible = pos > 0.55 && pos < 4.35;
     m.visible = visible;
     if (!visible) return;
     const shader = material.userData.shader as { uniforms: { uTime: { value: number } } } | undefined;
-    if (shader) shader.uniforms.uTime.value = sceneTime(state);
+    const lantern = smoothstep(2.6, 3.2, pos);
+    if (shader) {
+      shader.uniforms.uTime.value = sceneTime(state);
+      (shader.uniforms as unknown as { uLantern: { value: number } }).uLantern.value = lantern;
+    }
 
     // 魚群中心：跟著相機，但限制在「關於／技能」的深度帶裡，偏畫面右側前方
     const camY = state.camera.position.y;
-    const minY = cameraY(2.9);
+    const minY = cameraY(3.9);
     const maxY = cameraY(0.9);
     const portrait = state.size.width < state.size.height;
     center.set(portrait ? 1.5 : 7.5, Math.min(maxY, Math.max(minY, camY - 1)), portrait ? -28 : -24);
@@ -117,7 +167,12 @@ export default function Fish({ count }: { count: number }) {
         if (state.raycaster.ray.intersectPlane(avoidPlane, hit)) avoid = [hit.x - center.x, hit.y - center.y, 0];
       }
     }
-    stepSchool(school, sceneDelta(delta), avoid, radius, strength);
+    // 作品篩選：符合分類的魚聚成一團、其他散開（只在作品段的正中間）
+    const { projectFilter } = useSiteStore.getState();
+    const w = sectionWeight(pos, PROJECTS, 0.9);
+    gather.weight = projectFilter === 'all' ? 0 : smoothstep(0.5, 0.9, w);
+    gather.tag = projectFilter === 'all' ? 0 : CATEGORIES.indexOf(projectFilter);
+    stepSchool(school, sceneDelta(delta), avoid, radius, strength, gather);
 
     const p = school.pos;
     const v = school.vel;
