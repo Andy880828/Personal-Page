@@ -18,3 +18,6 @@ test-results
 .claude/skills/impeccable/
 .claude/agents/impeccable-*
 .impeccable/
+
+# 原始素材（模型、PDB），只在本機；減面後的成品才進 public/models/
+raw/

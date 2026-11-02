@@ -6,3 +6,5 @@ test-results
 tests/e2e/**/*-snapshots
 .lighthouseci
 package-lock.json
+raw
+public/models/LICENSES.md
