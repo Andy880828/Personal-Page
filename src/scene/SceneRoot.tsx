@@ -123,6 +123,7 @@ export function SceneContents({ budget, tier = 2 }: { budget: ReturnType<typeof 
       <LightShafts />
       <MarineSnow count={budget.snow} />
       <Fish count={budget.fish} />
+      <Fish count={Math.round(budget.fish * 0.55)} kind="lantern" />
       <SkillHelix />
       <CursorLight />
       <Jellyfish />

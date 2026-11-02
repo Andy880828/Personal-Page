@@ -110,9 +110,6 @@
 
   /* 淺水段的文字底：只壓暗文字欄那一側，3D 仍然看得到 */
   .scrim {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
     background: linear-gradient(90deg, rgb(2 16 31 / 0.62) 0%, rgb(2 16 31 / 0.42) 45%, rgb(2 16 31 / 0) 78%);
   }
 

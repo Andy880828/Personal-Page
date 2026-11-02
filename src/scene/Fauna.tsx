@@ -2,16 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   Box3,
-  Color,
   IcosahedronGeometry,
   MathUtils,
   Mesh,
-  MeshStandardMaterial,
+  MeshBasicMaterial,
+  SphereGeometry,
+  SRGBColorSpace,
   Vector3,
   type Group,
-  type Material,
   type Object3D,
-  type PointLight,
+  type ShaderMaterial,
 } from 'three';
 import { FAUNA } from '@/content/fauna';
 import { flags } from '@/lib/env';
@@ -20,11 +20,16 @@ import { floorHeight, rockJitter } from './floor';
 import { FLOOR_Y, rigY, sectionWeight } from './path';
 import { holdWork, loadModel, releaseWork } from './models';
 import { isFrozen, sceneTime } from './time';
+import { scanMaterial } from './scanMaterial';
 
 /**
  * 分層代表生物（content/fauna.ts）在場景裡的擺法。
  * 每一筆是一個實例：跟某一段走（y 用 rigY 做視差），或固定在海床上（floor）。
  * 模型的「頭」朝哪個軸：攝影測量的魚頭朝 -x、雀鯛朝 +z；擺尾 shader 依這個決定哪一端是尾巴。
+ *
+ * 所有生物都用 scanMaterial（和海床等深線同一套「被聲納掃出來」的語言），不用模型原本的顏色。
+ * 每隻只在自己那一段出現（sectionWeight 寬 0.55），而且擺在該段 DOM 留下的空位：
+ * 礁在 About 左下、柳珊瑚在 Skills 左下角、管水母在作品段右緣、鮟鱇在經歷段左半 YEAR 下方的空白。
  */
 type Motion = 'swim' | 'drift' | 'still' | 'crawl';
 interface Placement {
@@ -43,94 +48,75 @@ interface Placement {
 }
 
 const PLACEMENTS: Placement[] = [
-  // 透光帶礁區：畫面左下的岩坡，隆頭魚與雀鯛在礁旁繞
+  // 透光帶礁區：畫面左下、文字欄下緣的一塊礁，兩隻隆頭魚在礁上方繞
   {
     species: 'brain-coral',
     section: 1,
-    pos: [-11, -7.4, -21],
-    portrait: [-4.5, -9, -21],
-    scale: 3.2,
+    pos: [-12, -6.4, -22],
+    portrait: [-3.2, -10.5, -22],
+    scale: 3,
     yaw: 0.6,
     motion: 'still',
   },
   {
     species: 'pavona-coral',
     section: 1,
-    pos: [-6.5, -7.6, -19],
-    portrait: [-1.5, -9.2, -20],
-    scale: 3.4,
+    pos: [-7.5, -6.8, -21],
+    portrait: [0.8, -10.8, -21],
+    scale: 3.2,
     yaw: 2.1,
-    motion: 'still',
-  },
-  {
-    species: 'soft-coral',
-    section: 1,
-    pos: [-9, -6.6, -17],
-    portrait: [-3, -8.2, -17],
-    scale: 6,
-    yaw: 0.9,
     motion: 'still',
   },
   {
     species: 'snooty-wrasse',
     section: 1,
-    pos: [-6, -6, -17],
-    portrait: [-1.5, -7.5, -18],
-    scale: 3.2,
+    pos: [-8.5, -3.6, -20],
+    portrait: [-0.8, -7.6, -20],
+    scale: 2.8,
     motion: 'swim',
     head: 'x-',
-    orbit: [4.5, 2.2, 0.16],
+    orbit: [3.4, 1.6, 0.16],
   },
   {
     species: 'red-naped-wrasse',
     section: 1,
-    pos: [-10, -7, -15],
-    portrait: [-3, -8.5, -16],
-    scale: 2.4,
+    pos: [-11, -4.6, -18],
+    portrait: [-2, -8.6, -18],
+    scale: 2.1,
     motion: 'swim',
     head: 'x-',
-    orbit: [3.2, 1.6, -0.22],
+    orbit: [2.4, 1.2, -0.22],
   },
-  ...[0, 1, 2].map((i): Placement => ({
-    species: 'damselfish',
-    section: 1,
-    pos: [-8 + i * 0.9, -4.2 + i * 0.5, -14 - i * 0.6],
-    portrait: [-2 + i * 0.6, -4 + i * 0.5, -15 - i * 0.6],
-    scale: 0.9,
-    motion: 'swim',
-    head: 'z+',
-    orbit: [2.2 + i * 0.4, 1.2, 0.3 + i * 0.04],
-  })),
-  // 透光帶下緣：左下的柳珊瑚（右邊是技能的雙螺旋）
+  // 透光帶下緣：左下角的柳珊瑚（右邊是技能的雙螺旋）
   {
     species: 'sea-fan',
     section: 2,
-    pos: [-8.5, -7.5, -16],
-    portrait: [-3.5, -9, -18],
-    scale: 4.2,
+    pos: [-13, -7.6, -20],
+    portrait: [-4, -11, -20],
+    scale: 4,
     yaw: 0.4,
     motion: 'drift',
   },
-  // 中層帶：遠處慢慢漂的管水母
+  // 中層帶：作品卡片右緣、儀表下方，遠處慢慢漂的管水母
   {
     species: 'siphonophore',
     section: 3,
-    pos: [9, 0.5, -24],
-    portrait: [3, 4, -26],
-    scale: 10,
+    pos: [13, -3.5, -26],
+    portrait: [3.5, 7, -28],
+    scale: 8,
     yaw: -0.5,
     motion: 'drift',
   },
-  // 深層帶：一隻鮟鱇在右側緩慢游，誘餌是唯一的暖色光
+  // 深層帶：經歷段左半、YEAR 下方的空白，一隻鮟鱇緩慢游，誘餌是全段唯一的暖色光
   {
     species: 'anglerfish',
     section: 4,
-    pos: [5.2, -4.2, -12],
-    portrait: [1.5, 2.5, -14],
-    scale: 3,
+    pos: [-7.4, -4.6, -14],
+    portrait: [5.6, 2, -22],
+    scale: 2.6,
     motion: 'swim',
     head: 'x-',
-    orbit: [1.4, 0.6, 0.08],
+    orbit: [0.8, 0.4, 0.08],
   },
   // 海床：一隻大王具足蟲在泥上爬
   {
@@ -145,7 +131,7 @@ const PLACEMENTS: Placement[] = [
   },
 ];
 
-/** 礁區的岩坡（低多邊形、扁平著色），珊瑚擺在上面 */
+/** 礁區的岩坡，珊瑚擺在上面 */
 function reefRock() {
   const g = new IcosahedronGeometry(1, 2);
   const p = g.attributes.position!;
@@ -159,43 +145,24 @@ function reefRock() {
   return g;
 }
 
-/** 魚的擺尾：沿身體軸往尾巴越擺越大；尾端在哪一頭由 HEAD 決定 */
-function addSwimSway(mat: Material, axis: { min: number; max: number }, head: 'x-' | 'z+', uTime: { value: number }) {
-  mat.onBeforeCompile = (shader) => {
-    shader.uniforms.uTime = uTime;
-    shader.uniforms.uAxis = { value: [axis.min, axis.max] };
-    const along = head === 'x-' ? 'position.x' : 'position.z';
-    const side = head === 'x-' ? 'transformed.z' : 'transformed.x';
-    const tail = head === 'x-' ? 't' : '(1.0 - t)';
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform float uTime;\nuniform vec2 uAxis;')
-      .replace(
-        '#include <begin_vertex>',
-        `#include <begin_vertex>
-        float t = clamp((${along} - uAxis.x) / (uAxis.y - uAxis.x), 0.0, 1.0);
-        float tl = ${tail};
-        ${side} += sin(uTime * 7.0 - tl * 5.0) * (uAxis.y - uAxis.x) * 0.07 * tl * tl;`,
-      );
-  };
-  mat.customProgramCacheKey = () => `sway-${head}`;
-}
-
 const box = new Box3();
 const lurePos = new Vector3();
 const ndc = new Vector3();
+const bulbGeo = new SphereGeometry(1, 12, 8);
 
 function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: number }) {
   const species = FAUNA.find((f) => f.id === p.species)!;
   const slug = species.model!;
   const group = useRef<Group>(null);
-  const lure = useRef<PointLight>(null);
+  const lure = useRef<Mesh>(null);
+  const mats = useRef<ShaderMaterial[]>([]);
   const size = useThree((s) => s.size);
   const gl = useThree((s) => s.gl);
   const camera = useThree((s) => s.camera);
   const scene = useThree((s) => s.scene);
   const invalidate = useThree((s) => s.invalidate);
   const [model, setModel] = useState<Object3D | null>(null);
-  const uTime = useMemo(() => ({ value: 0 }), []);
+  const bulbMat = useMemo(() => new MeshBasicMaterial({ color: '#ffb86b', toneMapped: false, fog: false }), []);
   const lureLocal = useRef(new Vector3());
   const allowed = tier >= 2 || species.primary === true;
 
@@ -207,26 +174,30 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
       .then(async (src) => {
         const obj = src.clone(true);
         box.setFromObject(obj);
+        mats.current = [];
         obj.traverse((o) => {
           if (!(o as Mesh).isMesh) return;
           const mesh = o as Mesh;
           mesh.frustumCulled = false;
-          const mat = (mesh.material as MeshStandardMaterial).clone();
+          const g = mesh.geometry;
+          g.computeBoundingBox();
+          const bb = g.boundingBox!;
+          const sway =
+            p.motion === 'swim' && p.head
+              ? {
+                  head: p.head,
+                  axis: (p.head === 'x-' ? [bb.min.x, bb.max.x] : [bb.min.z, bb.max.z]) as [number, number],
+                }
+              : undefined;
+          // 掃描線間距依顯示大小換算，大小不同的生物看起來是同一把尺掃出來的
+          const mat = scanMaterial({
+            spacing: 0.11 * (p.scale / 3),
+            lines: p.species === 'siphonophore' ? 0.35 : 0.6,
+            opacity: p.species === 'siphonophore' ? 0.55 : 1,
+            sway,
+          });
           mesh.material = mat;
-          if (p.species === 'siphonophore') {
-            mat.transparent = true;
-            mat.opacity = 0.6;
-            mat.depthWrite = false;
-            mat.emissive = new Color('#4ff0d2');
-            mat.emissiveIntensity = 0.12;
-          }
-          if (p.motion === 'swim' && p.head) {
-            const g = mesh.geometry;
-            g.computeBoundingBox();
-            const bb = g.boundingBox!;
-            const axis = p.head === 'x-' ? { min: bb.min.x, max: bb.max.x } : { min: bb.min.z, max: bb.max.z };
-            addSwimSway(mat, axis, p.head, uTime);
-          }
+          mats.current.push(mat);
         });
         if (p.species === 'anglerfish') {
           // 誘餌在頭頂前端（模型頭朝 -x，已正規化成最長邊 1、底部貼 y=0）
@@ -244,7 +215,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     return () => {
       alive = false;
     };
-  }, [enabled, allowed, model, slug, p, gl, camera, scene, uTime]);
+  }, [enabled, allowed, model, slug, p, gl, camera, scene]);
 
   // 掛進場景之後才算完成（測試模式等這個）
   useEffect(() => {
@@ -257,11 +228,11 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     const g = group.current;
     if (!g || !model) return;
     const { pos } = useSiteStore.getState();
-    const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.95);
+    const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.55);
     g.visible = w > 0.001;
     if (!g.visible) return;
     const t = sceneTime(state);
-    uTime.value = t;
+    for (const m of mats.current) m.uniforms.uTime!.value = t;
     const portrait = size.width < size.height;
     const [x, y, z] = portrait && p.portrait ? p.portrait : p.pos;
     const baseY = p.floor ? FLOOR_Y + floorHeight(x, z) : rigY(pos, p.section, 10) + y;
@@ -303,8 +274,10 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
       ndc.copy(lurePos).project(state.camera);
       const d = Math.hypot(ndc.x - state.pointer.x, ndc.y - state.pointer.y);
       const near = isFrozen() ? 0 : 1 - MathUtils.smoothstep(d, 0.08, 0.45);
-      const flicker = isFrozen() ? 0 : Math.sin(t * 3.1) * 0.6 + Math.sin(t * 7.7) * 0.3;
-      lure.current.intensity = 5 + flicker + near * 22;
+      const flicker = isFrozen() ? 0 : Math.sin(t * 3.1) * 0.08 + Math.sin(t * 7.7) * 0.04;
+      // 誘餌：發光的小球（bloom 會讓它暈開），游標靠近時變大變亮
+      lure.current.scale.setScalar(p.scale * (0.022 + 0.016 * near) * (1 + flicker));
+      bulbMat.color.setRGB(1.4 + near * 1.6, 0.75 + near * 0.6, 0.35, SRGBColorSpace);
     }
   });
 
@@ -314,7 +287,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
       <group ref={group}>
         <primitive object={model} />
       </group>
-      {p.species === 'anglerfish' && <pointLight ref={lure} color="#ffb86b" distance={9} decay={1.8} intensity={5} />}
+      {p.species === 'anglerfish' && <mesh ref={lure} geometry={bulbGeo} material={bulbMat} frustumCulled={false} />}
     </>
   );
 }
@@ -326,7 +299,7 @@ function ReefRock() {
   const { geometry, material } = useMemo(
     () => ({
       geometry: reefRock(),
-      material: new MeshStandardMaterial({ color: '#3d5a63', roughness: 0.95, flatShading: true }),
+      material: scanMaterial({ spacing: 0.2, lines: 0.45 }),
     }),
     [],
   );
@@ -334,12 +307,12 @@ function ReefRock() {
     const m = mesh.current;
     if (!m) return;
     const { pos } = useSiteStore.getState();
-    m.visible = sectionWeight(pos, 1, 0.95) > 0.001;
+    m.visible = sectionWeight(pos, 1, 0.55) > 0.001;
     if (!m.visible) return;
     const portrait = size.width < size.height;
-    m.position.set(portrait ? -3 : -9, rigY(pos, 1, 10) + (portrait ? -12 : -10.5), portrait ? -20 : -19);
+    m.position.set(portrait ? -1 : -10, rigY(pos, 1, 10) + (portrait ? -13.6 : -9.6), portrait ? -22 : -22);
   });
-  return <mesh ref={mesh} geometry={geometry} material={material} scale={[7.5, 3.6, 5]} rotation-y={0.4} />;
+  return <mesh ref={mesh} geometry={geometry} material={material} scale={[6.5, 3, 4.5]} rotation-y={0.4} />;
 }
 
 /** 依段落鄰近才載入模型（前後各一段）；測試模式一次全部載入，視覺基準才穩 */

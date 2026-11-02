@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Color, FogExp2, PMREMGenerator, type DirectionalLight, type HemisphereLight } from 'three';
+import { Color, FogExp2, PMREMGenerator, SRGBColorSpace, type DirectionalLight, type HemisphereLight } from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { useSiteStore } from '@/store/useSiteStore';
 import { fogDensity, sunlight, waterColor } from './path';
@@ -53,9 +53,11 @@ export default function Atmosphere() {
       fog.density = 0.0035;
       bg.copy(ABOVE_FOG);
     } else {
+      // waterColor 是 sRGB（和 DOM 的 Backdrop 同一組色票）；setRGB 預設當線性值，會在輸出時被抬亮好幾倍，
+      // 深層帶因此比中層帶還亮。明確指定 sRGB。
       const [r, g, b] = waterColor(Math.max(pos, 0.5));
-      fog.color.setRGB(r, g, b);
-      bg.setRGB(r, g, b);
+      fog.color.setRGB(r, g, b, SRGBColorSpace);
+      bg.setRGB(r, g, b, SRGBColorSpace);
       fog.density = fogDensity(pos);
     }
     const light = sunlight(pos);

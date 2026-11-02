@@ -20,7 +20,7 @@ import { categoryColors } from '@/content/projects';
 import type { ProjectCategory } from '@/content/types';
 import { smoothstep } from '@/lib/math';
 import { createSchool, stepSchool, type Gather } from './boids';
-import { cameraY, sectionWeight } from './path';
+import { cameraY, rigY, sectionWeight } from './path';
 import { isFrozen, sceneDelta, sceneTime } from './time';
 
 /** 一條魚：拉長的身體 + 三角尾鰭，朝 +z 游 */
@@ -48,20 +48,23 @@ const CATEGORIES = Object.keys(categoryColors) as ProjectCategory[];
 const PROJECTS = 3;
 
 /**
- * 魚群：從「關於」一路陪相機游到「作品」；CPU boids + InstancedMesh + 尾巴擺動 shader。
- * 到了中層帶變成燈籠魚，每條魚帶一個作品分類，篩選作品時符合的魚聚成一團（像散點圖被 filter）。
+ * 魚群：CPU boids + InstancedMesh + 尾巴擺動 shader，兩群各活在自己的深度帶：
+ * - reef：透光帶（關於、技能），在畫面下緣的遠處（霧裡只剩剪影），越往下越稀，200 m 前就不見
+ * - lantern：中層帶（作品段）的燈籠魚，身體很暗、腹側有分類色的發光點；
+ *   篩選作品時符合分類的魚聚成一團、其他散開（像散點圖被 filter）
  */
-export default function Fish({ count }: { count: number }) {
+export default function Fish({ count, kind = 'reef' }: { count: number; kind?: 'reef' | 'lantern' }) {
+  const lanternMode = kind === 'lantern';
   const mesh = useRef<InstancedMesh>(null);
   const school = useMemo(() => {
-    const s = createSchool(count, SCENE_SEED + 3);
+    const s = createSchool(count, SCENE_SEED + (lanternMode ? 13 : 3));
     // 先模擬一段時間，讓魚群一出場就是成形的隊伍（固定步長，結果可重現）
     for (let i = 0; i < 90; i++) stepSchool(s, 1 / 20);
     return s;
-  }, [count]);
+  }, [count, lanternMode]);
 
   const { geometry, material } = useMemo(() => {
-    const m = new MeshStandardMaterial({ color: '#ffffff', metalness: 0.65, roughness: 0.32 });
+    const m = new MeshStandardMaterial({ color: '#ffffff', metalness: 0.3, roughness: 0.55 });
     m.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = { value: 0 };
       shader.uniforms.uLantern = { value: 0 };
@@ -114,7 +117,8 @@ export default function Fish({ count }: { count: number }) {
 
   useEffect(() => {
     const rng = createRng(SCENE_SEED + 5);
-    const base = [new Color('#9cc9e8'), new Color('#5fa8d6'), new Color('#e8c690')];
+    // 降飽和、偏水色：遠處的魚群是剪影，不是彩色貼紙
+    const base = [new Color('#7d9fb5'), new Color('#57809b'), new Color('#93907f')];
     const c = new Color();
     for (let i = 0; i < count; i++) {
       c.copy(base[Math.floor(rng() * 2.3)]!).multiplyScalar(0.6 + rng() * 0.35);
@@ -127,23 +131,27 @@ export default function Fish({ count }: { count: number }) {
     const m = mesh.current;
     if (!m) return;
     const pos = useSiteStore.getState().pos;
-    // 透光帶的魚群一路跟到中層帶，在作品段變成燈籠魚
-    const visible = pos > 0.55 && pos < 4.35;
+    const visible = lanternMode ? pos > 2.85 && pos < 4.15 : pos > 0.6 && pos < 2.95;
     m.visible = visible;
     if (!visible) return;
+    // 礁區魚群越往下越稀：只畫前面一部分實例
+    m.count = lanternMode ? count : Math.max(8, Math.round(count * (1 - 0.75 * smoothstep(1.9, 2.9, pos))));
     const shader = material.userData.shader as { uniforms: { uTime: { value: number } } } | undefined;
-    const lantern = smoothstep(2.6, 3.2, pos);
+    const lantern = lanternMode ? 1 : 0;
     if (shader) {
       shader.uniforms.uTime.value = sceneTime(state);
       (shader.uniforms as unknown as { uLantern: { value: number } }).uLantern.value = lantern;
     }
 
-    // 魚群中心：跟著相機，但限制在「關於／技能」的深度帶裡，偏畫面右側前方
+    // 魚群中心：在世界座標的深度帶裡慢慢落後相機（視差），放在畫面下緣的遠處，不壓在文字欄上
     const camY = state.camera.position.y;
-    const minY = cameraY(3.9);
-    const maxY = cameraY(0.9);
     const portrait = state.size.width < state.size.height;
-    center.set(portrait ? 1.5 : 7.5, Math.min(maxY, Math.max(minY, camY - 1)), portrait ? -28 : -24);
+    if (lanternMode) {
+      center.set(portrait ? 2 : 10, rigY(pos, PROJECTS, 8) - 2, portrait ? -30 : -26);
+    } else {
+      const y = Math.min(cameraY(1.1), Math.max(cameraY(2.8), camY - 10));
+      center.set(portrait ? 1 : 6, y, portrait ? -40 : -38);
+    }
     m.position.copy(center);
 
     let avoid: [number, number, number] | null = null;
@@ -170,7 +178,7 @@ export default function Fish({ count }: { count: number }) {
     // 作品篩選：符合分類的魚聚成一團、其他散開（只在作品段的正中間）
     const { projectFilter } = useSiteStore.getState();
     const w = sectionWeight(pos, PROJECTS, 0.9);
-    gather.weight = projectFilter === 'all' ? 0 : smoothstep(0.5, 0.9, w);
+    gather.weight = !lanternMode || projectFilter === 'all' ? 0 : smoothstep(0.5, 0.9, w);
     gather.tag = projectFilter === 'all' ? 0 : CATEGORIES.indexOf(projectFilter);
     stepSchool(school, sceneDelta(delta), avoid, radius, strength, gather);
 

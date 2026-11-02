@@ -53,7 +53,7 @@ export default function Projects() {
               }`}
             >
               {f === 'all' ? '全部' : categoryLabels[f]}
-              <span className="ml-1.5 font-mono text-xs opacity-60 tabular-nums">{counts[f] ?? 0}</span>
+              <span className="ml-1.5 font-mono text-xs opacity-85 tabular-nums">{counts[f] ?? 0}</span>
             </button>
           ))}
         </div>

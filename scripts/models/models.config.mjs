@@ -14,11 +14,9 @@ export const MODELS = {
   // 礁區（About 10–100 m）
   'snooty-wrasse': { tris: 8000, texture: 0, maps: [], bake: true },
   'red-naped-wrasse': { tris: 8000, texture: 0, maps: [], bake: true },
-  damselfish: { tris: null, texture: 512, maps: ['baseColor'] },
   'brain-coral': { tris: 8000, texture: 0, maps: [], bake: true },
   'pavona-coral': { tris: 8000, texture: 0, maps: [], bake: true },
   coral: { tris: null, texture: 0, maps: [] },
-  'soft-coral-set': { tris: 8000, texture: 256, maps: ['baseColor'], keepNodes: true },
   // 中層帶（Projects 200–1000 m）
   siphonophore: { tris: 8000, texture: 0, maps: [], bake: true, blend: true },
   // 深層帶（Experience 1000–3800 m）

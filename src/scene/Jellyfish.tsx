@@ -101,10 +101,11 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
   const items = useMemo(() => {
     const rng = createRng(SCENE_SEED + 21);
     const bell = new SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-    const top = cameraY(2.8);
-    const bottom = cameraY(4.7);
+    const top = cameraY(3.0);
+    const bottom = cameraY(4.3);
     return Array.from({ length: count }, (_, i) => {
-      const color = new Color(COLORS[i % COLORS.length]!);
+      // 降低飽和與亮度：水母是遠處的微光，不能比內容搶眼
+      const color = new Color(COLORS[i % COLORS.length]!).lerp(new Color('#7cc8ff'), 0.45).multiplyScalar(0.5);
       const phase = rng() * 6.28;
       const uniforms = {
         uTime: { value: 0 },
@@ -137,10 +138,10 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
           fog: false,
         }),
         uniforms,
-        x: side * (4 + rng() * 7),
+        x: side * (10 + rng() * 6),
         y: top + (bottom - top) * ((i + rng() * 0.6) / count),
-        z: -9 - rng() * 14,
-        scale: 0.55 + rng() * 0.7,
+        z: -16 - rng() * 16,
+        scale: 0.45 + rng() * 0.5,
         drift: rng() * 6.28,
       };
     });
@@ -152,7 +153,7 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
     const t = sceneTime(state);
     const camY = state.camera.position.y;
     const pos = useSiteStore.getState().pos;
-    if (group.current) group.current.visible = pos > 2.3 && pos < 5.3;
+    if (group.current) group.current.visible = pos > 2.7 && pos < 4.4;
     items.forEach((it, i) => {
       it.uniforms.uTime.value = t;
       it.uniforms.uExcite.value *= Math.exp(-sceneDelta(delta) * 1.4);

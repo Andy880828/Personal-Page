@@ -81,7 +81,6 @@ export default function Skills() {
       aria-labelledby="skills-title"
       className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
-      <div aria-hidden="true" className="scrim" />
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           id="skills"
@@ -172,7 +171,7 @@ export default function Skills() {
               {skills.map((s) => (
                 <li
                   key={s.id}
-                  className={`flex items-center gap-2 transition-opacity ${s.id === active ? 'opacity-100' : 'opacity-50'}`}
+                  className={`flex items-center gap-2 transition-opacity ${s.id === active ? 'opacity-100' : 'opacity-75'}`}
                   style={{ color: s.color }}
                 >
                   <span className="h-px w-6" style={{ background: s.color }} />

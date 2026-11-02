@@ -233,12 +233,12 @@ export default function Seafloor() {
 
   const mats = useMemo(
     () => ({
-      wormTube: new MeshStandardMaterial({ color: '#d9d4c7', roughness: 0.7 }),
+      wormTube: new MeshStandardMaterial({ color: '#6f6c63', roughness: 0.85 }),
       wormPlume: new MeshStandardMaterial({
-        color: '#c8203a',
-        roughness: 0.5,
+        color: '#7a1f2c',
+        roughness: 0.6,
         emissive: new Color('#ff3355'),
-        emissiveIntensity: 0.15,
+        emissiveIntensity: 0.06,
       }),
       floor: contourMaterial(),
       rock: new MeshStandardMaterial({ color: '#253a46', roughness: 0.9, flatShading: true }),

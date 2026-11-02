@@ -39,7 +39,6 @@ export const FAUNA: Species[] = [
     depth: [10, 40],
     model: 'red-naped-wrasse',
   },
-  { id: 'damselfish', nameZh: '雀鯛', name: 'Damselfish', section: 'about', depth: [10, 30], model: 'damselfish' },
   {
     id: 'brain-coral',
     nameZh: '腦珊瑚',
@@ -49,14 +48,6 @@ export const FAUNA: Species[] = [
     model: 'brain-coral',
   },
   { id: 'pavona-coral', nameZh: '葉狀珊瑚', name: 'Pavona', section: 'about', depth: [10, 50], model: 'pavona-coral' },
-  {
-    id: 'soft-coral',
-    nameZh: '軟珊瑚',
-    name: 'Soft corals',
-    section: 'about',
-    depth: [10, 50],
-    model: 'soft-coral-set',
-  },
 
   // 透光帶下緣
   { id: 'reef-school', nameZh: '小型魚群', name: 'Schooling fish', section: 'skills', depth: [100, 180], model: null },

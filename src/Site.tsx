@@ -11,6 +11,7 @@ import Loader from '@/components/Loader';
 import Console from '@/components/Console';
 import { useShortcuts } from '@/hooks/useShortcuts';
 import Backdrop from '@/components/Backdrop';
+import Scrim from '@/components/Scrim';
 import SceneBoundary from '@/components/SceneBoundary';
 import Hero from '@/sections/Hero';
 import About from '@/sections/About';
@@ -130,6 +131,7 @@ export default function Site() {
           </Suspense>
         </SceneBoundary>
       )}
+      <Scrim />
       <Nav />
       <Console />
       {/* 右側儀表（lg 以上）佔 10rem，內容欄位為它讓出空間，不互相覆蓋；1600px 以上才夠寬，不用讓 */}

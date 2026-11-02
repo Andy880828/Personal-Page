@@ -30,6 +30,8 @@ const HEIGHT = BP * dna.riseA * SCALE;
 const RADIUS = 0.9;
 
 const dummy = new Object3D();
+const SLATE = new Color('#36566b');
+const scratch = new Color();
 const up = new Vector3(0, 1, 0);
 const q = new Quaternion();
 const va = new Vector3();
@@ -188,7 +190,13 @@ export default function SkillHelix() {
         scales.current[i] = sc;
         layout(i, sc);
       }
-      const glow = isActive ? 1.1 : isHover ? 0.6 : 0.22;
+      // 只有選到的那段帶顏色，其他段退成接近水色的灰藍：一次只讀一個基因
+      const tint = isActive ? 0 : isHover ? 0.35 : 0.72;
+      scratch.copy(s.color).lerp(SLATE, tint);
+      s.nodes.color.lerp(scratch, k);
+      s.nodes.emissive.lerp(scratch, k);
+      s.rungs.color.lerp(scratch.multiplyScalar(0.55), k);
+      const glow = isActive ? 0.9 : isHover ? 0.45 : 0.08;
       s.nodes.emissiveIntensity = MathUtils.lerp(s.nodes.emissiveIntensity, glow + Math.sin(t * 2 + i) * 0.05, k);
       s.rungs.emissiveIntensity = MathUtils.lerp(s.rungs.emissiveIntensity, isActive ? 0.35 : 0.08, k);
     });

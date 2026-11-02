@@ -16,7 +16,6 @@ export default function About() {
       aria-labelledby="about-title"
       className="relative px-5 pt-28 pb-24 lg:pt-[22vh] lg:pb-[18vh] sm:px-10 lg:px-16"
     >
-      <div aria-hidden="true" className="scrim" />
       <div className="relative mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
         <div>
           <SectionHeader id="about" depth="10 m · 透光帶" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
