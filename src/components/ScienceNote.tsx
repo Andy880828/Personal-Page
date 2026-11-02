@@ -12,7 +12,7 @@ export default function ScienceNote({ section, className = '' }: { section: Note
       aria-label={`科學註記：${n.title}`}
       data-testid="science-note"
       data-reveal
-      className={`max-w-xl rounded-r-2xl border-l-2 border-biolum/50 bg-deep/70 py-4 pr-5 pl-5 ${className}`}
+      className={`max-w-xl rounded-2xl bg-deep/70 px-5 py-4 ${className}`}
     >
       <p className="flex items-center gap-2 font-mono text-[0.7rem] tracking-[0.18em] text-biolum uppercase">
         <FlaskConical size={13} aria-hidden="true" />
