@@ -100,7 +100,7 @@ export default function Console() {
         aria-expanded={open}
         aria-controls="dive-console"
         title="指令列（/）"
-        className="glass fixed right-4 bottom-4 z-30 inline-flex size-11 items-center justify-center rounded-full text-foam transition-colors hover:text-biolum lg:right-6 lg:bottom-6"
+        className="glass fixed bottom-4 left-4 z-30 hidden size-11 items-center justify-center rounded-full text-foam transition-colors hover:text-biolum md:inline-flex lg:bottom-6 lg:left-6"
       >
         <Terminal size={18} aria-hidden="true" />
         <span className="sr-only">開啟指令列</span>
@@ -111,7 +111,7 @@ export default function Console() {
           id="dive-console"
           role="dialog"
           aria-label="指令列"
-          className="fixed right-4 bottom-20 left-4 z-40 max-h-[60vh] rounded-2xl border border-foam/15 bg-abyss/95 font-mono text-sm text-ink sm:left-auto sm:w-[34rem] lg:right-6 lg:bottom-[5.5rem]"
+          className="fixed right-4 bottom-20 left-4 z-40 max-h-[60vh] rounded-2xl border border-foam/15 bg-abyss/95 font-mono text-sm text-ink sm:right-auto sm:w-[34rem] lg:bottom-[5.5rem] lg:left-6"
         >
           <header className="flex items-center justify-between border-b border-foam/10 px-4 py-2 text-[0.7rem] tracking-widest text-mist uppercase">
             <span>dive-console</span>
@@ -125,12 +125,19 @@ export default function Console() {
             aria-live="polite"
             className="max-h-[40vh] overflow-y-auto px-4 py-3 leading-relaxed"
           >
-            {lines.map((l, i) => (
-              <p key={i} className={`whitespace-pre-wrap ${l.kind === 'in' ? 'text-biolum' : 'text-ink/85'}`}>
-                {l.kind === 'in' && <span className="mr-2 text-haze select-none">$</span>}
-                {l.text}
-              </p>
-            ))}
+            {lines.map((l, i) =>
+              l.kind === 'out' && l.text.includes('\t') ? (
+                <p key={i} className="grid grid-cols-[minmax(8rem,auto)_1fr] gap-x-4 text-ink/85">
+                  <span className="text-foam">{l.text.split('\t')[0]}</span>
+                  <span>{l.text.split('\t')[1]}</span>
+                </p>
+              ) : (
+                <p key={i} className={`whitespace-pre-wrap ${l.kind === 'in' ? 'text-biolum' : 'text-ink/85'}`}>
+                  {l.kind === 'in' && <span className="mr-2 text-haze select-none">$</span>}
+                  {l.text}
+                </p>
+              ),
+            )}
           </div>
           <label className="flex items-center gap-2 border-t border-foam/10 px-4 py-2">
             <span className="text-biolum" aria-hidden="true">

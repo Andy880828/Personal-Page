@@ -52,7 +52,7 @@ export default function Hero() {
             </a>
           </div>
           <p className="mt-8 font-mono text-xs text-foam/85 tabular-nums [text-shadow:0_1px_10px_rgb(1_4_9/0.8)]">
-            0 m · 22.6°N 120.3°E · {profile.hometown} · 1 atm · 25.5 °C
+            0 m · 22.6°N 120.3°E · {profile.hometown}
           </p>
         </div>
       </div>

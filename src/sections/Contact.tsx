@@ -100,40 +100,62 @@ export default function Contact() {
           </div>
 
           <div data-reveal>
-            <form onSubmit={onSubmit} className="panel rounded-3xl p-7 sm:p-9" aria-describedby="contact-status">
-              <h3 className="text-xl font-bold text-foam">寄一封信給我</h3>
-              <div className="mt-6 grid gap-4">
-                <label className="grid gap-1.5 text-sm text-mist">
-                  姓名
-                  <input name="user_name" required autoComplete="name" className={field} />
-                </label>
-                <label className="grid gap-1.5 text-sm text-mist">
-                  Email（我會回信到這裡）
-                  <input name="user_email" type="email" required autoComplete="email" className={field} />
-                </label>
-                <label className="grid gap-1.5 text-sm text-mist">
-                  訊息
-                  <textarea name="message" required rows={5} className={`${field} resize-y`} />
-                </label>
+            {!emailReady ? (
+              <div className="panel rounded-3xl p-7 sm:p-9">
+                <h3 className="text-xl font-bold text-foam">直接找我</h3>
+                <p className="mt-3 text-ink/85">最快的方式是在 GitHub 開 issue 或留言，履歷上也有聯絡方式。</p>
+                <ul className="mt-6 grid gap-3">
+                  {links.map((l) => (
+                    <li key={l.label}>
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-between rounded-xl border border-foam/15 px-4 py-3 text-foam transition-colors hover:border-biolum/60 hover:text-biolum"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          {l.icon}
+                          {l.label}
+                        </span>
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <button
-                type="submit"
-                disabled={!emailReady || status === 'sending'}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-biolum px-6 py-3 font-medium text-deep transition-transform enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Send size={16} aria-hidden="true" />
-                {status === 'sending' ? '送出中…' : '送出'}
-              </button>
-              <p id="contact-status" role="status" className="mt-4 min-h-6 text-sm">
-                {!emailReady && (
-                  <span className="text-mist">表單暫時關閉，可以先到 GitHub 找我，或看履歷上的聯絡方式。</span>
-                )}
-                {status === 'sent' && <span className="text-biolum">收到了，我會盡快回覆你。</span>}
-                {status === 'error' && (
-                  <span className="text-coral">送出失敗了，內容還在，稍後再按一次送出；也可以先到 GitHub 找我。</span>
-                )}
-              </p>
-            </form>
+            ) : (
+              <form onSubmit={onSubmit} className="panel rounded-3xl p-7 sm:p-9" aria-describedby="contact-status">
+                <h3 className="text-xl font-bold text-foam">寄一封信給我</h3>
+                <div className="mt-6 grid gap-4">
+                  <label className="grid gap-1.5 text-sm text-mist">
+                    姓名
+                    <input name="user_name" required autoComplete="name" className={field} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm text-mist">
+                    Email（我會回信到這裡）
+                    <input name="user_email" type="email" required autoComplete="email" className={field} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm text-mist">
+                    訊息
+                    <textarea name="message" required rows={5} className={`${field} resize-y`} />
+                  </label>
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-biolum px-6 py-3 font-medium text-deep transition-transform enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Send size={16} aria-hidden="true" />
+                  {status === 'sending' ? '送出中…' : '送出'}
+                </button>
+                <p id="contact-status" role="status" className="mt-4 min-h-6 text-sm">
+                  {status === 'sent' && <span className="text-biolum">收到了，我會盡快回覆你。</span>}
+                  {status === 'error' && (
+                    <span className="text-coral">送出失敗了，內容還在，稍後再按一次送出；也可以先到 GitHub 找我。</span>
+                  )}
+                </p>
+              </form>
+            )}
           </div>
         </div>
 

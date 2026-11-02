@@ -110,11 +110,19 @@ export function lightFraction(depth: number, k: number = ATTENUATION.par): numbe
   return Math.exp(-k * Math.max(0, depth));
 }
 
-/** 格式化成百分比，很小的值用科學記號 */
+const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup = (n: number) =>
+  String(n)
+    .split('')
+    .map((c) => (c === '-' ? '⁻' : SUP[Number(c)]))
+    .join('');
+
+/** 格式化成表層光的比例：1% 以上用百分比，更小的用 10 的次方（曙光帶還有微光，不寫成 0） */
 export function formatLight(fraction: number): string {
   if (fraction >= 0.01) return `${(fraction * 100).toFixed(0)}%`;
-  if (fraction >= 1e-6) return `${(fraction * 100).toPrecision(2)}%`;
-  return '≈0';
+  if (fraction >= 1e-4) return `${(fraction * 100).toPrecision(2)}%`;
+  if (fraction < 1e-30) return '0';
+  return `10${sup(Math.round(Math.log10(fraction)))}`;
 }
 
 /** 斯涅爾窗：水下往上看，整個天空被壓縮在約 97° 的圓錐內（2·asin(1/1.33)） */

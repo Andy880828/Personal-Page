@@ -40,7 +40,8 @@ describe('海洋科學換算', () => {
     expect(lightFraction(10, ATTENUATION.red)).toBeLessThan(0.05);
     expect(formatLight(1)).toBe('100%');
     expect(formatLight(0.001)).toBe('0.10%');
-    expect(formatLight(1e-12)).toBe('≈0');
+    expect(formatLight(1e-12)).toBe('10⁻¹²');
+    expect(formatLight(3e-7)).toBe('10⁻⁷');
   });
 
   it('分層帶與段落的深度一致', () => {

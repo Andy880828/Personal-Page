@@ -8,7 +8,7 @@ const inView = async (page: import('@playwright/test').Page, id: string) =>
   }, id);
 
 test.describe('指令列與快捷鍵', () => {
-  test('按 / 開啟、help 列指令、goto 捲動、Esc 關閉並把焦點還給按鈕', async ({ page }) => {
+  test('按 / 開啟、help 列指令、goto 捲動、Esc 關閉並把焦點還給按鈕', async ({ page }, info) => {
     const errors = collectErrors(page);
     await openTestMode(page);
     await page.keyboard.press('/');
@@ -27,7 +27,8 @@ test.describe('指令列與快捷鍵', () => {
     await expect(dialog.getByRole('log')).toContainText('深層帶');
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
-    await expect(page.getByRole('button', { name: '開啟指令列' })).toBeFocused();
+    // 開啟按鈕只在 md 以上顯示；手機用鍵盤 / 開啟，關閉後沒有按鈕可還焦點
+    if (info.project.name !== 'mobile') await expect(page.getByRole('button', { name: '開啟指令列' })).toBeFocused();
     expect(errors).toEqual([]);
   });
 

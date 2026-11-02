@@ -89,13 +89,13 @@ export default function Skills() {
           title="一段序列，五個基因"
           lead={
             tier
-              ? '像 eDNA 一樣把技能讀出來：拖曳右邊的雙螺旋、點任一區段，或用下面的分頁切換。'
+              ? '像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能；大螢幕上也可以拖曳右邊的雙螺旋、點任一區段。'
               : '像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能。'
           }
         />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
-          <div data-reveal>
+          <div data-reveal className="min-w-0">
             <div role="tablist" aria-label="技能分類" className="flex flex-wrap gap-2">
               {skills.map((s, i) => {
                 const selected = s.id === active;
@@ -112,7 +112,7 @@ export default function Skills() {
                     onKeyDown={(e) => onKeyDown(e, i)}
                     onPointerEnter={() => setHover(s.id)}
                     onPointerLeave={() => setHover(null)}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
+                    className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
                       selected ? 'border-transparent bg-foam text-deep' : 'hairline text-mist hover:text-foam'
                     }`}
                   >
@@ -128,7 +128,7 @@ export default function Skills() {
               role="tabpanel"
               aria-labelledby={`skill-tab-${current.id}`}
               tabIndex={0}
-              className="panel mt-6 rounded-3xl p-7 sm:p-9"
+              className="panel mt-6 overflow-hidden rounded-3xl p-7 sm:p-9"
             >
               <p className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: current.color }}>
                 {current.nameEn}
@@ -136,7 +136,10 @@ export default function Skills() {
                   locus skill/{current.id} · {current.tools.length} tools
                 </span>
               </p>
-              <p aria-hidden="true" className="mt-1 truncate font-mono text-[0.68rem] tracking-[0.08em] text-haze">
+              <p
+                aria-hidden="true"
+                className="mt-1 hidden truncate font-mono text-[0.68rem] tracking-[0.08em] text-haze sm:block"
+              >
                 5′ {pseudoSequence(current.id)} 3′
               </p>
               <h3 className="mt-2 text-2xl font-bold text-foam sm:text-3xl">{current.name}</h3>
@@ -166,7 +169,7 @@ export default function Skills() {
           {/* 右欄：有 3D 時留白給雙螺旋，右緣放區段圖例；沒有 3D（tier 0）時畫一條靜態的 SVG 雙螺旋 */}
           <div aria-hidden="true" className="relative hidden min-h-[28rem] lg:block">
             {tier === 0 && <HelixFallback active={active} />}
-            <ol className="absolute top-6 right-0 flex flex-col gap-5 font-mono text-[0.66rem] tracking-[0.18em] uppercase">
+            <ol className="absolute top-6 left-0 flex flex-col gap-5 font-mono text-[0.66rem] tracking-[0.18em] uppercase">
               {skills.map((s) => (
                 <li
                   key={s.id}

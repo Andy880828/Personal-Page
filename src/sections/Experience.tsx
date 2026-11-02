@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSiteStore } from '@/store/useSiteStore';
 import { experience } from '@/content/experience';
 import type { ExperienceItem } from '@/content/types';
 import { useReveal } from '@/hooks/useReveal';
-import { formatDepth } from '@/lib/scroll';
 import SectionHeader from '@/components/SectionHeader';
 import ScienceNote from '@/components/ScienceNote';
 
@@ -19,18 +17,6 @@ export default function Experience() {
   useReveal(scope);
   const [active, setActive] = useState(0);
   const items = useRef<(HTMLLIElement | null)[]>([]);
-  const depthRef = useRef<HTMLSpanElement>(null);
-
-  // 深度讀數與右側深度計共用同一個來源（捲動位置），不會出現兩個不同的數字
-  useEffect(() => {
-    const apply = (d: number) => {
-      if (depthRef.current) depthRef.current.textContent = formatDepth(d);
-    };
-    apply(useSiteStore.getState().depth);
-    return useSiteStore.subscribe((s, prev) => {
-      if (s.depth !== prev.depth) apply(s.depth);
-    });
-  }, []);
 
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -61,12 +47,7 @@ export default function Experience() {
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}
           <div aria-hidden="true" className="hidden lg:block">
             <div className="sticky top-[30vh] font-mono">
-              <p className="text-xs tracking-[0.25em] text-haze uppercase">depth</p>
-              <p className="text-5xl text-foam tabular-nums">
-                <span ref={depthRef}>1,000</span>
-                <span className="ml-2 text-lg text-mist">m</span>
-              </p>
-              <p className="mt-8 text-xs tracking-[0.25em] text-haze uppercase">year</p>
+              <p className="text-xs tracking-[0.25em] text-haze uppercase">year</p>
               <p className="text-[6rem] leading-none font-bold text-biolum tabular-nums">{current.start.slice(0, 4)}</p>
             </div>
           </div>

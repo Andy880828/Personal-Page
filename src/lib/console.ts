@@ -67,7 +67,7 @@ export function ctdReport(depth: number): string[] {
     `zone      ${z.zh}（${z.en}, ${z.from}–${z.to} m）`,
     `pressure  ${pressureAtm(d).toFixed(1)} atm`,
     `temp      ${temperatureC(d).toFixed(1)} °C（典型亞熱帶西北太平洋剖面，概略）`,
-    `light     ${formatLight(lightFraction(d))} of surface PAR`,
+    `light     ${formatLight(lightFraction(d))} of surface light`,
   ];
 }
 
@@ -79,7 +79,8 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
       return { lines: [] };
     case 'help':
     case '?':
-      return { lines: COMMANDS.map((c) => `${c.usage.padEnd(30)} ${c.help}`) };
+      // 用 tab 分隔用法與說明，由畫面排成兩欄（padEnd 在中文寬度下對不齊）
+      return { lines: COMMANDS.map((c) => `${c.usage}\t${c.help}`) };
     case 'ls': {
       if (!arg || arg === 'sections')
         return {
