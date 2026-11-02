@@ -95,14 +95,14 @@ describe('場景內容依 GPU 等級變化', () => {
     expect(t2.maxPoints).toBeGreaterThan(t1.maxPoints);
   });
 
-  it('所有主要元件都有掛上：水面、天空、五顆氣泡、水母、海床', async () => {
+  it('所有主要元件都有掛上：水面、天空、雙螺旋、水母、海床、礁岩', async () => {
     const r = await render(2);
     const meshes = r.scene.findAll((n) => (n.instance as { type?: string }).type === 'Mesh');
-    // 5 顆氣泡 + 5 個核心 + 水面 + 天空 + 9 道光束 + 探測器 5 + 7 隻水母 + 海床（地形、岩塊、煙囪）
+    // 雙螺旋 + 水面 + 天空 + 9 道光束 + 7 隻水母 + 海床（地形、岩塊、煙囪）+ 礁岩；模型是非同步載入，不算在這裡
     expect(meshes.length).toBeGreaterThan(40);
     expect(
       r.scene.findAll((n) => (n.instance as { isLineSegments?: boolean }).isLineSegments === true).length,
-    ).toBeGreaterThanOrEqual(8);
+    ).toBeGreaterThanOrEqual(7);
     await r.unmount();
   });
 });

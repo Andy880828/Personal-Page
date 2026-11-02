@@ -22,6 +22,8 @@ export interface SiteState {
   sceneProgress: number;
   sceneReady: boolean;
   consoleOpen: boolean;
+  /** 指令 ascii on：整個畫面以字元渲染（tier ≥ 2 的後製） */
+  ascii: boolean;
   /** 最近一次在畫面上的點擊（正規化座標 -1..1 與時間戳），給魚群驚散、聲納 ping 用 */
   pulse: { x: number; y: number; t: number } | null;
   setScroll: (pos: number, depth: number, velocity: number, section: SectionId) => void;
@@ -34,6 +36,7 @@ export interface SiteState {
   setSceneProgress: (p: number) => void;
   setSceneReady: (v: boolean) => void;
   setConsoleOpen: (v: boolean) => void;
+  setAscii: (v: boolean) => void;
   firePulse: (x: number, y: number) => void;
 }
 
@@ -70,12 +73,13 @@ export const useSiteStore = create<SiteState>()((set, get) => ({
   tier: null,
   systemReducedMotion: initialSystemReduced(),
   motionPref: initialMotionPref(),
-  activeSkill: 'frontend',
+  activeSkill: 'mining',
   hoverSkill: null,
   projectFilter: 'all',
   sceneProgress: 0,
   sceneReady: false,
   consoleOpen: false,
+  ascii: false,
   pulse: null,
   setScroll: (pos, depth, velocity, section) => {
     if (get().section !== section) set({ pos, depth, velocity, section });
@@ -90,6 +94,7 @@ export const useSiteStore = create<SiteState>()((set, get) => ({
   setSceneProgress: (sceneProgress) => set({ sceneProgress }),
   setSceneReady: (sceneReady) => set({ sceneReady }),
   setConsoleOpen: (consoleOpen) => set({ consoleOpen }),
+  setAscii: (ascii) => set({ ascii }),
   firePulse: (x, y) => set({ pulse: { x, y, t: performance.now() } }),
 }));
 

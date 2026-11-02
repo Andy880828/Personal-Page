@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Terminal, X } from 'lucide-react';
-import { runCommand } from '@/lib/console';
+import { promptFor, runCommand } from '@/lib/console';
 import { scrollToDepth, scrollToSection } from '@/lib/scroller';
 import { isReducedMotion, saveMotionPref, useSiteStore } from '@/store/useSiteStore';
 
 interface Line {
   kind: 'in' | 'out';
   text: string;
+  /** 輸入行：當時的提示字元 */
+  prompt?: string;
 }
 
 const GREETING: Line[] = [{ kind: 'out', text: 'dive-console 2.0 · 輸入 help 看指令，Esc 關閉' }];
@@ -24,6 +26,9 @@ export default function Console() {
   const input = useRef<HTMLInputElement>(null);
   const log = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
+  // 提示字元跟著段落換（深度就是目前目錄）
+  const section = useSiteStore((s) => s.section);
+  const prompt = `~/ocean/${section} $`;
 
   useEffect(() => {
     if (open) input.current?.focus();
@@ -40,10 +45,10 @@ export default function Console() {
 
   const submit = (raw: string) => {
     const s = useSiteStore.getState();
-    const result = runCommand(raw, { depth: s.depth, tier: s.tier, reduced: isReducedMotion(s) });
+    const result = runCommand(raw, { depth: s.depth, tier: s.tier, reduced: isReducedMotion(s), ascii: s.ascii });
     const next: Line[] = [
       ...lines,
-      { kind: 'in', text: raw },
+      { kind: 'in', text: raw, prompt: promptFor(s.depth) },
       ...result.lines.map((t) => ({ kind: 'out' as const, text: t })),
     ];
     setLines(next);
@@ -67,6 +72,9 @@ export default function Console() {
       case 'motion':
         s.setMotionPref(a.reduce ? 'reduce' : 'full');
         saveMotionPref(a.reduce ? 'reduce' : 'full');
+        break;
+      case 'ascii':
+        s.setAscii(a.on);
         break;
       case 'clear':
         setLines([]);
@@ -133,15 +141,15 @@ export default function Console() {
                 </p>
               ) : (
                 <p key={i} className={`whitespace-pre-wrap ${l.kind === 'in' ? 'text-biolum' : 'text-ink/85'}`}>
-                  {l.kind === 'in' && <span className="mr-2 text-haze select-none">$</span>}
+                  {l.kind === 'in' && <span className="mr-2 text-haze select-none">{l.prompt ?? '$'}</span>}
                   {l.text}
                 </p>
               ),
             )}
           </div>
           <label className="flex items-center gap-2 border-t border-foam/10 px-4 py-2">
-            <span className="text-biolum" aria-hidden="true">
-              $
+            <span className="shrink-0 text-biolum" aria-hidden="true">
+              {prompt}
             </span>
             <span className="sr-only">輸入指令</span>
             <input

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { formatDepth } from '@/lib/scroll';
 import { useSiteStore } from '@/store/useSiteStore';
-import { formatLight, lightFraction, pressureAtm, temperatureC, zoneAt } from '@/content/science';
+import { formatLight, lightFraction, pressureAtm, temperatureC } from '@/content/science';
 
 /** 深度（公尺）→ 刻度位置 0–1：對數尺度，淺水的變化（溫躍層、光的衰減）才看得到，像真正的 CTD 剖面圖 */
 const MAX_DEPTH = 4000;
@@ -37,13 +37,12 @@ function useProfilePaths() {
 }
 
 /**
- * 右側儀表：深度計 + CTD 剖面 + 遙測讀數（壓力、溫度、光）。
+ * 右側儀表：深度計 + 溫度與光的剖面 + 三個讀數（壓力、溫度、光），不加任何文字標籤。
  * 所有數字用 subscribe 直接改 DOM，不觸發 React 重繪。
  * 螢幕閱讀器不需要每一幀的深度，所以整塊 aria-hidden；段落資訊由導覽列的 aria-current 提供。
  */
 export default function DepthHUD() {
   const depthEl = useRef<HTMLSpanElement>(null);
-  const zoneEl = useRef<HTMLSpanElement>(null);
   const pressEl = useRef<HTMLSpanElement>(null);
   const tempEl = useRef<HTMLSpanElement>(null);
   const lightEl = useRef<HTMLSpanElement>(null);
@@ -58,8 +57,6 @@ export default function DepthHUD() {
       if (d === lastDepth) return;
       lastDepth = d;
       if (depthEl.current) depthEl.current.textContent = formatDepth(d);
-      const z = zoneAt(d);
-      if (zoneEl.current) zoneEl.current.textContent = d >= 3990 ? '海床' : d < 1 ? '海面' : `${z.zh} · ${z.en}`;
       if (pressEl.current) pressEl.current.textContent = pressureAtm(d).toFixed(d < 100 ? 1 : 0);
       if (tempEl.current) tempEl.current.textContent = temperatureC(d).toFixed(1);
       if (lightEl.current) lightEl.current.textContent = formatLight(lightFraction(d));
@@ -79,22 +76,10 @@ export default function DepthHUD() {
   return (
     <div aria-hidden="true" className="pointer-events-none">
       <div
-        className="fixed top-24 right-4 z-30 hidden w-[11.5rem] rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono lg:block"
+        className="fixed top-24 right-4 z-30 hidden w-[9rem] rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono lg:block"
         data-testid="hud"
       >
-        <p className="flex items-center justify-between text-[0.7rem] tracking-[0.18em] text-mist uppercase">
-          telemetry
-          <span className="flex gap-2 normal-case tracking-normal">
-            <span>
-              <span className="mr-1 inline-block h-px w-3 bg-ember align-middle" />T
-            </span>
-            <span>
-              <span className="mr-1 inline-block h-px w-3 bg-foam/50 align-middle" />光
-            </span>
-          </span>
-        </p>
-
-        <div className="mt-2 flex gap-3">
+        <div className="flex gap-3">
           {/* 深度刻度 */}
           <div className="relative h-[26vh] w-px bg-foam/15">
             {TICKS.map((t) => (
@@ -152,23 +137,18 @@ export default function DepthHUD() {
             <span ref={depthEl}>0</span>
             <span className="ml-1 text-xs text-mist">m</span>
           </div>
-          <span ref={zoneEl} className="block text-[0.7rem] tracking-widest text-ink/85">
-            海面
-          </span>
-          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[0.72rem] tabular-nums">
-            <dt className="text-haze">壓力</dt>
-            <dd className="text-right text-ink">
+          {/* 只留數值與單位，不寫名稱：壓力、水溫（琥珀，對應剖面曲線）、表層光的比例 */}
+          <p className="mt-1 grid gap-y-0.5 text-right text-[0.72rem] tabular-nums">
+            <span className="text-ink">
               <span ref={pressEl}>1.0</span> atm
-            </dd>
-            <dt className="text-haze">水溫</dt>
-            <dd className="text-right text-ember">
+            </span>
+            <span className="text-ember">
               <span ref={tempEl}>25.5</span> °C
-            </dd>
-            <dt className="text-haze">光</dt>
-            <dd className="text-right text-ink">
+            </span>
+            <span className="text-ink">
               <span ref={lightEl}>100%</span>
-            </dd>
-          </dl>
+            </span>
+          </p>
         </div>
       </div>
     </div>

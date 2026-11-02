@@ -13,10 +13,11 @@ import MarineSnow from './MarineSnow';
 import Fish from './Fish';
 import SkillHelix from './SkillHelix';
 import CursorLight from './CursorLight';
-import ProjectProbe from './ProjectProbe';
 import Jellyfish from './Jellyfish';
 import Plankton from './Plankton';
 import Seafloor from './Seafloor';
+import Fauna from './Fauna';
+import { pendingModels } from './models';
 import { SKY_HEIGHT } from './path';
 
 const Effects = lazy(() => import('./Effects'));
@@ -99,6 +100,8 @@ function ReadyProbe() {
       p.last = now;
     }
     if (!compiled.current) return;
+    // 測試模式：等模型都掛進場景才算就緒（視覺基準要包含牠們）
+    if (flags.test && pendingModels() > 0) return;
     frames.current++;
     if (frames.current === 2) {
       useSiteStore.getState().setSceneProgress(1);
@@ -110,7 +113,7 @@ function ReadyProbe() {
 }
 
 /** 場景內容（不含 Canvas），依 GPU 等級的預算決定數量；單元測試直接渲染這一層 */
-export function SceneContents({ budget }: { budget: ReturnType<typeof sceneBudget> }) {
+export function SceneContents({ budget, tier = 2 }: { budget: ReturnType<typeof sceneBudget>; tier?: number }) {
   return (
     <>
       <CameraRig />
@@ -122,10 +125,10 @@ export function SceneContents({ budget }: { budget: ReturnType<typeof sceneBudge
       <Fish count={budget.fish} />
       <SkillHelix />
       <CursorLight />
-      <ProjectProbe />
       <Jellyfish />
       <Plankton count={budget.plankton} />
       <Seafloor />
+      <Fauna tier={tier} />
     </>
   );
 }
@@ -173,7 +176,7 @@ export default function SceneRoot() {
         {!flags.test && <PerformanceMonitor onDecline={() => setDegraded(true)} flipflops={2} />}
         <Invalidator />
         <ReadyProbe />
-        <SceneContents budget={budget} />
+        <SceneContents budget={budget} tier={tier ?? 1} />
         {budget.postprocessing && (
           <Suspense fallback={null}>
             <Effects />

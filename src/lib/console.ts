@@ -3,7 +3,7 @@ import { formatDepth } from './scroll';
 import { projects, categoryLabels } from '@/content/projects';
 import { skills } from '@/content/skills';
 import { profile } from '@/content/profile';
-import { formatLight, lightFraction, pressureAtm, temperatureC, zoneAt } from '@/content/science';
+import { formatLight, lightFraction, NOTES, pressureAtm, SOURCES, temperatureC, zoneAt } from '@/content/science';
 
 /**
  * 站內指令列的純邏輯：輸入一行字，回傳要印的行與要做的動作。
@@ -14,6 +14,7 @@ export type ConsoleAction =
   | { type: 'dive'; depth: number }
   | { type: 'tier'; tier: number }
   | { type: 'motion'; reduce: boolean }
+  | { type: 'ascii'; on: boolean }
   | { type: 'clear' }
   | { type: 'close' };
 
@@ -26,18 +27,53 @@ export interface ConsoleContext {
   depth: number;
   tier: number | null;
   reduced: boolean;
+  ascii?: boolean;
+}
+
+/** 深度 → 所在段落（指令列的「目前目錄」） */
+export function sectionAtDepth(depth: number): SectionId {
+  const d = Math.max(0, depth);
+  return (SECTIONS.find((s) => d < s.depthEnd) ?? SECTIONS[SECTIONS.length - 1]!).id;
+}
+
+/** 提示字元：深度就是目前目錄 */
+export function promptFor(depth: number): string {
+  return `~/ocean/${sectionAtDepth(depth)} $`;
+}
+
+/** 每一段 `ls` 列得出來、可以 `cat` 的東西 */
+function listing(section: SectionId): string[] {
+  if (section === 'skills') return [...skills.map((s) => s.id), 'zone'];
+  if (section === 'projects') return [...projects.map((p) => p.slug), 'zone'];
+  return ['zone'];
+}
+
+/** 這一段深度帶的說明與來源（網站畫面上不寫，想看的人用 cat zone） */
+function zoneReport(section: SectionId): string[] {
+  const n = NOTES.find((x) => x.section === section);
+  if (!n) return ['cat: 這裡沒有 zone'];
+  return [
+    `# ${n.title}`,
+    n.body,
+    `畫面：${n.seen}`,
+    ...n.sources.map((id) => {
+      const src = SOURCES.find((x) => x.id === id)!;
+      return `[${id}] ${src.title}  ${src.url}`;
+    }),
+  ];
 }
 
 export const COMMANDS: { name: string; usage: string; help: string }[] = [
   { name: 'help', usage: 'help', help: '列出所有指令' },
-  { name: 'ls', usage: 'ls [sections|projects|skills]', help: '列出段落、作品或技能' },
+  { name: 'ls', usage: 'ls [sections|projects|skills]', help: '列出目前這段可以 cat 的東西，或段落、作品、技能' },
   { name: 'goto', usage: 'goto <section>', help: '捲到某段：about、skills、projects、experience、contact、hero' },
   { name: 'dive', usage: 'dive <公尺>', help: '潛到指定深度（0–4000）' },
   { name: 'ctd', usage: 'ctd', help: '目前深度的壓力、水溫、光量與分層' },
-  { name: 'cat', usage: 'cat <skill|project>', help: '顯示一組技能或一個作品的細節' },
+  { name: 'cat', usage: 'cat <skill|project|zone>', help: '顯示技能、作品，或這段深度帶的說明與來源' },
   { name: 'whoami', usage: 'whoami', help: '這個網站的主人' },
   { name: 'tier', usage: 'tier [0-3]', help: '查看或切換 3D 等級（切換會重新載入）' },
   { name: 'motion', usage: 'motion on|off', help: '開關動態效果' },
+  { name: 'ascii', usage: 'ascii on|off', help: '整個畫面改用字元畫（需要 3D 與動態效果）' },
   { name: 'clear', usage: 'clear', help: '清空畫面' },
   { name: 'exit', usage: 'exit', help: '關閉指令列（或按 Esc）' },
 ];
@@ -82,7 +118,8 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
       // 用 tab 分隔用法與說明，由畫面排成兩欄（padEnd 在中文寬度下對不齊）
       return { lines: COMMANDS.map((c) => `${c.usage}\t${c.help}`) };
     case 'ls': {
-      if (!arg || arg === 'sections')
+      if (!arg) return { lines: [listing(sectionAtDepth(ctx.depth)).join('  ')] };
+      if (arg === 'sections')
         return {
           lines: SECTIONS.map((s) => `${s.id.padEnd(12)} ${formatDepth(s.depthStart).padStart(6)} m  ${s.label}`),
         };
@@ -110,6 +147,7 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
     case 'ctd':
       return { lines: ctdReport(ctx.depth) };
     case 'cat': {
+      if (arg === 'zone') return { lines: zoneReport(sectionAtDepth(ctx.depth)) };
       const sk = skills.find((s) => s.id === arg || s.name === args.join(' '));
       if (sk)
         return {
@@ -147,6 +185,12 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
       if (arg !== 'on' && arg !== 'off')
         return { lines: [`motion: 目前${ctx.reduced ? 'off' : 'on'}；用 motion on 或 motion off`] };
       return { lines: [`motion ${arg}`], action: { type: 'motion', reduce: arg === 'off' } };
+    }
+    case 'ascii': {
+      if (arg !== 'on' && arg !== 'off')
+        return { lines: [`ascii: 目前${ctx.ascii ? 'on' : 'off'}；用 ascii on 或 ascii off`] };
+      const note = ctx.tier !== null && ctx.tier < 2 ? '（這個 3D 等級沒有後製，看不到效果）' : '';
+      return { lines: [`ascii ${arg}${note}`], action: { type: 'ascii', on: arg === 'on' } };
     }
     case 'clear':
       return { lines: [], action: { type: 'clear' } };

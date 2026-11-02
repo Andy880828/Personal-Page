@@ -5,9 +5,8 @@ import { useReveal } from '@/hooks/useReveal';
 import { useSiteStore } from '@/store/useSiteStore';
 import SectionHeader from '@/components/SectionHeader';
 import ProjectCard from '@/components/ProjectCard';
-import ScienceNote from '@/components/ScienceNote';
 
-const FILTERS: (ProjectCategory | 'all')[] = ['all', 'agent', 'selfhost', 'data', 'web', 'bio'];
+const FILTERS: (ProjectCategory | 'all')[] = ['all', 'mining', 'viz', 'workflow', 'agent', 'web'];
 
 export default function Projects() {
   const scope = useRef<HTMLElement>(null);
@@ -39,7 +38,7 @@ export default function Projects() {
           id="projects"
           depth="200 m · 中層帶"
           title="最近在潛的地方"
-          lead="2026 年起專注在給 AI agent 用的 CLI 與自架服務；網站與 eDNA 資料流是更早的作品，也一起留在這裡。"
+          lead="現在主要做三件事：從資料裡找答案、把流程做成系統、讓程式替人跑完一段工作。網站與 eDNA 資料流是更早的作品，也留在這裡。"
         />
 
         <div role="group" aria-label="依類別篩選作品" className="mt-10 flex flex-wrap gap-2" data-reveal>
@@ -103,7 +102,6 @@ export default function Projects() {
             </ul>
           </div>
         )}
-        <ScienceNote section="projects" className="mt-16" />
       </div>
     </section>
   );

@@ -1,13 +1,13 @@
 export const profile = {
   name: '林敬勛',
   nameEn: 'Ching-Hsun Lin',
-  role: 'Full-stack & Data Engineer',
+  role: 'Data & Workflow Engineer',
   roleSecond: 'Oceanographer',
-  roleZh: '全端與資料工程師，海洋科學出身',
+  roleZh: '資料與流程工程師，海洋科學出身',
   hometown: '高雄',
   intro: [
     '我來自高雄，在中山大學讀完海洋科學系與研究所，碩士做的是溪流環境 DNA（eDNA）。',
-    '後來轉進軟體：從 Vue、ASP.NET 的全端網站，到台郡科技的數據分析，再到現在專心做「給 AI agent 用的工具」與自架服務。',
+    '後來轉進軟體：從 Vue、ASP.NET 的全端網站，到台郡科技的數據分析；現在專注在資料探勘與數據可視化、工作流程數位化，以及把 agent 放進實際流程裡。',
     '我喜歡把混亂的資料整理成可以被驗證的系統，不管那份資料來自一條溪、一台伺服器，還是一份減脂挑戰賽的 InBody 報告。',
   ],
   links: {

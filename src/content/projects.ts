@@ -1,19 +1,23 @@
 import type { Project, ProjectCategory } from './types';
+import { skills } from './skills';
 
 export const categoryLabels: Record<ProjectCategory, string> = {
-  agent: 'Agent 工具',
-  selfhost: '自架',
-  data: '資料',
+  mining: '資料探勘',
+  viz: '數據可視化',
+  workflow: '流程數位化',
+  agent: 'Agent 應用',
   web: '網站',
-  bio: '生物',
 };
+
+/** 分類顏色：分類 id 與技能 id 一一對應，顏色跟雙螺旋同一組 */
+export const categoryColors = Object.fromEntries(skills.map((s) => [s.id, s.color])) as Record<ProjectCategory, string>;
 
 export const projects: Project[] = [
   {
     slug: 'syssec',
     name: 'syssec',
-    nameZh: '主機安全態勢 CLI',
-    summary: '給 AI agent 用的主機安全稽核與漏洞情資 CLI：單一靜態執行檔，跨 Linux、macOS、Windows。',
+    nameZh: '主機安全稽核 CLI',
+    summary: '主機安全稽核與漏洞情資 CLI：單一執行檔，查最新漏洞並比對這台機器裝了什麼，輸出可以被程式讀的報告。',
     highlights: [
       '稽核 SSH、kernel、防火牆、磁碟加密等 50 多項硬化設定',
       '用 OSV.dev 比對已安裝套件，再以 CISA KEV 與 EPSS 排出真正該先修的漏洞',
@@ -21,7 +25,7 @@ export const projects: Project[] = [
     ],
     tags: ['Go', 'SQLite', 'OSV', 'CLI'],
     year: 2026,
-    categories: ['agent'],
+    categories: ['agent', 'workflow'],
     repo: 'https://github.com/Andy880828/syssec',
     cover: {
       prompt: 'sudo syssec scan --vulns',
@@ -40,12 +44,12 @@ export const projects: Project[] = [
     summary: '影片或錄音進、標好講者的逐字稿出；轉錄與講者分辨全部在本地 GPU 執行，不上傳任何音訊。',
     highlights: [
       '輸出 txt、srt、vtt、md、json 五種格式',
-      '為 agent 設計：JSON envelope、穩定錯誤碼、schema 自我描述',
-      '附 6 個 Claude Code skills：轉錄、批次、會議摘要等',
+      '可被程式呼叫：JSON envelope、穩定錯誤碼、schema 自我描述',
+      '附 6 個 Claude Code skills：轉錄、批次、會議摘要',
     ],
     tags: ['Python', 'Whisper', 'pyannote', 'CUDA'],
     year: 2026,
-    categories: ['data', 'agent'],
+    categories: ['workflow', 'agent'],
     repo: 'https://github.com/Andy880828/local-transcribe',
     cover: {
       prompt: 'uv run transcribe run meeting.mp4 --speakers 3',
@@ -61,15 +65,15 @@ export const projects: Project[] = [
     slug: 'scout',
     name: 'scout',
     nameZh: '科技資訊雷達',
-    summary: '給 AI agent 操作的個人科技資訊雷達：抓自選來源、去重、用公開規則排序，摘要交給 Claude 寫。',
+    summary: '個人科技資訊雷達：抓自選來源、去重、用公開規則排序，摘要再交給人或程式接手。',
     highlights: [
       '零依賴 Go 單一執行檔，所有指令都有固定的 JSON envelope',
       '每一分排序都附理由，不是黑盒',
-      '自己決定資訊來源，主導權回到自己手上',
+      '來源清單自己決定，排序規則公開',
     ],
-    tags: ['Go', 'RSS', 'CLI', 'Claude'],
+    tags: ['Go', 'RSS', 'CLI'],
     year: 2026,
-    categories: ['agent', 'data'],
+    categories: ['agent', 'mining'],
     cover: {
       prompt: 'scout candidates',
       lines: [
@@ -85,15 +89,15 @@ export const projects: Project[] = [
     slug: 'homelab',
     name: 'homelab',
     nameZh: '家用小電腦基礎服務',
-    summary: '家中常駐小電腦的 Caddy、Uptime Kuma 與 LiteLLM，由一份給 agent 的架設 prompt 從盤點一路做到驗證。',
+    summary: '家中小電腦的 Caddy、Uptime Kuma、LiteLLM：一份從盤點到驗證的架設手冊，照著做就能重建。',
     highlights: [
       'Caddy 反向代理與自動 HTTPS',
-      'LiteLLM 當 Claude API 閘道：虛擬金鑰與預算控管',
-      '設定與祕密只存在機器上，repo 裡只有 prompt',
+      'LiteLLM 閘道：虛擬金鑰與用量預算',
+      '設定與祕密只存在機器上，repo 裡只有架設手冊',
     ],
     tags: ['Caddy', 'LiteLLM', 'Uptime Kuma', 'Linux'],
     year: 2026,
-    categories: ['selfhost', 'agent'],
+    categories: ['workflow'],
     cover: {
       prompt: 'cat homelab/docs/SETUP-PROMPT.md',
       lines: ['1. 盤點 → 2. 詢問 → 3. 架設', '4. 驗證 → 5. 文件', 'Caddy · Uptime Kuma · LiteLLM'],
@@ -104,11 +108,11 @@ export const projects: Project[] = [
   {
     slug: 'andy-claude-kit',
     name: 'andy-claude-kit',
-    nameZh: '私人 Claude Code plugin 集',
-    summary: '一行指令在任何電腦重建我的 Claude Code 環境：工程規則、語言 rules、唯讀審查 agents。',
+    nameZh: '開發環境一鍵重建',
+    summary: '一行指令在任何電腦重建我的開發環境：工程規則、語言 rules、唯讀審查流程。',
     highlights: [
       'setup 冪等：記錄每個受管檔的 hash，手改過的不覆蓋',
-      '六個只回報不改檔的審查 agent（Python、TS、Go、Rust、DB、資安）',
+      '六個只回報、不改檔的審查流程（Python、TS、Go、Rust、DB、資安）',
       '專案文件骨幹與文件同步 hook',
     ],
     tags: ['Claude Code', 'Plugin', 'JavaScript'],
@@ -124,12 +128,12 @@ export const projects: Project[] = [
   {
     slug: 'stock-analysis-app',
     name: 'stock-analysis-app',
-    nameZh: '投資紀錄與顧問 App',
-    summary: '我自己的投資紀錄與顧問 App：把每一筆投資留下紀錄，再從資料回頭檢視決策。',
+    nameZh: '投資紀錄與回顧 App',
+    summary: '投資紀錄與回顧 App：每一筆進出都留紀錄，再用圖表回頭看決策對不對。',
     highlights: ['投資紀錄', '顧問式分析'],
     tags: ['Python', 'Pandas', '資料分析'],
     year: 2026,
-    categories: ['data'],
+    categories: ['mining', 'viz'],
     cover: {
       prompt: 'stock-analysis-app',
       lines: ['投資紀錄', '顧問分析', 'Python'],
@@ -149,7 +153,7 @@ export const projects: Project[] = [
     ],
     tags: ['Python', 'Pandas', 'Bioinformatics', 'GUI'],
     year: 2025,
-    categories: ['bio', 'data'],
+    categories: ['mining', 'workflow'],
     repo: 'https://github.com/Andy880828/Trim2Sort',
     image: 'trim2sort',
     status: 'stable',
@@ -162,7 +166,7 @@ export const projects: Project[] = [
     highlights: ['Nuxt 4 + Supabase，TypeScript strict', 'Vitest 與 Playwright 測試', 'Vercel cron 防止 Supabase 休眠'],
     tags: ['Nuxt 4', 'TypeScript', 'Supabase', 'Vercel'],
     year: 2026,
-    categories: ['web', 'data'],
+    categories: ['viz', 'web'],
     repo: 'https://github.com/Andy880828/fitness_challenge',
     demo: 'https://fitness-challenge-seven.vercel.app',
     image: 'fitness',
@@ -176,7 +180,7 @@ export const projects: Project[] = [
     highlights: ['Nuxt 建置', '照片皆具版權，僅供參考'],
     tags: ['Nuxt', 'Vue', 'Tailwind CSS'],
     year: 2025,
-    categories: ['web', 'bio'],
+    categories: ['web'],
     repo: 'https://github.com/Andy880828/nature-footprint-studio',
     cover: {
       prompt: 'nuxt build',
@@ -193,7 +197,7 @@ export const projects: Project[] = [
     highlights: ['Vue 3 Composition API 前台', 'ASP.NET Core Web API + SQL Server', '另有 .NET MVC 後台系統'],
     tags: ['Vue 3', 'ASP.NET Core', 'SQL Server'],
     year: 2024,
-    categories: ['web'],
+    categories: ['web', 'workflow'],
     repo: 'https://github.com/Andy880828/RecipeCube',
     image: 'recipecube',
     status: 'archived',

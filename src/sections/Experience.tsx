@@ -3,7 +3,6 @@ import { experience } from '@/content/experience';
 import type { ExperienceItem } from '@/content/types';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
-import ScienceNote from '@/components/ScienceNote';
 
 const KIND: Record<ExperienceItem['kind'], { label: string; color: string }> = {
   edu: { label: '學歷', color: '#7cc8ff' },
@@ -41,7 +40,7 @@ export default function Experience() {
       className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader id="experience" depth="1,000 m · 深層帶" title="一路潛下來的軌跡" lead="越往下越接近現在。" />
+        <SectionHeader id="experience" depth="1,000 m · 深層帶" title="一路潛下來的軌跡" lead="新的在上，越往下越早。" />
 
         <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}
@@ -93,7 +92,6 @@ export default function Experience() {
             })}
           </ol>
         </div>
-        <ScienceNote section="experience" className="mt-16" />
       </div>
     </section>
   );

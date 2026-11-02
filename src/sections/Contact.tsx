@@ -3,7 +3,6 @@ import { FileText, Send } from 'lucide-react';
 import { profile } from '@/content/profile';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
-import ScienceNote from '@/components/ScienceNote';
 import Picture from '@/components/Picture';
 import { GithubIcon, FacebookIcon } from '@/components/BrandIcons';
 import interests from '@/assets/img/interests.webp?w=640;1256&format=avif;webp&as=picture';
@@ -159,11 +158,19 @@ export default function Contact() {
           </div>
         </div>
 
-        <ScienceNote section="contact" className="mt-16" />
-
         <footer className="mt-[16vh] flex flex-col gap-3 border-t border-foam/10 pt-8 text-sm text-haze sm:flex-row sm:items-baseline sm:justify-between">
           <p className="text-foam">感謝你的造訪。</p>
-          <p>© {profile.name} · 照片版權所有 · 用 React Three Fiber 打造</p>
+          <p>
+            © {profile.name} · 照片版權所有 ·{' '}
+            <a
+              href="https://github.com/Andy880828/Personal-Page#科學資料來源"
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-haze/50 underline-offset-2 hover:text-foam"
+            >
+              資料來源
+            </a>
+          </p>
         </footer>
       </div>
     </section>

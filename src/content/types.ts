@@ -1,4 +1,4 @@
-export type ProjectCategory = 'agent' | 'selfhost' | 'data' | 'web' | 'bio';
+export type ProjectCategory = 'mining' | 'viz' | 'workflow' | 'agent' | 'web';
 
 export interface Project {
   slug: string;

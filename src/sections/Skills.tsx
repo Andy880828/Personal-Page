@@ -3,7 +3,6 @@ import { skills } from '@/content/skills';
 import { useReveal } from '@/hooks/useReveal';
 import { useSiteStore } from '@/store/useSiteStore';
 import SectionHeader from '@/components/SectionHeader';
-import ScienceNote from '@/components/ScienceNote';
 
 /** 用技能 id 產生一段固定的假序列（純裝飾，呼應 eDNA 的定序讀段） */
 function pseudoSequence(id: string, length = 36): string {
@@ -164,7 +163,6 @@ export default function Skills() {
                 ))}
               </ul>
             </div>
-            <ScienceNote section="skills" className="mt-10" />
           </div>
           {/* 右欄：有 3D 時留白給雙螺旋，右緣放區段圖例；沒有 3D（tier 0）時畫一條靜態的 SVG 雙螺旋 */}
           <div aria-hidden="true" className="relative hidden min-h-[28rem] lg:block">

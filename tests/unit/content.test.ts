@@ -15,7 +15,7 @@ const projectSchema = z.object({
   highlights: z.array(z.string().min(2)).max(3),
   tags: z.array(z.string()).min(1).max(6),
   year: z.number().int().min(2019).max(2030),
-  categories: z.array(z.enum(['agent', 'selfhost', 'data', 'web', 'bio'])).min(1),
+  categories: z.array(z.enum(['mining', 'viz', 'workflow', 'agent', 'web'])).min(1),
   repo: https.optional(),
   demo: https.optional(),
   image: z.enum(['recipecube', 'trim2sort', 'fitness']).optional(),
@@ -66,16 +66,16 @@ describe('作品資料', () => {
 });
 
 describe('技能與經歷', () => {
-  it('五組技能，id 不重複，顏色是 hex', () => {
-    expect(skills).toHaveLength(5);
+  it('五組技能，主方向在前，id 不重複，顏色是 hex', () => {
+    expect(skills.map((s) => s.id)).toEqual(['mining', 'viz', 'workflow', 'agent', 'web']);
     expect(new Set(skills.map((s) => s.id)).size).toBe(5);
     for (const s of skills) expect(s.color).toMatch(/^#[0-9a-f]{6}$/i);
   });
 
-  it('經歷由舊到新排序，只有最後一筆可以沒有結束日期', () => {
+  it('經歷由新到舊排序，只有第一筆可以沒有結束日期', () => {
     const starts = experience.map((e) => e.start);
-    expect([...starts].sort()).toEqual(starts);
-    experience.slice(0, -1).forEach((e) => expect(e.end).not.toBeNull());
+    expect([...starts].sort().reverse()).toEqual(starts);
+    experience.slice(1).forEach((e) => expect(e.end).not.toBeNull());
     for (const e of experience) {
       expect(e.start).toMatch(/^\d{4}\/\d{2}$/);
       if (e.end) expect(e.end >= e.start).toBe(true);

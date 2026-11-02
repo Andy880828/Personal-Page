@@ -1,51 +1,29 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
   Color,
+  ConeGeometry,
+  CylinderGeometry,
   IcosahedronGeometry,
+  InstancedMesh,
   LatheGeometry,
   MeshStandardMaterial,
   PlaneGeometry,
   ShaderMaterial,
+  Object3D,
   Vector2,
+  Vector3,
   type Group,
   type PointLight,
 } from 'three';
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
 import { FLOOR_Y } from './path';
+import { floorHeight } from './floor';
 import { sceneTime } from './time';
-
-/** 簡單的值雜訊 fbm（CPU，建立地形用） */
-function makeNoise(seed: number) {
-  const rng = createRng(seed);
-  const perm = Array.from({ length: 512 }, () => rng());
-  const h = (x: number, z: number) => perm[(((x * 73856093) ^ (z * 19349663)) >>> 0) % 512]!;
-  const smooth = (t: number) => t * t * (3 - 2 * t);
-  const noise = (x: number, z: number) => {
-    const xi = Math.floor(x);
-    const zi = Math.floor(z);
-    const xf = smooth(x - xi);
-    const zf = smooth(z - zi);
-    const a = h(xi, zi) + (h(xi + 1, zi) - h(xi, zi)) * xf;
-    const b = h(xi, zi + 1) + (h(xi + 1, zi + 1) - h(xi, zi + 1)) * xf;
-    return a + (b - a) * zf;
-  };
-  return (x: number, z: number) => {
-    let v = 0;
-    let amp = 1;
-    let f = 0.06;
-    for (let o = 0; o < 4; o++) {
-      v += noise(x * f, z * f) * amp;
-      amp *= 0.5;
-      f *= 2.1;
-    }
-    return v;
-  };
-}
 
 const VENTS: [number, number, number][] = [
   [7, -34, 1.0],
@@ -88,15 +66,11 @@ export default function Seafloor() {
   const light = useRef<PointLight>(null);
 
   const data = useMemo(() => {
-    const noise = makeNoise(SCENE_SEED + 41);
     const terrain = new PlaneGeometry(150, 110, 110, 80);
     terrain.rotateX(-Math.PI / 2);
     terrain.translate(0, 0, -30);
     const p = terrain.attributes.position!;
-    const heightAt = (x: number, z: number) => {
-      const ridge = Math.abs(noise(x + 40, z + 40) - 0.9) * 3.2;
-      return noise(x, z) * 3.6 - ridge;
-    };
+    const heightAt = floorHeight;
     for (let i = 0; i < p.count; i++) p.setY(i, heightAt(p.getX(i), p.getZ(i)));
     terrain.computeVertexNormals();
 
@@ -163,11 +137,67 @@ export default function Seafloor() {
       ),
     );
 
-    return { terrain, rocks, chimneys, plume, dotGeo };
+    // 管蟲叢（Riftia）：熱泉旁一叢白色管子，頂端是紅色的鰓冠；程序幾何，兩個 InstancedMesh
+    const worms: { x: number; y: number; z: number; h: number; tilt: number; ry: number }[] = [];
+    for (const [vx, vz] of [VENTS[0]!, VENTS[2]!]) {
+      for (let i = 0; i < 46; i++) {
+        const a = rng() * Math.PI * 2;
+        const r = 1.6 + Math.sqrt(rng()) * 2.6;
+        const x = vx + Math.cos(a) * r;
+        const z = vz + Math.sin(a) * r;
+        worms.push({
+          x,
+          z,
+          y: heightAt(x, z) - 0.1,
+          h: 0.9 + rng() * 1.6,
+          tilt: (rng() - 0.5) * 0.35,
+          ry: rng() * 6.28,
+        });
+      }
+    }
+
+    return { terrain, rocks, chimneys, plume, dotGeo, worms };
   }, []);
+
+  const wormTubes = useRef<InstancedMesh>(null);
+  const wormPlumes = useRef<InstancedMesh>(null);
+  const wormGeo = useMemo(
+    () => ({
+      tube: new CylinderGeometry(0.07, 0.09, 1, 6, 1).translate(0, 0.5, 0),
+      plume: new ConeGeometry(0.16, 0.34, 7, 1).translate(0, 0.17, 0),
+    }),
+    [],
+  );
+  useEffect(() => {
+    const d = new Object3D();
+    data.worms.forEach((w, i) => {
+      d.position.set(w.x, w.y, w.z);
+      d.rotation.set(w.tilt, w.ry, w.tilt * 0.6);
+      d.scale.set(1, w.h, 1);
+      d.updateMatrix();
+      wormTubes.current?.setMatrixAt(i, d.matrix);
+      // 鰓冠接在管子頂端
+      d.position.set(w.x, w.y, w.z);
+      d.updateMatrix();
+      const top = new Vector3(0, w.h, 0).applyEuler(d.rotation);
+      d.position.add(top);
+      d.scale.setScalar(0.9 + (i % 5) * 0.08);
+      d.updateMatrix();
+      wormPlumes.current?.setMatrixAt(i, d.matrix);
+    });
+    if (wormTubes.current) wormTubes.current.instanceMatrix.needsUpdate = true;
+    if (wormPlumes.current) wormPlumes.current.instanceMatrix.needsUpdate = true;
+  }, [data]);
 
   const mats = useMemo(
     () => ({
+      wormTube: new MeshStandardMaterial({ color: '#d9d4c7', roughness: 0.7 }),
+      wormPlume: new MeshStandardMaterial({
+        color: '#c8203a',
+        roughness: 0.5,
+        emissive: new Color('#ff3355'),
+        emissiveIntensity: 0.15,
+      }),
       floor: new MeshStandardMaterial({ color: '#2a5568', roughness: 0.95, metalness: 0.05, flatShading: true }),
       rock: new MeshStandardMaterial({ color: '#253a46', roughness: 0.9, flatShading: true }),
       chimney: new MeshStandardMaterial({
@@ -236,6 +266,8 @@ export default function Seafloor() {
       {data.chimneys.map((c, i) => (
         <mesh key={i} geometry={c.g} material={mats.chimney} position={[c.x, c.y, c.z]} scale={c.s} />
       ))}
+      <instancedMesh ref={wormTubes} args={[wormGeo.tube, mats.wormTube, data.worms.length]} frustumCulled={false} />
+      <instancedMesh ref={wormPlumes} args={[wormGeo.plume, mats.wormPlume, data.worms.length]} frustumCulled={false} />
       <points geometry={data.plume} material={mats.plume} frustumCulled={false} />
       <points geometry={data.dotGeo} material={mats.dots} frustumCulled={false} />
       <pointLight ref={light} position={[7, 9, -32]} color="#ff9a4d" distance={60} decay={1.3} intensity={16} />

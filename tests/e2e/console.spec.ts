@@ -42,7 +42,6 @@ test.describe('指令列與快捷鍵', () => {
     const hud = page.getByTestId('hud');
     await expect(hud).toContainText('1,200');
     await expect(hud).toContainText('121 atm');
-    await expect(hud).toContainText('深層帶');
   });
 
   test('j / k 在段落間移動；在輸入框裡打字不會觸發', async ({ page }) => {
@@ -58,13 +57,13 @@ test.describe('指令列與快捷鍵', () => {
     await expect.poll(() => inView(page, 'about')).toBe(true);
   });
 
-  test('每段都有科學註記與來源連結', async ({ page }) => {
+  test('畫面上沒有解釋性的科學註記；cat zone 才看得到說明與來源', async ({ page }) => {
     await page.goto('/?tier=0');
-    const notes = page.getByTestId('science-note');
-    await expect(notes).toHaveCount(5);
-    const links = notes.locator('a[href]');
-    expect(await links.count()).toBeGreaterThanOrEqual(5);
-    for (const href of await links.evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href)))
-      expect(href).toMatch(/^https:\/\//);
+    await expect(page.getByTestId('science-note')).toHaveCount(0);
+    await page.keyboard.press('/');
+    const input = page.getByRole('dialog').getByLabel('輸入指令');
+    await input.fill('cat zone');
+    await input.press('Enter');
+    await expect(page.getByRole('dialog')).toContainText('https://');
   });
 });

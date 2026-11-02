@@ -1,7 +1,7 @@
 import { ExternalLink, Lock } from 'lucide-react';
 import { GithubIcon } from './BrandIcons';
 import type { Project } from '@/content/types';
-import { categoryLabels } from '@/content/projects';
+import { categoryColors, categoryLabels } from '@/content/projects';
 import TiltCard from './TiltCard';
 import TerminalCover from './TerminalCover';
 import Picture from './Picture';
@@ -11,16 +11,8 @@ import fitness from '@/assets/img/fitness.webp?w=480;960&format=avif;webp;jpg&as
 
 const images = { recipecube, trim2sort, fitness } as const;
 
-const ACCENT: Record<string, string> = {
-  agent: '#ffb86b',
-  selfhost: '#7cc8ff',
-  data: '#a99bff',
-  web: '#4ff0d2',
-  bio: '#ff7eb6',
-};
-
 export default function ProjectCard({ project, featured = false }: { project: Project; featured?: boolean }) {
-  const accent = ACCENT[project.categories[0] ?? 'web'] ?? '#4ff0d2';
+  const accent = categoryColors[project.categories[0] ?? 'web'];
   return (
     <TiltCard className="panel h-full overflow-hidden rounded-3xl">
       <article

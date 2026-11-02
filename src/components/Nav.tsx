@@ -39,12 +39,17 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color] duration-500 ${
-        section === 'hero'
-          ? 'border-b border-transparent bg-gradient-to-b from-deep/80 via-deep/40 to-transparent'
-          : 'border-b border-foam/8 bg-deep/85'
+      className={`fixed inset-x-0 top-0 z-40 transition-[background-color] duration-500 ${
+        section === 'hero' ? 'bg-transparent' : 'bg-deep/85'
       }`}
     >
+      {/* 海面狀態的遮罩：比列高很多、用 mask 慢慢淡掉，不在列的底緣收尾（之前 56 px 內收尾會在交界壓出一條暗線） */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-deep/70 transition-opacity duration-500 [mask-image:linear-gradient(to_bottom,black,transparent)] ${
+          section === 'hero' ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
       <nav
         aria-label="主要導覽"
         className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-3.5"

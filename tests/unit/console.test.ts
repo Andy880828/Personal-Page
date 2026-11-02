@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { COMMANDS, runCommand } from '@/lib/console';
+import { COMMANDS, promptFor, runCommand } from '@/lib/console';
 
 const ctx = { depth: 1200, tier: 2, reduced: false };
 
@@ -33,10 +33,28 @@ describe('指令列', () => {
   it('ls / cat 讀內容層', () => {
     expect(runCommand('ls projects', ctx).lines.length).toBeGreaterThanOrEqual(10);
     expect(runCommand('ls skills', ctx).lines).toHaveLength(5);
-    expect(runCommand('cat frontend', ctx).lines[0]).toContain('網頁前端');
+    expect(runCommand('cat mining', ctx).lines[0]).toContain('資料探勘');
     expect(runCommand('cat syssec', ctx).lines.join('\n')).toContain('github.com');
     expect(runCommand('cat scout', ctx).lines.join('\n')).toContain('私人');
     expect(runCommand('cat nope', ctx).lines[0]).toContain('找不到');
+  });
+
+  it('提示字元是目前段落；ls 無參數列出這段可以 cat 的東西；cat zone 顯示說明與來源', () => {
+    expect(promptFor(0)).toBe('~/ocean/hero $');
+    expect(promptFor(1200)).toBe('~/ocean/experience $');
+    expect(promptFor(4000)).toBe('~/ocean/contact $');
+    expect(runCommand('ls', { ...ctx, depth: 150 }).lines[0]).toContain('mining');
+    expect(runCommand('ls', { ...ctx, depth: 300 }).lines[0]).toContain('syssec');
+    const zone = runCommand('cat zone', ctx).lines.join('\n');
+    expect(zone).toContain('深層帶');
+    expect(zone).toMatch(/https:\/\//);
+  });
+
+  it('ascii on|off', () => {
+    expect(runCommand('ascii on', ctx).action).toEqual({ type: 'ascii', on: true });
+    expect(runCommand('ascii off', ctx).action).toEqual({ type: 'ascii', on: false });
+    expect(runCommand('ascii', ctx).action).toBeUndefined();
+    expect(runCommand('ascii on', { ...ctx, tier: 1 }).lines[0]).toContain('看不到');
   });
 
   it('tier、motion、clear、exit、未知指令', () => {
