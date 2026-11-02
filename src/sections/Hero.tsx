@@ -46,13 +46,13 @@ export default function Hero() {
                 e.preventDefault();
                 navigate('/project');
               }}
-              className="rounded-full border border-foam/40 px-6 py-3 text-foam backdrop-blur-sm transition-colors hover:border-foam hover:bg-foam/10"
+              className="rounded-full border border-foam/40 px-6 py-3 text-foam transition-colors hover:border-foam hover:bg-foam/10"
             >
               直接看作品
             </a>
           </div>
           <p className="mt-8 font-mono text-xs text-foam/85 tabular-nums [text-shadow:0_1px_10px_rgb(1_4_9/0.8)]">
-            0 m · 22.6°N 120.3°E · {profile.hometown}
+            0 m · 22.6°N 120.3°E · {profile.hometown} · 1 atm · 25.5 °C
           </p>
         </div>
       </div>

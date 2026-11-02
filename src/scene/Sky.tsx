@@ -5,12 +5,13 @@ import common from './shaders/common.glsl?raw';
 import skyFrag from './shaders/sky.glsl?raw';
 import { SUN_DIR } from './constants';
 
+// 不用 gl_Position.xyww 的技巧：深度剛好等於遠裁剪面，在部分 GPU 驅動上會時有時無（整片天空閃爍）。
+// 球半徑在 far 之內，關掉深度測試與寫入、最先畫，效果相同而且穩定。
 const vert = /* glsl */ `
 varying vec3 vDir;
 void main() {
   vDir = position;
-  vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  gl_Position = p.xyww;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
 
 /** 暮色天空球：只在相機高於水面時可見，跟著相機移動（視為無限遠） */
@@ -24,6 +25,7 @@ export default function Sky() {
         uniforms: { uSunDir: { value: SUN_DIR } },
         side: BackSide,
         depthWrite: false,
+        depthTest: false,
         fog: false,
       }),
     [],
@@ -35,7 +37,7 @@ export default function Sky() {
   });
   return (
     <mesh ref={mesh} material={material} renderOrder={-10} frustumCulled={false}>
-      <sphereGeometry args={[300, 32, 16]} />
+      <sphereGeometry args={[200, 32, 16]} />
     </mesh>
   );
 }

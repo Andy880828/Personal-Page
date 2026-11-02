@@ -13,16 +13,17 @@ import {
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
 import { cameraY } from './path';
-import { sceneTime } from './time';
+import { sceneDelta, sceneTime } from './time';
 
 const bellVert = /* glsl */ `
 uniform float uTime;
 uniform float uPhase;
+uniform float uExcite;
 varying vec3 vNormalV;
 varying vec3 vViewDir;
 varying float vY;
 void main() {
-  float pulse = pow(0.5 + 0.5 * sin(uTime * 1.6 + uPhase), 3.0);
+  float pulse = pow(0.5 + 0.5 * sin(uTime * (1.6 + uExcite * 2.5) + uPhase), 3.0);
   vec3 p = position;
   p.xz *= 1.0 - 0.18 * pulse * (1.0 - p.y);
   p.y *= 1.0 + 0.12 * pulse;
@@ -36,6 +37,7 @@ void main() {
 const bellFrag = /* glsl */ `
 uniform vec3 uColor;
 uniform float uFade;
+uniform float uExcite;
 varying vec3 vNormalV;
 varying vec3 vViewDir;
 varying float vY;
@@ -43,7 +45,7 @@ void main() {
   float rim = pow(1.0 - abs(dot(vNormalV, vViewDir)), 2.2);
   float bands = 0.55 + 0.45 * sin(vY * 26.0);
   vec3 col = uColor * (rim * 1.6 + 0.12 * bands) + vec3(1.0) * pow(rim, 6.0) * 0.6;
-  gl_FragColor = vec4(col * uFade, 1.0);
+  gl_FragColor = vec4(col * uFade * (1.0 + uExcite * 1.2), 1.0);
 }`;
 
 const tentVert = /* glsl */ `
@@ -109,6 +111,7 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
         uPhase: { value: phase },
         uColor: { value: color },
         uFade: { value: 1 },
+        uExcite: { value: 0 },
       };
       const side = i % 2 === 0 ? -1 : 1;
       return {
@@ -145,13 +148,14 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
 
   const groups = useRef<(Group | null)[]>([]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const t = sceneTime(state);
     const camY = state.camera.position.y;
     const pos = useSiteStore.getState().pos;
     if (group.current) group.current.visible = pos > 2.3 && pos < 5.3;
     items.forEach((it, i) => {
       it.uniforms.uTime.value = t;
+      it.uniforms.uExcite.value *= Math.exp(-sceneDelta(delta) * 1.4);
       const d = Math.abs(it.y - camY);
       it.uniforms.uFade.value = 1 - Math.min(1, Math.max(0, (d - 10) / 12));
       const g = groups.current[i];
@@ -171,7 +175,15 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
           scale={it.scale}
           rotation={[0.15 * (i % 3), 0, 0.12 * ((i % 2) * 2 - 1)]}
         >
-          <mesh geometry={it.bell} material={it.bellMat} frustumCulled={false} />
+          <mesh
+            geometry={it.bell}
+            material={it.bellMat}
+            frustumCulled={false}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              it.uniforms.uExcite.value = 1;
+            }}
+          />
           <lineSegments geometry={it.tent} material={it.tentMat} frustumCulled={false} />
         </group>
       ))}

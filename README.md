@@ -43,12 +43,13 @@ npm run lhci           # Lighthouse CI（用 Playwright 附帶的 Chromium）
 
 所有文案都在 `src/content/`，改完跑 `npm run fonts` 再 `npm run verify`：
 
-| 檔案            | 內容                                          |
-| --------------- | --------------------------------------------- |
-| `profile.ts`    | 姓名、職稱、自我介紹、連結、證照、興趣        |
-| `skills.ts`     | 五組技能（也決定 3D 氣泡的顏色）              |
-| `projects.ts`   | 作品；私有 repo 不放 `repo` 連結，改寫 `note` |
-| `experience.ts` | 經歷時間軸，由舊到新                          |
+| 檔案            | 內容                                                     |
+| --------------- | -------------------------------------------------------- |
+| `profile.ts`    | 姓名、職稱、自我介紹、連結、證照、興趣                   |
+| `skills.ts`     | 五組技能（也決定 3D 氣泡的顏色）                         |
+| `projects.ts`   | 作品；私有 repo 不放 `repo` 連結，改寫 `note`            |
+| `experience.ts` | 經歷時間軸，由舊到新                                     |
+| `science.ts`    | 深度換算（壓力、溫度、光）、分層帶、每段的科學註記與來源 |
 
 新增作品截圖：`npm run images -- 截圖.png 名稱.webp 1200`，再到 `src/components/ProjectCard.tsx` 的 `images` 加一行。
 

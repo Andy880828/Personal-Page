@@ -21,6 +21,9 @@ export interface SiteState {
   /** 3D 場景載入進度 0–1 與是否已畫出第一幀 */
   sceneProgress: number;
   sceneReady: boolean;
+  consoleOpen: boolean;
+  /** 最近一次在畫面上的點擊（正規化座標 -1..1 與時間戳），給魚群驚散、聲納 ping 用 */
+  pulse: { x: number; y: number; t: number } | null;
   setScroll: (pos: number, depth: number, velocity: number, section: SectionId) => void;
   setTier: (tier: Tier) => void;
   setSystemReducedMotion: (v: boolean) => void;
@@ -30,6 +33,8 @@ export interface SiteState {
   setProjectFilter: (f: ProjectCategory | 'all') => void;
   setSceneProgress: (p: number) => void;
   setSceneReady: (v: boolean) => void;
+  setConsoleOpen: (v: boolean) => void;
+  firePulse: (x: number, y: number) => void;
 }
 
 const MOTION_KEY = 'motion-pref';
@@ -70,6 +75,8 @@ export const useSiteStore = create<SiteState>()((set, get) => ({
   projectFilter: 'all',
   sceneProgress: 0,
   sceneReady: false,
+  consoleOpen: false,
+  pulse: null,
   setScroll: (pos, depth, velocity, section) => {
     if (get().section !== section) set({ pos, depth, velocity, section });
     else set({ pos, depth, velocity });
@@ -82,6 +89,8 @@ export const useSiteStore = create<SiteState>()((set, get) => ({
   setProjectFilter: (projectFilter) => set({ projectFilter }),
   setSceneProgress: (sceneProgress) => set({ sceneProgress }),
   setSceneReady: (sceneReady) => set({ sceneReady }),
+  setConsoleOpen: (consoleOpen) => set({ consoleOpen }),
+  firePulse: (x, y) => set({ pulse: { x, y, t: performance.now() } }),
 }));
 
 export function isReducedMotion(s: Pick<SiteState, 'motionPref' | 'systemReducedMotion'>): boolean {

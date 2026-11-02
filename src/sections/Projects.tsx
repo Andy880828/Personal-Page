@@ -5,6 +5,7 @@ import { useReveal } from '@/hooks/useReveal';
 import { useSiteStore } from '@/store/useSiteStore';
 import SectionHeader from '@/components/SectionHeader';
 import ProjectCard from '@/components/ProjectCard';
+import ScienceNote from '@/components/ScienceNote';
 
 const FILTERS: (ProjectCategory | 'all')[] = ['all', 'agent', 'selfhost', 'data', 'web', 'bio'];
 
@@ -102,6 +103,7 @@ export default function Projects() {
             </ul>
           </div>
         )}
+        <ScienceNote section="projects" className="mt-16" />
       </div>
     </section>
   );

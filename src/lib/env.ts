@@ -4,12 +4,14 @@
  *   ?tier=0-3 強制 GPU 等級
  *   ?debug    載入 leva / r3f-perf
  *   ?perf=1   在 window.__perf 回報 frame time
+ *   ?slow=0.1 場景時間放慢（除錯：找閃爍時把波浪等連續動畫放慢，剩下的變化就是不連續的）
  */
 export interface RuntimeFlags {
   test: boolean;
   tier: number | null;
   debug: boolean;
   perf: boolean;
+  timeScale: number;
 }
 
 export function parseFlags(search: string): RuntimeFlags {
@@ -21,6 +23,7 @@ export function parseFlags(search: string): RuntimeFlags {
     tier,
     debug: q.has('debug'),
     perf: q.get('perf') === '1',
+    timeScale: Number(q.get('slow')) > 0 ? Number(q.get('slow')) : 1,
   };
 }
 

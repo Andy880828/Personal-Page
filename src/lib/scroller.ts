@@ -98,6 +98,26 @@ export function scrollToSection(id: SectionId, immediate = false) {
   }
 }
 
+/** 捲到某個深度（公尺）：把深度反算成 pos，再換成捲動位置 */
+export function scrollToDepth(depth: number) {
+  const d = Math.max(0, Math.min(4000, depth));
+  let pos = SECTIONS.length;
+  for (let i = 0; i < SECTIONS.length; i++) {
+    const s = SECTIONS[i]!;
+    if (d <= s.depthEnd) {
+      pos = i + (d - s.depthStart) / (s.depthEnd - s.depthStart);
+      break;
+    }
+  }
+  const target = posToScroll(pos, breakpoints);
+  if (lenis) lenis.scrollTo(target, { duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
+  else {
+    const smooth = document.documentElement.dataset.motion !== 'reduce';
+    window.scrollTo({ top: target, behavior: (smooth ? 'smooth' : 'instant') as ScrollBehavior });
+    update();
+  }
+}
+
 /** 測試用：直接捲到某個 pos */
 export function scrollToPosition(pos: number) {
   window.scrollTo({ top: posToScroll(pos, breakpoints), behavior: 'instant' as ScrollBehavior });

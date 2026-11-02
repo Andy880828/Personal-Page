@@ -34,12 +34,22 @@ describe('魚群模擬', () => {
     expect(Array.from(s.pos)).toEqual(before);
   });
 
-  it('會躲開滑鼠', () => {
+  it('會躲開滑鼠；點擊驚散的範圍與力道更大', () => {
     const s = createSchool(1, 9);
     s.pos.set([0, 0, 0]);
     s.vel.set([3, 0, 0]);
     stepSchool(s, 1 / 30, [0.5, 0, 0]);
     expect(s.vel[0]!).toBeLessThan(3);
+    // 距離 6：一般躲避（半徑 4）沒反應，驚散（半徑 9）會
+    const a = createSchool(1, 9);
+    a.pos.set([0, 0, 0]);
+    a.vel.set([3, 0, 0]);
+    stepSchool(a, 1 / 30, [6, 0, 0]);
+    const b = createSchool(1, 9);
+    b.pos.set([0, 0, 0]);
+    b.vel.set([3, 0, 0]);
+    stepSchool(b, 1 / 30, [6, 0, 0], 9, 3);
+    expect(b.vel[0]!).toBeLessThan(a.vel[0]!);
   });
 });
 
@@ -68,7 +78,9 @@ describe('場景內容依 GPU 等級變化', () => {
   it('tier 2 的魚與海雪比 tier 1 多', async () => {
     const counts = async (tier: 1 | 2) => {
       const r = await render(tier);
-      const fish = r.scene.findAll((n) => (n.instance as { isInstancedMesh?: boolean }).isInstancedMesh === true)[0]!;
+      const fish = r.scene
+        .findAll((n) => (n.instance as { isInstancedMesh?: boolean }).isInstancedMesh === true)
+        .find((n) => (n.instance as { count: number }).count >= 100)!;
       const points = r.scene.findAll((n) => (n.instance as { isPoints?: boolean }).isPoints === true);
       const snow = points
         .map((p) => (p.instance as unknown as { geometry: { attributes: { position: { count: number } } } }).geometry)
