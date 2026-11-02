@@ -180,6 +180,11 @@ html[data-motion='reduce'] .motion-lift:hover {
   transform: none !important;
 }
 
+/* 測試模式：一般換行。text-wrap: pretty 有效能上限，Chrome 不保證每次都套用，截圖會不穩定 */
+html[data-test] :is(p, h1, h2, h3) {
+  text-wrap: wrap !important;
+}
+
 /* 測試模式：隱藏捲軸，版面寬度與瀏覽器捲軸樣式無關（CI 與本機一致） */
 html[data-test] {
   scrollbar-width: none;

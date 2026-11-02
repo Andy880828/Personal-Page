@@ -12,9 +12,7 @@ export default defineConfig({
   timeout: 90_000,
   expect: {
     timeout: 20_000,
-    // 基準圖以 CI（ubuntu-24.04 + Playwright Chromium）的渲染為準。
-    // 其他機器的字寬有次像素差異，中文段落可能在換行邊界多擠一個字，所以本機容差放寬一點。
-    toHaveScreenshot: { maxDiffPixelRatio: process.env.CI ? 0.02 : 0.04, animations: 'disabled', caret: 'hide' },
+    toHaveScreenshot: { maxDiffPixelRatio: 0.02, animations: 'disabled', caret: 'hide' },
   },
   fullyParallel: false,
   workers: 1,
