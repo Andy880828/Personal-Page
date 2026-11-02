@@ -114,6 +114,7 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
         uExcite: { value: 0 },
       };
       const side = i % 2 === 0 ? -1 : 1;
+      const z = -16 - rng() * 16;
       return {
         bell,
         tent: tentacles(rng),
@@ -137,10 +138,11 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
           fog: false,
         }),
         uniforms,
-        x: side * (10 + rng() * 6),
         // 在中層帶裡的相對位置；實際高度每幀依相機路徑算（路徑依版面量測結果而定）
         frac: (i + rng() * 0.6) / count,
-        z: -16 - rng() * 16,
+        z,
+        // 放在作品卡片欄外：畫面的半寬約 0.78·|z|（16:10），x 取 0.82–0.95 倍，留在邊緣
+        x: side * Math.abs(z) * (0.82 + rng() * 0.13),
         scale: 0.45 + rng() * 0.5,
         drift: rng() * 6.28,
       };

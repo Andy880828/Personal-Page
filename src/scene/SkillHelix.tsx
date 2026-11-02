@@ -161,7 +161,7 @@ export default function SkillHelix() {
     if (!g) return;
     const { pos, activeSkill, hoverSkill } = useSiteStore.getState();
     // 窄一點：pos 2.0 之後才出現，不壓到關於段的大頭照與證照
-    const w = sectionWeight(pos, SECTION, 0.5);
+    const w = sectionWeight(pos, SECTION, 0.4);
     g.visible = w > 0.001;
     if (!g.visible) return;
     const t = sceneTime(state);
@@ -193,7 +193,7 @@ export default function SkillHelix() {
         layout(i, sc);
       }
       // 只有選到的那段帶顏色，其他段退成接近水色的灰藍：一次只讀一個基因
-      const tint = isActive ? 0 : isHover ? 0.35 : 0.72;
+      const tint = isActive ? 0 : isHover ? 0.35 : 0.88;
       scratch.copy(s.color).lerp(SLATE, tint);
       s.nodes.color.lerp(scratch, k);
       s.nodes.emissive.lerp(scratch, k);

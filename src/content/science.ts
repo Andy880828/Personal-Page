@@ -121,7 +121,8 @@ const sup = (n: number) =>
 export function formatLight(fraction: number): string {
   if (fraction >= 0.01) return `${(fraction * 100).toFixed(0)}%`;
   if (fraction >= 1e-4) return `${(fraction * 100).toPrecision(2)}%`;
-  if (fraction < 1e-30) return '0';
+  // 深層帶以下不寫成「0」（看起來像故障）：寫成小於 10⁻³⁰
+  if (fraction < 1e-30) return `<10${sup(-30)}`;
   return `10${sup(Math.round(Math.log10(fraction)))}`;
 }
 

@@ -22,7 +22,7 @@ export default function SectionHeader({ id, depth, title, lead }: Props) {
         >
           <span id={`${id}-title`}>{title}</span>
         </SplitHeading>
-        <span aria-hidden="true" className="hidden h-px flex-1 translate-y-[-0.35em] bg-foam/20 sm:block" />
+        <span aria-hidden="true" className="hidden h-px min-w-10 flex-1 translate-y-[-0.35em] bg-foam/20 sm:block" />
         <span className="hidden shrink-0 font-mono text-xs text-foam/85 tabular-nums sm:inline">{depth}</span>
       </div>
       {lead && (

@@ -17,9 +17,11 @@ export default function Projects() {
     () => (filter === 'all' ? projects : projects.filter((p) => p.categories.includes(filter))),
     [filter],
   );
-  // 已封存的早期作品不佔大卡片，放在最後的精簡列表
-  const current = list.filter((p) => p.status !== 'archived');
-  const earlier = list.filter((p) => p.status === 'archived');
+  // 全部：只有前四個進行中的作品是卡片，其餘（含已封存的早期作品）放在最後的精簡列表，作品段才不會長到看不出地標；
+  // 篩選後符合的都用卡片
+  const active = list.filter((p) => p.status !== 'archived');
+  const current = filter === 'all' ? active.slice(0, 4) : active;
+  const earlier = [...(filter === 'all' ? active.slice(4) : []), ...list.filter((p) => p.status === 'archived')];
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: projects.length };
     for (const p of projects) for (const k of p.categories) c[k] = (c[k] ?? 0) + 1;
@@ -75,7 +77,7 @@ export default function Projects() {
 
         {earlier.length > 0 && (
           <div className="mt-14" data-reveal>
-            <h3 className="text-lg font-bold text-foam">更早的作品</h3>
+            <h3 className="text-lg font-bold text-foam">{filter === 'all' ? '其他作品' : '更早的作品'}</h3>
             <ul className="mt-4 divide-y divide-foam/10 border-y border-foam/10">
               {earlier.map((p) => (
                 <li key={p.slug} data-project={p.slug} className="min-w-0">

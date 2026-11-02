@@ -19,13 +19,18 @@ export default function Hero() {
             <RiseText text={profile.name} />
           </h1>
           <p className="mt-6 max-w-3xl text-[clamp(1.25rem,2.6vw,2rem)] leading-snug font-medium text-foam [text-shadow:0_2px_18px_rgb(1_4_9/0.6)]">
-            {profile.nameEn}
-            <span className="mx-3 text-ember" aria-hidden="true">
+            {/* 手機：英文名自己一行、不帶破折號；職稱各自不斷行，斜線放在第二個職稱前面，換行時不會掛在行尾 */}
+            <span className="block sm:inline">{profile.nameEn}</span>
+            <span className="mx-3 hidden text-ember sm:inline" aria-hidden="true">
               —
             </span>
-            {/* 職稱各自不斷行：寧可整個換到下一行，也不要把「Data & Workflow / Engineer」拆開 */}
-            <span className="whitespace-nowrap">{profile.role}</span> {/* 斜線兩側要有空白，窄螢幕才能在這裡換行 */}
-            <span className="mx-1 text-ember">/</span> <span className="whitespace-nowrap">{profile.roleSecond}</span>
+            <span className="whitespace-nowrap">{profile.role}</span>{' '}
+            <span className="whitespace-nowrap">
+              <span className="mr-2 text-ember" aria-hidden="true">
+                /
+              </span>
+              {profile.roleSecond}
+            </span>
           </p>
           <p className="mt-2 text-base text-foam/90 sm:text-lg [text-shadow:0_2px_14px_rgb(1_4_9/0.7)]">
             {profile.roleZh}

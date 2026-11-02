@@ -16,6 +16,7 @@ import CursorLight from './CursorLight';
 import Jellyfish from './Jellyfish';
 import Plankton from './Plankton';
 import Seafloor from './Seafloor';
+import Bubbles from './Bubbles';
 import Fauna from './Fauna';
 import { pendingModels } from './models';
 import { SKY_HEIGHT } from './path';
@@ -120,6 +121,7 @@ export function SceneContents({ budget, tier = 2 }: { budget: ReturnType<typeof 
       <Atmosphere />
       <Sky />
       <Water segments={budget.waterSegments} />
+      <Bubbles />
       <LightShafts />
       <MarineSnow count={budget.snow} />
       <Fish count={budget.fish} />

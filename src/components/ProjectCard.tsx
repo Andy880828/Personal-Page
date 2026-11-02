@@ -20,7 +20,14 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
         className={`flex h-full min-w-0 flex-col ${featured ? 'md:grid md:grid-cols-[1.1fr_1fr]' : ''}`}
       >
         <div
-          className={`relative overflow-hidden ${featured ? 'md:order-2 md:h-full' : project.image ? 'aspect-[16/9]' : ''}`}
+          className={`relative overflow-hidden ${
+            project.image
+              ? featured
+                ? 'md:order-2 md:h-full'
+                : 'aspect-[16/9]'
+              : // 終端機封面只要放得下指令與三行輸出：固定矮高度，大卡片裡靠底對齊，不撐成一大塊空框
+                `h-40 ${featured ? 'md:order-2 md:self-end md:h-44' : ''}`
+          }`}
         >
           {project.image ? (
             <Picture

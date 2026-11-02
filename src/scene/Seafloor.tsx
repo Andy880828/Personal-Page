@@ -181,7 +181,8 @@ export default function Seafloor() {
 
     // 管蟲叢（Riftia）：熱泉旁一叢白色管子，頂端是紅色的鰓冠；程序幾何，兩個 InstancedMesh
     const worms: { x: number; y: number; z: number; h: number; tilt: number; ry: number }[] = [];
-    for (const [vx, vz] of [VENTS[0]!, VENTS[2]!]) {
+    // 只放在右邊兩座熱泉旁：左邊那座在聯絡段文字後面
+    for (const [vx, vz] of [VENTS[0]!, VENTS[1]!]) {
       for (let i = 0; i < 46; i++) {
         const a = rng() * Math.PI * 2;
         const r = 1.6 + Math.sqrt(rng()) * 2.6;

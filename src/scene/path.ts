@@ -63,9 +63,45 @@ export function cameraY(pos: number): number {
   return DIVE_BOTTOM - UNDER - f;
 }
 
-/** 相機俯角（弧度，負值往下看）：海面上看向夕陽海面，水下逐漸平視 */
+/**
+ * 「每 px 等距」的 pos：把相機的實際高度換回六段等長時的 pos。
+ * 水色、霧、光量這些跟深度走的東西用它，速度就和相機一樣在段落邊界不換檔
+ * （直接用 pos 時，短的段落變色快、長的作品段變色慢，每個邊界都有一個速度折點）。
+ * 六段等長時就是 pos 本身。
+ */
+export function evenPos(pos: number): number {
+  if (pos <= 1 || pos >= 5) return pos;
+  return 1 + (DIVE_BOTTOM - cameraY(pos)) / SECTION_SPACING;
+}
+
+/** 相機穿過水面（y = 0）時的 pos；海面段的曲線單調，用二分法解 */
+export function surfacePos(): number {
+  let lo = 0;
+  let hi = 1;
+  for (let k = 0; k < 30; k++) {
+    const mid = (lo + hi) / 2;
+    if (cameraY(mid) > 0) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/** 入水後抬頭看斯涅爾窗的最大仰角（弧度）：視線中心離正上方約 21°，整個光窗（半角 48.6°）剛好框在畫面裡 */
+export const SNELL_LOOK = 1.15;
+
+/**
+ * 入水事件的仰角權重 0–1：穿過水面後抬頭（看到頭頂的斯涅爾窗），停一下，再隨下潛轉回平視。
+ * 全部由捲動驅動，往回捲就倒著播；用 smoothstep 接合，速度連續。
+ */
+export function entryLook(pos: number): number {
+  const sp = surfacePos();
+  const end = Math.min(1.1, sp + 0.5);
+  return smoothstep(sp - 0.02, sp + 0.12, pos) * (1 - smoothstep(sp + 0.24, end, pos));
+}
+
+/** 相機俯角（弧度，負值往下看）：海面上看向夕陽海面；入水時抬頭看斯涅爾窗；水下平視；到海床往下看 */
 export function cameraPitch(pos: number): number {
-  if (pos < 1) return lerp(-0.2, 0.06, smoothstep(0.1, 0.9, pos));
+  if (pos < 1.15) return lerp(-0.2, 0.06, smoothstep(0.1, 0.9, pos)) + SNELL_LOOK * entryLook(pos);
   return lerp(0.06, -0.4, smoothstep(4.6, 5.7, pos));
 }
 
@@ -103,7 +139,8 @@ const WATER_STOPS: [number, [number, number, number]][] = [
   [5.6, [0x01, 0x05, 0x0c]],
 ];
 
-export function waterColor(pos: number): [number, number, number] {
+export function waterColor(rawPos: number): [number, number, number] {
+  const pos = evenPos(rawPos);
   const first = WATER_STOPS[0]!;
   const last = WATER_STOPS[WATER_STOPS.length - 1]!;
   if (pos <= first[0]) return first[1].map((c) => c / 255) as [number, number, number];
@@ -120,12 +157,13 @@ export function waterColor(pos: number): [number, number, number] {
 }
 
 /** 水下霧濃度：越深越濃 */
-export function fogDensity(pos: number): number {
+export function fogDensity(rawPos: number): number {
+  const pos = evenPos(rawPos);
   // 海床段變清澈一點，讓地形與熱泉看得到
   return lerp(0.026, 0.034, smoothstep(1, 4.5, pos)) - 0.014 * smoothstep(4.9, 5.6, pos);
 }
 
 /** 從海面往下的光量（0–1），給光束、海雪亮度用 */
 export function sunlight(pos: number): number {
-  return 1 - smoothstep(0.6, 3.6, pos);
+  return 1 - smoothstep(0.6, 3.6, evenPos(pos));
 }

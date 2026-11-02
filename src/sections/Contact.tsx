@@ -63,21 +63,24 @@ export default function Contact() {
 
         <div className="mt-12 grid gap-12 lg:grid-cols-2">
           <div className="space-y-10">
-            <ul className="flex flex-wrap gap-3" data-reveal>
-              {links.map((l) => (
-                <li key={l.label}>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="glass inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-foam transition-colors hover:border-biolum/60 hover:text-biolum"
-                  >
-                    {l.icon}
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {/* 表單關閉時右邊的「直接找我」卡片已經有這三個連結，這排就不重複顯示 */}
+            {emailReady && (
+              <ul className="flex flex-wrap gap-3" data-reveal>
+                {links.map((l) => (
+                  <li key={l.label}>
+                    <a
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="glass inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-foam transition-colors hover:border-biolum/60 hover:text-biolum"
+                    >
+                      {l.icon}
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <div data-reveal>
               <h3 className="text-lg font-bold text-foam">不在工作的時候</h3>

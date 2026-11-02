@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSiteStore } from '@/store/useSiteStore';
 import { smoothstep } from '@/lib/math';
+import { evenPos } from '@/scene/path';
 
 /**
  * 文字欄後面的暗色遮罩：一層固定在畫面上的圖層（在 3D 之上、內容之下），
@@ -10,7 +11,8 @@ import { smoothstep } from '@/lib/math';
 export default function Scrim() {
   const el = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const apply = (pos: number) => {
+    const apply = (raw: number) => {
+      const pos = evenPos(raw);
       if (el.current) el.current.style.opacity = String(smoothstep(0.7, 1.05, pos) * (1 - smoothstep(3.0, 3.8, pos)));
     };
     apply(useSiteStore.getState().pos);

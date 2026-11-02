@@ -65,6 +65,22 @@ describe('相機路徑的速度連續', () => {
     for (let p = 0.1; p < 6; p += 0.01) expect(cameraY(p + 0.01)).toBeLessThanOrEqual(cameraY(p) + 1e-9);
   });
 
+  it('evenPos：水色與光量跟著相機的實際深度走，每 px 的變化在段落邊界連續', async () => {
+    const { evenPos, setSectionSpans } = await import('@/scene/path');
+    expect(evenPos(2.3)).toBeCloseTo(2.3);
+    const spans = [1350, 1002, 1119, 3500, 1950, 1278];
+    setSectionSpans(spans);
+    const e = 1e-4;
+    const perPx = (p: number, dir: 1 | -1) => {
+      const i = Math.min(5, Math.floor(dir < 0 ? p - e : p));
+      return (evenPos(p + dir * e) - evenPos(p)) / (dir * e) / spans[i]!;
+    };
+    for (const p of [2, 3, 4])
+      expect(Math.abs(perPx(p, -1) - perPx(p, 1)) / perPx(p, 1), `pos ${p}`).toBeLessThan(0.01);
+    expect(evenPos(1)).toBeCloseTo(1);
+    expect(evenPos(5)).toBeCloseTo(5);
+  });
+
   it('六段等長時和固定間距一致（預設值）', async () => {
     const { cameraY, SECTION_SPACING, DIVE_BOTTOM } = await import('@/scene/path');
     expect(cameraY(2)).toBeCloseTo(DIVE_BOTTOM - SECTION_SPACING);

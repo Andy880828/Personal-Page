@@ -24,7 +24,8 @@ varying vec2 vUv;
 varying float vDepth;
 void main() {
   float across = smoothstep(0.0, 0.5, vUv.x) * smoothstep(1.0, 0.5, vUv.x);
-  float along = smoothstep(0.0, 0.85, vUv.y) * smoothstep(-70.0, -4.0, vDepth);
+  // 頂端也要淡出：傾斜平面的頂邊是一條斜的硬亮度線，下潛時會斜著掃過畫面
+  float along = smoothstep(0.0, 0.85, vUv.y) * smoothstep(1.0, 0.72, vUv.y) * smoothstep(-70.0, -4.0, vDepth);
   float flicker = 0.65 + 0.35 * sin(uTime * 0.7 + uSeed * 6.28 + vUv.x * 3.0);
   float a = across * across * along * flicker * uIntensity;
   gl_FragColor = vec4(vec3(0.62, 0.86, 1.0) * a * 0.18, 1.0);

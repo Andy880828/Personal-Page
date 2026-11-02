@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { computeBreakpoints, formatDepth, posToDepth, posToScroll, posToSectionIndex, scrollToPos } from '@/lib/scroll';
+import {
+  computeBreakpoints,
+  depthAtScroll,
+  formatDepth,
+  posToDepth,
+  posToScroll,
+  posToSectionIndex,
+  scrollForDepth,
+  scrollToPos,
+} from '@/lib/scroll';
 import { SECTIONS, sectionForRoute } from '@/lib/sections';
 
 const VH = 900;
@@ -75,5 +84,40 @@ describe('深度', () => {
     expect(sectionForRoute('/about/')).toBe('about');
     expect(sectionForRoute('/project')).toBe('projects');
     expect(sectionForRoute('/nope')).toBeNull();
+  });
+});
+
+describe('深度計的捲動 → 深度', () => {
+  const b = computeBreakpoints(tops, VH, maxScroll);
+
+  it('每個段落斷點剛好是該段的起始深度，捲到底是 4,000 m', () => {
+    for (let i = 0; i < SECTIONS.length; i++) expect(depthAtScroll(b[i]!, b)).toBeCloseTo(SECTIONS[i]!.depthStart, 6);
+    expect(depthAtScroll(maxScroll, b)).toBe(4000);
+  });
+
+  it('單調，而且數字的速度在段落邊界兩側連續（不會一進經歷段就突然快很多倍）', () => {
+    let last = -1;
+    for (let y = 0; y <= maxScroll; y += 7) {
+      const d = depthAtScroll(y, b);
+      expect(d).toBeGreaterThanOrEqual(last - 1e-9);
+      last = d;
+    }
+    const e = 0.25;
+    for (let i = 1; i < b.length - 1; i++) {
+      const y = b[i]!;
+      const l = (depthAtScroll(y, b) - depthAtScroll(y - e, b)) / e;
+      const r = (depthAtScroll(y + e, b) - depthAtScroll(y, b)) / e;
+      expect(Math.abs(l - r) / Math.max(l, r), `邊界 ${i}`).toBeLessThan(0.02);
+    }
+  });
+
+  it('scrollForDepth 反解：誤差不超過一個像素對應的深度（捲動位置只能是整數像素）', () => {
+    for (const d of [5, 50, 150, 600, 1200, 3000, 3900]) {
+      const y = scrollForDepth(d, b);
+      const perPx = depthAtScroll(y + 1, b) - depthAtScroll(y, b);
+      const got = depthAtScroll(y, b);
+      expect(got, String(d)).toBeGreaterThanOrEqual(d - 1e-6);
+      expect(got - d, String(d)).toBeLessThanOrEqual(perPx + 1e-6);
+    }
   });
 });

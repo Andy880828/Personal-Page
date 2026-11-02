@@ -1,6 +1,13 @@
 import type Lenis from 'lenis';
 import { SECTIONS, type SectionId } from './sections';
-import { computeBreakpoints, posToDepth, posToSectionIndex, posToScroll, scrollToPos } from './scroll';
+import {
+  computeBreakpoints,
+  depthAtScroll,
+  posToSectionIndex,
+  posToScroll,
+  scrollForDepth,
+  scrollToPos,
+} from './scroll';
 import { loadMotion } from './motion';
 import { useSiteStore } from '@/store/useSiteStore';
 import { setSectionSpans } from '@/scene/path';
@@ -46,7 +53,7 @@ function update() {
   lastT = now;
   const pos = scrollToPos(y, breakpoints);
   const section = SECTIONS[posToSectionIndex(pos)]!.id;
-  useSiteStore.getState().setScroll(pos, posToDepth(pos), v, section);
+  useSiteStore.getState().setScroll(pos, depthAtScroll(y, breakpoints), v, section);
 }
 
 export function startScroller(smooth: boolean) {
@@ -101,18 +108,9 @@ export function scrollToSection(id: SectionId, immediate = false) {
   }
 }
 
-/** 捲到某個深度（公尺）：把深度反算成 pos，再換成捲動位置 */
+/** 捲到某個深度（公尺）：用深度樣條反解出捲動位置 */
 export function scrollToDepth(depth: number) {
-  const d = Math.max(0, Math.min(4000, depth));
-  let pos = SECTIONS.length;
-  for (let i = 0; i < SECTIONS.length; i++) {
-    const s = SECTIONS[i]!;
-    if (d <= s.depthEnd) {
-      pos = i + (d - s.depthStart) / (s.depthEnd - s.depthStart);
-      break;
-    }
-  }
-  const target = posToScroll(pos, breakpoints);
+  const target = scrollForDepth(Math.max(0, Math.min(4000, depth)), breakpoints);
   if (lenis) lenis.scrollTo(target, { duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
   else {
     const smooth = document.documentElement.dataset.motion !== 'reduce';

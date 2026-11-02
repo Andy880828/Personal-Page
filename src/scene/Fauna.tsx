@@ -230,6 +230,9 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     const { pos } = useSiteStore.getState();
     const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.45);
     g.visible = w > 0.001;
+    // 誘餌小球是模型的兄弟節點（要放在世界座標），要跟著一起藏；
+    // 否則它會停在初始位置（原點、剛好在水面上），剛入水抬頭就看到一顆不吃霧的橘色多邊形
+    if (lure.current) lure.current.visible = g.visible;
     if (!g.visible) return;
     const t = sceneTime(state);
     for (const m of mats.current) m.uniforms.uTime!.value = t;
@@ -287,7 +290,9 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
       <group ref={group}>
         <primitive object={model} />
       </group>
-      {p.species === 'anglerfish' && <mesh ref={lure} geometry={bulbGeo} material={bulbMat} frustumCulled={false} />}
+      {p.species === 'anglerfish' && (
+        <mesh ref={lure} geometry={bulbGeo} material={bulbMat} frustumCulled={false} visible={false} />
+      )}
     </>
   );
 }

@@ -4,7 +4,7 @@ import { AdditiveBlending, BufferAttribute, BufferGeometry, ShaderMaterial, Vect
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
 import { sceneTime } from './time';
-import { sunlight } from './path';
+import { evenPos, sunlight } from './path';
 import { smoothstep } from '@/lib/math';
 import { GLYPH_GRID, glyphAtlas, SNOW_GLYPHS } from './glyphs';
 
@@ -103,7 +103,7 @@ export default function MarineSnow({ count }: { count: number }) {
     material.uniforms.uPixelRatio!.value = state.gl.getPixelRatio();
     material.uniforms.uBright!.value = 0.35 + 0.65 * sunlight(pos);
     // 作品段（200 m）開始出現字元，經歷段（1000 m）以下全部是字
-    material.uniforms.uChars!.value = smoothstep(3, 4, pos);
+    material.uniforms.uChars!.value = smoothstep(2.6, 3.9, evenPos(pos));
   });
 
   return <points geometry={geometry} material={material} frustumCulled={false} />;
