@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, 'rebuild/**']
+    branches: [main]
   pull_request:
 
 concurrency:
@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -39,9 +41,14 @@ jobs:
           path: bundle-report.html
       - name: 安裝 Playwright Chromium
         run: npx playwright install --with-deps chromium
-      # 基準圖以 CI 的渲染為準：commit 訊息含 [update-snapshots] 時重新產生，並上傳成 artifact 供 commit 回 repo
+      # 基準圖以 CI 的渲染為準：最新 commit 訊息含 [update-snapshots] 時重新產生，並上傳成 artifact 供 commit 回 repo
+      # （push 與 pull_request 都用 git log 讀訊息；PR 事件沒有 head_commit）
       - name: 視覺回歸與互動測試
-        run: npm run test:e2e -- ${{ contains(github.event.head_commit.message, '[update-snapshots]') && '--update-snapshots' || '' }}
+        run: |
+          msg=$(git log -1 --format=%B ${{ github.event.pull_request.head.sha || github.sha }})
+          if [[ "$msg" == *"[update-snapshots]"* ]]; then flag=--update-snapshots; else flag=; fi
+          echo "snapshots: ${flag:-compare}"
+          npm run test:e2e -- $flag
       - uses: actions/upload-artifact@v4
         if: always()
         with:
