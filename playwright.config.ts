@@ -12,9 +12,8 @@ export default defineConfig({
   timeout: 90_000,
   expect: {
     timeout: 20_000,
-    // 基準圖以 CI（ubuntu-24.04 + Playwright Chromium）為準：CI 容差 2%。
-    // 其他 Linux 機器的字型光柵化有次像素差異（字形位置偏移不到 1px），本機放寬到 4%。
-    toHaveScreenshot: { maxDiffPixelRatio: process.env.CI ? 0.02 : 0.04, animations: 'disabled', caret: 'hide' },
+    // 基準圖以 CI（ubuntu-24.04 + Playwright Chromium）為準
+    toHaveScreenshot: { maxDiffPixelRatio: 0.02, animations: 'disabled', caret: 'hide' },
   },
   fullyParallel: false,
   workers: 1,
