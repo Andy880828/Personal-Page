@@ -20,7 +20,7 @@
     "test:visual:update": "playwright test --update-snapshots",
     "size": "size-limit && node scripts/check-assets.mjs",
     "analyze": "vite-bundle-visualizer",
-    "lhci": "lhci autorun",
+    "lhci": "node scripts/lhci.mjs",
     "fonts": "node scripts/subset-fonts.mjs",
     "images": "node scripts/prepare-images.mjs",
     "og": "node scripts/make-og.mjs",

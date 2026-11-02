@@ -18,7 +18,7 @@ function subscribe(cb: () => void) {
 
 export function navigate(path: string, opts: { replace?: boolean } = {}) {
   if (opts.replace) window.history.replaceState(null, '', path);
-  else if (window.location.pathname !== path) window.history.pushState(null, '', path);
+  else if (window.location.pathname !== path) window.history.pushState(null, '', path + window.location.search);
   emit();
 }
 

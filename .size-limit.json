@@ -7,10 +7,7 @@
   },
   {
     "name": "3D 核心（three + r3f + drei，場景 lazy 載入）",
-    "path": [
-      "dist/assets/three-*.js",
-      "dist/assets/r3f-*.js"
-    ],
+    "path": ["dist/assets/three-*.js", "dist/assets/r3f-*.js"],
     "limit": "250 KB",
     "gzip": true
   },
@@ -22,10 +19,7 @@
   },
   {
     "name": "後製（tier ≥ 2 才載入）",
-    "path": [
-      "dist/assets/postfx-*.js",
-      "dist/assets/Effects-*.js"
-    ],
+    "path": ["dist/assets/postfx-*.js", "dist/assets/Effects-*.js"],
     "limit": "80 KB",
     "gzip": true
   },
@@ -37,10 +31,7 @@
   },
   {
     "name": "全部 JS（不含 ?debug 才載入的效能面板）",
-    "path": [
-      "dist/assets/*.js",
-      "!dist/assets/Debug-*.js"
-    ],
+    "path": ["dist/assets/*.js", "!dist/assets/Debug-*.js"],
     "limit": "500 KB",
     "gzip": true
   },

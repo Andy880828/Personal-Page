@@ -22,7 +22,7 @@ interface Window {
     scrollToPos: (pos: number) => void;
     frames: () => number;
     ready: () => boolean;
-    tier: () => number;
+    tier: () => number | null;
   };
   __perf?: { avgFrameMs: number; samples: number };
 }

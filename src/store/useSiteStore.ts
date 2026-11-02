@@ -11,7 +11,8 @@ export interface SiteState {
   depth: number;
   velocity: number;
   section: SectionId;
-  tier: Tier;
+  /** null = 還在偵測，這段時間不載入任何 WebGL */
+  tier: Tier | null;
   systemReducedMotion: boolean;
   motionPref: MotionPref;
   activeSkill: string;
@@ -31,14 +32,39 @@ export interface SiteState {
   setSceneReady: (v: boolean) => void;
 }
 
+const MOTION_KEY = 'motion-pref';
+
+/** 建立 store 時就讀好動態偏好，第一次 render 就是正確值（不會先載入動畫套件再關掉） */
+function initialSystemReduced(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function initialMotionPref(): MotionPref {
+  try {
+    const v = typeof localStorage !== 'undefined' ? localStorage.getItem(MOTION_KEY) : null;
+    return v === 'reduce' || v === 'full' ? v : 'system';
+  } catch {
+    return 'system';
+  }
+}
+
+export function saveMotionPref(p: MotionPref) {
+  try {
+    localStorage.setItem(MOTION_KEY, p);
+  } catch {
+    /* 無痕模式或封鎖儲存：只在本次有效 */
+  }
+}
+
 export const useSiteStore = create<SiteState>()((set, get) => ({
   pos: 0,
   depth: 0,
   velocity: 0,
   section: 'hero',
-  tier: 2,
-  systemReducedMotion: false,
-  motionPref: 'system',
+  tier: null,
+  systemReducedMotion: initialSystemReduced(),
+  motionPref: initialMotionPref(),
   activeSkill: 'frontend',
   hoverSkill: null,
   projectFilter: 'all',

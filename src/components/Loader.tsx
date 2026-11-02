@@ -6,7 +6,7 @@ export default function Loader() {
   const tier = useSiteStore((s) => s.tier);
   const ready = useSiteStore((s) => s.sceneReady);
   const progress = useSiteStore((s) => s.sceneProgress);
-  if (tier === 0 || ready || flags.test) return null;
+  if (!tier || ready || flags.test) return null;
   const pct = Math.round(progress * 100);
   return (
     <div

@@ -18,8 +18,9 @@ describe('GPU 分級', () => {
     expect(classifyGpu({ ...base, webgl2: false })).toBe(0);
     expect(classifyGpu({ ...base, saveData: true })).toBe(0);
   });
-  it('軟體算繪（CI 的 SwiftShader）→ 1', () => {
-    expect(classifyGpu({ ...base, renderer: 'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)))' })).toBe(1);
+  it('軟體算繪（CI 的 SwiftShader、llvmpipe）→ 0，用純 DOM 版', () => {
+    expect(classifyGpu({ ...base, renderer: 'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)))' })).toBe(0);
+    expect(classifyGpu({ ...base, renderer: 'llvmpipe (LLVM 15.0.7, 256 bits)' })).toBe(0);
   });
   it('手機與弱 GPU → 1', () => {
     expect(classifyGpu({ ...base, coarsePointer: true, viewportWidth: 390, renderer: 'Apple GPU' })).toBe(1);

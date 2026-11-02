@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@source not '../../legacy';
 
 @font-face {
   font-family: 'Noto Sans TC Subset';

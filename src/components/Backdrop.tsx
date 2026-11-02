@@ -41,7 +41,7 @@ export default function Backdrop() {
             'radial-gradient(120% 70% at 70% 58%, rgb(255 184 107 / 0.55), transparent 60%), linear-gradient(180deg, #071a33 0%, #0c3358 38%, #2a5f86 55%, #0b3a5c 56%, #04203a 100%)',
         }}
       />
-      {tier > 0 && !sceneReady && (
+      {!!tier && !sceneReady && (
         <Suspense fallback={null}>
           <PaperBackdrop />
         </Suspense>

@@ -17,6 +17,7 @@ let lastT = 0;
 let resizeObserver: ResizeObserver | null = null;
 let generation = 0;
 let detachTicker: (() => void) | null = null;
+let sleepTicker: (() => void) | null = null;
 
 export function measure() {
   const vh = window.innerHeight;
@@ -53,7 +54,11 @@ export function startScroller(smooth: boolean) {
   resizeObserver = new ResizeObserver(() => measure());
   resizeObserver.observe(document.body);
   measure();
-  if (!smooth) return;
+  if (!smooth) {
+    // 減少動態：讓已經載入過的 GSAP ticker 休眠，不再每幀呼叫 requestAnimationFrame
+    sleepTicker?.();
+    return;
+  }
   void loadMotion().then(({ Lenis: LenisCtor, gsap, ScrollTrigger }) => {
     if (gen !== generation) return;
     lenis = new LenisCtor({ lerp: 0.085, wheelMultiplier: 0.9, touchMultiplier: 1.4 });
@@ -62,6 +67,8 @@ export function startScroller(smooth: boolean) {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     detachTicker = () => gsap.ticker.remove(tick);
+    sleepTicker = () => gsap.ticker.sleep();
+    gsap.ticker.wake();
   });
 }
 

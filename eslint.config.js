@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default tseslint.config(
-  { ignores: ['dist', 'legacy', 'node_modules', 'playwright-report', 'test-results', '.lighthouseci', 'coverage'] },
+  { ignores: ['dist', 'node_modules', 'playwright-report', 'test-results', '.lighthouseci', 'coverage'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended, jsxA11y.flatConfigs.recommended],
     files: ['**/*.{ts,tsx}'],

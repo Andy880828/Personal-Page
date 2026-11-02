@@ -19,8 +19,6 @@ import Contact from '@/sections/Contact';
 
 const SceneRoot = lazy(() => import('@/scene/SceneRoot'));
 
-const MOTION_KEY = 'motion-pref';
-
 export default function Site() {
   const pathname = usePathname();
   const tier = useSiteStore((s) => s.tier);
@@ -30,19 +28,17 @@ export default function Site() {
 
   // GPU 分級、動態偏好（系統設定 + 使用者切換）
   useEffect(() => {
-    const store = useSiteStore.getState();
-    store.setTier(classifyGpu(readGpuInput(flags.tier)));
+    let alive = true;
+    void readGpuInput(flags.tier).then((input) => {
+      if (alive) useSiteStore.getState().setTier(classifyGpu(input));
+    });
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    store.setSystemReducedMotion(mq.matches);
     const onChange = () => useSiteStore.getState().setSystemReducedMotion(mq.matches);
     mq.addEventListener('change', onChange);
-    try {
-      const saved = localStorage.getItem(MOTION_KEY);
-      if (saved === 'reduce' || saved === 'full') store.setMotionPref(saved);
-    } catch {
-      /* 無痕模式或封鎖儲存：用系統設定 */
-    }
-    return () => mq.removeEventListener('change', onChange);
+    return () => {
+      alive = false;
+      mq.removeEventListener('change', onChange);
+    };
   }, []);
 
   // 捲動來源：一般情況 Lenis，減少動態與測試模式用原生捲動
@@ -55,7 +51,7 @@ export default function Site() {
 
   // 場景等第一次繪製完成後才開始下載，不擋首屏
   useEffect(() => {
-    if (tier === 0) return;
+    if (!tier) return;
     const start = () => setSceneAllowed(true);
     if (flags.test) {
       start();
@@ -74,7 +70,8 @@ export default function Site() {
   useEffect(() => {
     const target = sectionForRoute(pathname);
     if (!target) {
-      navigate('/', { replace: true });
+      // 保留網址參數（例如 ?test=1、?tier=0）
+      navigate(`/${window.location.search}`, { replace: true });
       return;
     }
     const immediate = firstRoute.current;
@@ -110,7 +107,7 @@ export default function Site() {
         跳到主要內容
       </a>
       <Backdrop />
-      {sceneAllowed && tier > 0 && (
+      {sceneAllowed && !!tier && (
         <SceneBoundary>
           <Suspense fallback={null}>
             <SceneRoot />

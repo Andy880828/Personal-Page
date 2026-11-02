@@ -133,7 +133,7 @@ export default function SceneRoot() {
   const ready = useSiteStore((s) => s.sceneReady);
   const reduced = useReducedMotion();
   const [degraded, setDegraded] = useState(false);
-  const budget = useMemo(() => sceneBudget(degraded ? 1 : tier, flags.test), [tier, degraded]);
+  const budget = useMemo(() => sceneBudget(degraded ? 1 : (tier ?? 1), flags.test), [tier, degraded]);
   const demand = reduced || flags.test;
 
   useEffect(() => {

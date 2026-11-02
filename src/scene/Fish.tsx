@@ -43,7 +43,7 @@ export default function Fish({ count }: { count: number }) {
   const school = useMemo(() => {
     const s = createSchool(count, SCENE_SEED + 3);
     // 先模擬一段時間，讓魚群一出場就是成形的隊伍（固定步長，結果可重現）
-    for (let i = 0; i < 240; i++) stepSchool(s, 1 / 30);
+    for (let i = 0; i < 90; i++) stepSchool(s, 1 / 20);
     return s;
   }, [count]);
 

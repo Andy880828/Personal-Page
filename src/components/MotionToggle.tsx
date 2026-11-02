@@ -1,5 +1,5 @@
 import { Waves, Pause } from 'lucide-react';
-import { isReducedMotion, useSiteStore } from '@/store/useSiteStore';
+import { isReducedMotion, saveMotionPref, useSiteStore } from '@/store/useSiteStore';
 
 /** 一鍵關掉所有動態（慣性捲動、3D 動畫、文字動畫）；記在 localStorage */
 export default function MotionToggle({ className = '' }: { className?: string }) {
@@ -8,11 +8,7 @@ export default function MotionToggle({ className = '' }: { className?: string })
   const toggle = () => {
     const next = reduced ? 'full' : 'reduce';
     setPref(next);
-    try {
-      localStorage.setItem('motion-pref', next);
-    } catch {
-      /* 儲存被封鎖時只在本次有效 */
-    }
+    saveMotionPref(next);
   };
   return (
     <button
