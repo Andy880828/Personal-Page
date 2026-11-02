@@ -32,13 +32,13 @@ export default function Backdrop() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
-      <div ref={water} className="absolute inset-0" style={{ backgroundColor: '#146f9a' }} />
+      <div ref={water} className="absolute inset-0" style={{ backgroundColor: '#0f587f' }} />
       <div
         ref={sky}
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(120% 70% at 70% 58%, rgb(255 184 107 / 0.55), transparent 60%), linear-gradient(180deg, #071a33 0%, #0c3358 38%, #2a5f86 55%, #0b3a5c 56%, #04203a 100%)',
+            'radial-gradient(120% 70% at 70% 52%, rgb(255 184 107 / 0.45), transparent 60%), linear-gradient(180deg, #071a33 0%, #0c3358 34%, #2a5f86 48%, #123f61 58%, #04203a 100%)',
         }}
       />
       {!!tier && !sceneReady && (

@@ -34,6 +34,30 @@ export const projects: Project[] = [
     status: 'active',
   },
   {
+    slug: 'local-transcribe',
+    name: 'local-transcribe',
+    nameZh: '本地轉錄與講者辨識',
+    summary: '影片或錄音進、標好講者的逐字稿出；轉錄與講者分辨全部在本地 GPU 執行，不上傳任何音訊。',
+    highlights: [
+      '輸出 txt、srt、vtt、md、json 五種格式',
+      '為 agent 設計：JSON envelope、穩定錯誤碼、schema 自我描述',
+      '附 6 個 Claude Code skills：轉錄、批次、會議摘要等',
+    ],
+    tags: ['Python', 'Whisper', 'pyannote', 'CUDA'],
+    year: 2026,
+    categories: ['data', 'agent'],
+    repo: 'https://github.com/Andy880828/local-transcribe',
+    cover: {
+      prompt: 'uv run transcribe run meeting.mp4 --speakers 3',
+      lines: [
+        '→ outputs/meeting/meeting.{txt,srt,vtt,md,json}',
+        'transcript rename --map SPEAKER_00=王小明',
+        'transcript search meeting.json "交期" -C 1',
+      ],
+    },
+    status: 'active',
+  },
+  {
     slug: 'scout',
     name: 'scout',
     nameZh: '科技資訊雷達',
@@ -94,30 +118,6 @@ export const projects: Project[] = [
     cover: {
       prompt: 'claude plugin install andy-init@andy-claude-kit',
       lines: ['/andy-init:setup', '→ 確認 → 選 LSP → 重啟 Claude Code', '冪等：手改過的檔案不覆蓋'],
-    },
-    status: 'active',
-  },
-  {
-    slug: 'local-transcribe',
-    name: 'local-transcribe',
-    nameZh: '本地轉錄與講者辨識',
-    summary: '影片或錄音進、標好講者的逐字稿出；轉錄與講者分辨全部在本地 GPU 執行，不上傳任何音訊。',
-    highlights: [
-      '輸出 txt、srt、vtt、md、json 五種格式',
-      '為 agent 設計：JSON envelope、穩定錯誤碼、schema 自我描述',
-      '附 6 個 Claude Code skills：轉錄、批次、會議摘要等',
-    ],
-    tags: ['Python', 'Whisper', 'pyannote', 'CUDA'],
-    year: 2026,
-    categories: ['data', 'agent'],
-    repo: 'https://github.com/Andy880828/local-transcribe',
-    cover: {
-      prompt: 'uv run transcribe run meeting.mp4 --speakers 3',
-      lines: [
-        '→ outputs/meeting/meeting.{txt,srt,vtt,md,json}',
-        'transcript rename --map SPEAKER_00=王小明',
-        'transcript search meeting.json "交期" -C 1',
-      ],
     },
     status: 'active',
   },

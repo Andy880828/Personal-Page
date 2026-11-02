@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { navigate, usePathname } from '@/lib/router';
 import { Menu, X } from 'lucide-react';
 import { SECTIONS, type SectionDef } from '@/lib/sections';
@@ -11,6 +11,21 @@ import DepthReadout from './DepthReadout';
 export default function Nav() {
   const section = useSiteStore((s) => s.section);
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+
+  // 手機選單：打開時焦點進到第一個連結，Esc 關閉並把焦點還給按鈕
+  useEffect(() => {
+    if (!open) return;
+    menu.current?.querySelector<HTMLElement>('a')?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      menuButton.current?.focus();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
   const pathname = usePathname();
 
   const go = (s: SectionDef) => (e: React.MouseEvent) => {
@@ -25,7 +40,9 @@ export default function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-[background-color,backdrop-filter,border-color] duration-500 ${
-        section === 'hero' ? 'border-b border-transparent' : 'border-b border-foam/8 bg-deep/70 backdrop-blur-xl'
+        section === 'hero'
+          ? 'border-b border-transparent bg-gradient-to-b from-deep/80 via-deep/40 to-transparent'
+          : 'border-b border-foam/8 bg-deep/75 backdrop-blur-xl'
       }`}
     >
       <nav
@@ -39,13 +56,13 @@ export default function Nav() {
           aria-label={`${profile.name}，回到海面`}
         >
           <span className="text-lg font-black tracking-wider">{profile.name}</span>
-          <span className="hidden font-mono text-[0.7rem] tracking-[0.2em] text-mist uppercase sm:inline">
+          <span className="hidden font-mono text-[0.7rem] tracking-[0.2em] text-ink/90 uppercase sm:inline">
             {profile.nameEn}
           </span>
         </a>
 
         <div
-          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'glass' : ''}`}
+          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'bg-deep/70 backdrop-blur-md' : ''}`}
         >
           {links.map((s) => (
             <a
@@ -54,7 +71,7 @@ export default function Nav() {
               onClick={go(s)}
               aria-current={section === s.id ? 'location' : undefined}
               className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                section === s.id ? 'bg-foam/12 text-foam' : 'text-mist hover:text-foam'
+                section === s.id ? 'bg-foam/15 text-foam' : 'text-ink/90 hover:text-foam'
               }`}
             >
               {s.label}
@@ -66,6 +83,7 @@ export default function Nav() {
 
         <DepthReadout className="ml-auto md:hidden" />
         <button
+          ref={menuButton}
           type="button"
           className="glass inline-flex size-11 items-center justify-center rounded-full text-foam md:hidden"
           aria-expanded={open}
@@ -78,7 +96,7 @@ export default function Nav() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="glass mx-4 rounded-2xl p-3 md:hidden">
+        <div id="mobile-menu" ref={menu} className="glass mx-4 rounded-2xl p-3 md:hidden">
           <ul className="grid grid-cols-2 gap-1">
             {links.map((s) => (
               <li key={s.id}>

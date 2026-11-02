@@ -12,27 +12,26 @@ export default function Hero() {
     <section id="hero" aria-labelledby="hero-title" className="relative h-[150vh]">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-end px-5 pb-[14vh] sm:px-10 lg:px-16">
         <div className="max-w-6xl">
-          <p className="eyebrow text-foam/80">
-            <span className="normal-case">0 m</span> <span className="mx-2 text-foam/40">/</span> 22.6°N 120.3°E ·{' '}
-            {profile.hometown}
-          </p>
-          <p className="mt-6 font-mono text-sm tracking-[0.3em] text-foam/85 uppercase sm:text-base">
-            {profile.nameEn}
-          </p>
           <h1
             id="hero-title"
-            className="mt-1 text-[clamp(4.5rem,15vw,12.5rem)] leading-[0.95] font-black tracking-tight text-foam [text-shadow:0_6px_40px_rgb(1_4_9/0.45)]"
+            className="text-[clamp(4.5rem,15vw,12.5rem)] leading-[0.95] font-black tracking-tight text-foam [text-shadow:0_6px_40px_rgb(1_4_9/0.45)]"
           >
             <RiseText text={profile.name} />
           </h1>
           <p className="mt-6 max-w-3xl text-[clamp(1.25rem,2.6vw,2rem)] leading-snug font-medium text-foam [text-shadow:0_2px_18px_rgb(1_4_9/0.6)]">
+            {profile.nameEn}
+            <span className="mx-3 text-ember" aria-hidden="true">
+              —
+            </span>
             {profile.role}
             <span className="mx-3 text-ember">/</span>
             {profile.roleSecond}
           </p>
-          <p className="mt-2 text-base text-foam/80 sm:text-lg">{profile.roleZh}</p>
+          <p className="mt-2 text-base text-foam/90 sm:text-lg [text-shadow:0_2px_14px_rgb(1_4_9/0.7)]">
+            {profile.roleZh}
+          </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-4">
             <button
               type="button"
               onClick={() => scrollToSection('about')}
@@ -52,6 +51,9 @@ export default function Hero() {
               直接看作品
             </a>
           </div>
+          <p className="mt-8 font-mono text-xs text-foam/85 tabular-nums [text-shadow:0_1px_10px_rgb(1_4_9/0.8)]">
+            0 m · 22.6°N 120.3°E · {profile.hometown}
+          </p>
         </div>
       </div>
     </section>

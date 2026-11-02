@@ -15,10 +15,11 @@ export default function MotionToggle({ className = '' }: { className?: string })
       type="button"
       onClick={toggle}
       aria-pressed={reduced}
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-mono text-xs text-mist transition-colors hover:text-foam ${className}`}
+      title={reduced ? '動態已關閉，按一下恢復' : '關閉慣性捲動與動畫'}
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-mono text-xs text-ink/90 transition-colors hover:text-foam ${className}`}
     >
       {reduced ? <Pause size={14} aria-hidden="true" /> : <Waves size={14} aria-hidden="true" />}
-      <span>{reduced ? '動態已關閉' : '減少動態'}</span>
+      <span>減少動態</span>
     </button>
   );
 }

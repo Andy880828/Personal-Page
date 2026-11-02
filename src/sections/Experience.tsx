@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSiteStore } from '@/store/useSiteStore';
 import { experience } from '@/content/experience';
 import type { ExperienceItem } from '@/content/types';
 import { useReveal } from '@/hooks/useReveal';
@@ -12,14 +13,23 @@ const KIND: Record<ExperienceItem['kind'], { label: string; color: string }> = {
   build: { label: '開發', color: '#4ff0d2' },
 };
 
-/** 每筆經歷對應的深度：1,000 m 到 3,800 m 平均分配，越近期越深 */
-const itemDepth = (i: number) => 1000 + (i * 2800) / Math.max(1, experience.length - 1);
-
 export default function Experience() {
   const scope = useRef<HTMLElement>(null);
   useReveal(scope);
   const [active, setActive] = useState(0);
   const items = useRef<(HTMLLIElement | null)[]>([]);
+  const depthRef = useRef<HTMLSpanElement>(null);
+
+  // 深度讀數與右側深度計共用同一個來源（捲動位置），不會出現兩個不同的數字
+  useEffect(() => {
+    const apply = (d: number) => {
+      if (depthRef.current) depthRef.current.textContent = formatDepth(d);
+    };
+    apply(useSiteStore.getState().depth);
+    return useSiteStore.subscribe((s, prev) => {
+      if (s.depth !== prev.depth) apply(s.depth);
+    });
+  }, []);
 
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -41,16 +51,10 @@ export default function Experience() {
       id="experience"
       ref={scope}
       aria-labelledby="experience-title"
-      className="relative px-5 py-[18vh] sm:px-10 lg:px-16"
+      className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          id="experience"
-          depth="1,000 m"
-          label="Experience"
-          title="一路潛下來的軌跡"
-          lead="越往下越接近現在。"
-        />
+        <SectionHeader id="experience" depth="1,000 m · 深層帶" title="一路潛下來的軌跡" lead="越往下越接近現在。" />
 
         <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}
@@ -58,13 +62,11 @@ export default function Experience() {
             <div className="sticky top-[30vh] font-mono">
               <p className="text-xs tracking-[0.25em] text-haze uppercase">depth</p>
               <p className="text-5xl text-foam tabular-nums">
-                {formatDepth(itemDepth(active))}
+                <span ref={depthRef}>1,000</span>
                 <span className="ml-2 text-lg text-mist">m</span>
               </p>
               <p className="mt-8 text-xs tracking-[0.25em] text-haze uppercase">year</p>
-              <p className="text-[6.5rem] leading-none font-bold text-biolum tabular-nums [text-shadow:0_0_40px_rgb(79_240_210/0.35)]">
-                {current.start.slice(0, 4)}
-              </p>
+              <p className="text-[6rem] leading-none font-bold text-biolum tabular-nums">{current.start.slice(0, 4)}</p>
             </div>
           </div>
 
@@ -84,10 +86,11 @@ export default function Experience() {
                 >
                   <span
                     aria-hidden="true"
-                    className="absolute top-2 -left-[calc(2rem+5px)] size-[9px] rounded-full transition-shadow duration-700 sm:-left-[calc(2.5rem+5px)]"
+                    className="absolute top-2 -left-[calc(2rem+5px)] size-[9px] rounded-full transition-[box-shadow,transform] duration-500 sm:-left-[calc(2.5rem+5px)]"
                     style={{
                       background: k.color,
-                      boxShadow: isActive ? `0 0 0 6px ${k.color}22, 0 0 28px 4px ${k.color}` : `0 0 10px ${k.color}88`,
+                      boxShadow: isActive ? `0 0 0 5px ${k.color}33` : 'none',
+                      transform: isActive ? 'scale(1.35)' : 'scale(1)',
                     }}
                   />
                   <p className="font-mono text-sm text-mist tabular-nums">

@@ -27,7 +27,9 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
         aria-labelledby={`p-${project.slug}`}
         className={`flex h-full min-w-0 flex-col ${featured ? 'md:grid md:grid-cols-[1.1fr_1fr]' : ''}`}
       >
-        <div className={`relative overflow-hidden ${featured ? 'md:order-2 md:h-full' : 'aspect-[16/9]'}`}>
+        <div
+          className={`relative overflow-hidden ${featured ? 'md:order-2 md:h-full' : project.image ? 'aspect-[16/9]' : ''}`}
+        >
           {project.image ? (
             <Picture
               picture={images[project.image]}
@@ -46,7 +48,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
             <span className="text-haze tabular-nums">{project.year}</span>
             {project.status === 'active' && (
               <span className="inline-flex items-center gap-1.5 text-biolum">
-                <span aria-hidden="true" className="size-1.5 animate-pulse rounded-full bg-biolum" />
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-biolum" />
                 進行中
               </span>
             )}

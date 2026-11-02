@@ -90,7 +90,8 @@ export default function Fish({ count }: { count: number }) {
     const camY = state.camera.position.y;
     const minY = cameraY(2.9);
     const maxY = cameraY(0.9);
-    center.set(7.5, Math.min(maxY, Math.max(minY, camY - 1)), -24);
+    const portrait = state.size.width < state.size.height;
+    center.set(portrait ? 1.5 : 7.5, Math.min(maxY, Math.max(minY, camY - 1)), portrait ? -28 : -24);
     m.position.copy(center);
 
     let avoid: [number, number, number] | null = null;

@@ -32,8 +32,8 @@ export default function DepthHUD() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none">
-      <div className="fixed top-1/2 right-6 z-30 hidden h-[52vh] -translate-y-1/2 lg:block">
-        <div className="relative flex h-full gap-3">
+      <div className="fixed top-1/2 right-4 z-30 hidden -translate-y-1/2 rounded-2xl bg-deep/55 px-3 py-4 backdrop-blur-md lg:block">
+        <div className="relative flex h-[44vh] gap-3">
           <div className="relative h-full w-px bg-foam/15">
             {SECTIONS.map((s, i) => (
               <span
@@ -43,22 +43,22 @@ export default function DepthHUD() {
               />
             ))}
             <div ref={needle} className="absolute inset-x-0 top-0 h-full">
-              <span className="absolute -left-[3px] size-[7px] rounded-full bg-biolum shadow-[0_0_12px_var(--color-biolum)]" />
+              <span className="absolute -left-[4px] size-[9px] rounded-full border-2 border-deep bg-biolum" />
             </div>
           </div>
-          <div className="flex flex-col justify-between font-mono text-[0.65rem] text-haze">
+          <div className="flex flex-col justify-between font-mono text-[0.7rem] text-ink/90 [text-shadow:0_1px_6px_rgb(1_4_9/0.9)]">
             {SECTIONS.map((s) => (
               <span key={s.id}>{formatDepth(s.depthStart)}</span>
             ))}
             <span>4,000</span>
           </div>
         </div>
-        <div className="absolute -bottom-14 right-0 text-right font-mono">
-          <div className="text-xl text-foam tabular-nums">
+        <div className="mt-4 text-right font-mono">
+          <div className="text-xl text-foam tabular-nums [text-shadow:0_1px_8px_rgb(1_4_9/0.9)]">
             <span ref={value}>0</span>
             <span className="ml-1 text-xs text-mist">m</span>
           </div>
-          <span ref={zone} className="text-[0.7rem] tracking-widest text-mist">
+          <span ref={zone} className="text-[0.7rem] tracking-widest text-ink/90 [text-shadow:0_1px_6px_rgb(1_4_9/0.9)]">
             海面
           </span>
         </div>

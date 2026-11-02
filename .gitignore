@@ -13,3 +13,8 @@ test-results
 !.vscode/extensions.json
 .idea
 *.tsbuildinfo
+
+# impeccable：skill 與引擎用 `npx impeccable install --providers=claude --scope=project` 安裝，不進 repo
+.claude/skills/impeccable/
+.claude/agents/impeccable-*
+.impeccable/

@@ -17,7 +17,7 @@ export default function DepthReadout({ className = '' }: { className?: string })
     });
   }, []);
   return (
-    <span ref={ref} aria-hidden="true" className={`font-mono text-xs text-mist tabular-nums ${className}`}>
+    <span ref={ref} aria-hidden="true" className={`font-mono text-xs text-ink tabular-nums ${className}`}>
       0 m
     </span>
   );

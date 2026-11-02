@@ -17,7 +17,7 @@ const EMAIL = {
 const emailReady = Boolean(EMAIL.service && EMAIL.template && EMAIL.key);
 
 const field =
-  'w-full rounded-xl border border-foam/15 bg-abyss/60 px-4 py-3 text-ink placeholder:text-haze focus:border-biolum focus:outline-none';
+  'w-full rounded-xl border border-foam/20 bg-abyss/60 px-4 py-3 text-ink placeholder:text-haze focus-visible:border-biolum focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-biolum';
 
 export default function Contact() {
   const scope = useRef<HTMLElement>(null);
@@ -42,8 +42,8 @@ export default function Contact() {
 
   const links = [
     { href: profile.links.github, label: 'GitHub', icon: <GithubIcon size={18} /> },
-    { href: profile.links.facebook, label: 'Facebook', icon: <FacebookIcon size={18} /> },
     { href: profile.links.resume, label: '履歷', icon: <FileText size={18} aria-hidden="true" /> },
+    { href: profile.links.facebook, label: 'Facebook', icon: <FacebookIcon size={18} /> },
   ];
 
   return (
@@ -51,13 +51,12 @@ export default function Contact() {
       id="contact"
       ref={scope}
       aria-labelledby="contact-title"
-      className="relative px-5 pt-[18vh] pb-10 sm:px-10 lg:px-16"
+      className="relative px-5 pt-24 pb-10 lg:pt-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           id="contact"
-          depth="4,000 m"
-          label="Seafloor"
+          depth="4,000 m · 海床"
           title="到海床了，打聲招呼吧"
           lead="工作機會、合作、或只是想聊魚，都歡迎。"
         />
@@ -81,7 +80,7 @@ export default function Contact() {
             </ul>
 
             <div data-reveal>
-              <h3 className="eyebrow text-mist">不在工作的時候</h3>
+              <h3 className="text-lg font-bold text-foam">不在工作的時候</h3>
               <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-2xl font-bold text-foam">
                 {profile.interests.map((it) => (
                   <li key={it}>{it}</li>
@@ -107,16 +106,10 @@ export default function Contact() {
                   姓名
                   <input name="user_name" required autoComplete="name" className={field} />
                 </label>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="grid gap-1.5 text-sm text-mist">
-                    Email
-                    <input name="user_email" type="email" required autoComplete="email" className={field} />
-                  </label>
-                  <label className="grid gap-1.5 text-sm text-mist">
-                    電話（選填）
-                    <input name="user_phone" type="tel" autoComplete="tel" className={field} />
-                  </label>
-                </div>
+                <label className="grid gap-1.5 text-sm text-mist">
+                  Email（我會回信到這裡）
+                  <input name="user_email" type="email" required autoComplete="email" className={field} />
+                </label>
                 <label className="grid gap-1.5 text-sm text-mist">
                   訊息
                   <textarea name="message" required rows={5} className={`${field} resize-y`} />
@@ -132,11 +125,11 @@ export default function Contact() {
               </button>
               <p id="contact-status" role="status" className="mt-4 min-h-6 text-sm">
                 {!emailReady && (
-                  <span className="text-mist">表單暫時關閉，請先用上面的 GitHub 或 Facebook 聯絡我。</span>
+                  <span className="text-mist">表單暫時關閉，可以先到 GitHub 找我，或看履歷上的聯絡方式。</span>
                 )}
                 {status === 'sent' && <span className="text-biolum">收到了，我會盡快回覆你。</span>}
                 {status === 'error' && (
-                  <span className="text-coral">送出失敗了，可以稍後再試，或改用 Facebook 聯絡我。</span>
+                  <span className="text-coral">送出失敗了，內容還在，稍後再按一次送出；也可以先到 GitHub 找我。</span>
                 )}
               </p>
             </form>

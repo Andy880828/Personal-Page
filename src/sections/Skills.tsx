@@ -14,6 +14,7 @@ export default function Skills() {
   const active = useSiteStore((s) => s.activeSkill);
   const setActive = useSiteStore((s) => s.setActiveSkill);
   const setHover = useSiteStore((s) => s.setHoverSkill);
+  const tier = useSiteStore((s) => s.tier);
   const current = skills.find((s) => s.id === active) ?? skills[0]!;
 
   const onKeyDown = (e: React.KeyboardEvent, index: number) => {
@@ -39,15 +40,15 @@ export default function Skills() {
       id="skills"
       ref={scope}
       aria-labelledby="skills-title"
-      className="relative px-5 py-[18vh] sm:px-10 lg:px-16"
+      className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
-      <div className="mx-auto max-w-6xl">
+      <div aria-hidden="true" className="scrim" />
+      <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           id="skills"
-          depth="100 m"
-          label="Skills"
+          depth="100 m · 透光帶"
           title="五顆氣泡，五種工具箱"
-          lead="點畫面裡漂浮的氣泡，或用下面的分頁切換。"
+          lead={tier ? '點畫面裡漂浮的氣泡，或用下面的分頁切換。' : '用下面的分頁切換五組技能。'}
         />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
@@ -112,8 +113,34 @@ export default function Skills() {
               </ul>
             </div>
           </div>
-          {/* 右欄留白給 3D 氣泡 */}
-          <div aria-hidden="true" className="hidden min-h-[28rem] lg:block" />
+          {/* 右欄：有 3D 時留白給氣泡；沒有 3D（tier 0）時用 CSS 畫五顆對應的光點 */}
+          <div aria-hidden="true" className="relative hidden min-h-[28rem] lg:block">
+            {tier === 0 &&
+              skills.map((s, i) => {
+                const pos = [
+                  [18, 14, 7.5],
+                  [62, 8, 6],
+                  [40, 42, 8.5],
+                  [74, 58, 6.5],
+                  [16, 66, 6],
+                ][i]!;
+                const on = s.id === active;
+                return (
+                  <span
+                    key={s.id}
+                    className="absolute rounded-full border border-foam/25 transition-transform duration-500"
+                    style={{
+                      left: `${pos[0]}%`,
+                      top: `${pos[1]}%`,
+                      width: `${pos[2]}rem`,
+                      height: `${pos[2]}rem`,
+                      transform: on ? 'scale(1.15)' : 'scale(1)',
+                      background: `radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.18), transparent 45%), radial-gradient(circle, ${s.color}${on ? '55' : '22'} 0 18%, transparent 19%)`,
+                    }}
+                  />
+                );
+              })}
+          </div>
         </div>
       </div>
     </section>

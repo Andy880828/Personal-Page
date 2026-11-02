@@ -68,6 +68,11 @@
     color: var(--color-foam);
   }
 
+  input,
+  textarea {
+    caret-color: var(--color-biolum);
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-biolum);
     outline-offset: 3px;
@@ -87,15 +92,6 @@
 }
 
 @layer components {
-  /* 段落標籤：深度 + 英文名，等寬字 */
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-biolum);
-  }
-
   /* 水下的玻璃面板：只用一層，不疊卡片 */
   .glass {
     background: color-mix(in oklab, var(--color-deep) 58%, transparent);
@@ -106,6 +102,20 @@
 
   .hairline {
     border-color: color-mix(in oklab, var(--color-foam) 14%, transparent);
+  }
+
+  /* 淺水段的文字底：只壓暗文字欄那一側，3D 仍然看得到 */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(2 16 31 / 0.62) 0%, rgb(2 16 31 / 0.42) 45%, rgb(2 16 31 / 0) 78%);
+  }
+
+  @media (max-width: 1023px) {
+    .scrim {
+      background: rgb(2 16 31 / 0.5);
+    }
   }
 
   .chip {
@@ -154,16 +164,26 @@ html[data-test] *::after {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
   }
 }
 
 html[data-motion='reduce'] *,
 html[data-motion='reduce'] *::before,
 html[data-motion='reduce'] *::after {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
+  animation: none !important;
+}
+
+/* 減少動態時不做位移（hover 浮起等），顏色與透明度的轉場保留 */
+html[data-motion='reduce'] .motion-lift:hover {
+  transform: none !important;
+}
+
+/* 測試模式：隱藏捲軸，版面寬度與瀏覽器捲軸樣式無關（CI 與本機一致） */
+html[data-test] {
+  scrollbar-width: none;
+}
+html[data-test]::-webkit-scrollbar {
+  display: none;
 }

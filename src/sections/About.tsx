@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { profile } from '@/content/profile';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
@@ -13,11 +14,12 @@ export default function About() {
       id="about"
       ref={scope}
       aria-labelledby="about-title"
-      className="relative px-5 pt-[22vh] pb-[18vh] sm:px-10 lg:px-16"
+      className="relative px-5 pt-28 pb-24 lg:pt-[22vh] lg:pb-[18vh] sm:px-10 lg:px-16"
     >
-      <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
+      <div aria-hidden="true" className="scrim" />
+      <div className="relative mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
         <div>
-          <SectionHeader id="about" depth="10 m" label="About" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
+          <SectionHeader id="about" depth="10 m · 透光帶" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
           <div className="mt-8 space-y-5 text-lg text-ink/90">
             {profile.intro.map((p) => (
               <p key={p} data-reveal>
@@ -30,10 +32,10 @@ export default function About() {
             target="_blank"
             rel="noreferrer"
             data-reveal
-            className="mt-9 inline-flex items-center gap-2 border-b border-biolum/60 pb-1 text-biolum transition-colors hover:border-biolum hover:text-foam"
+            className="mt-9 inline-flex items-center gap-1.5 border-b border-biolum/60 pb-1 font-medium text-biolum transition-colors hover:border-biolum hover:text-foam"
           >
             看完整履歷
-            <span aria-hidden="true">↗</span>
+            <ArrowUpRight size={16} aria-hidden="true" />
           </a>
         </div>
 
@@ -52,7 +54,7 @@ export default function About() {
           </figure>
 
           <div data-reveal>
-            <h3 className="eyebrow text-mist">證照</h3>
+            <h3 className="text-lg font-bold text-foam">證照</h3>
             <dl className="mt-4 divide-y divide-foam/10 border-y border-foam/10">
               {profile.certificates.map((c) => (
                 <div key={c.name} className="flex items-baseline justify-between gap-6 py-3">

@@ -43,6 +43,17 @@ describe('魚群模擬', () => {
   });
 });
 
+describe('渲染迴圈', () => {
+  it('場景程式沒有使用 priority > 0 的 useFrame（那會關掉 R3F 的自動渲染，沒有後製的 tier 1 會整片空白）', async () => {
+    const { readFileSync, readdirSync } = await import('node:fs');
+    const dir = 'src/scene';
+    for (const f of readdirSync(dir).filter((n) => n.endsWith('.tsx'))) {
+      const src = readFileSync(`${dir}/${f}`, 'utf8');
+      expect(src, f).not.toMatch(/useFrame\([\s\S]*?\},\s*[1-9]\d*\s*\)/);
+    }
+  });
+});
+
 describe('場景內容依 GPU 等級變化', () => {
   beforeEach(() => useSiteStore.setState({ pos: 1.5 }));
 

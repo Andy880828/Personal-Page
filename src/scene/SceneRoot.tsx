@@ -104,7 +104,7 @@ function ReadyProbe() {
       useSiteStore.getState().setSceneReady(true);
     }
     if (frames.current < 3) invalidate();
-  }, 1);
+  });
   return null;
 }
 

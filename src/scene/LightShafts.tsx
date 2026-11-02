@@ -27,7 +27,7 @@ void main() {
   float along = smoothstep(0.0, 0.85, vUv.y) * smoothstep(-70.0, -4.0, vDepth);
   float flicker = 0.65 + 0.35 * sin(uTime * 0.7 + uSeed * 6.28 + vUv.x * 3.0);
   float a = across * across * along * flicker * uIntensity;
-  gl_FragColor = vec4(vec3(0.62, 0.86, 1.0) * a * 0.32, 1.0);
+  gl_FragColor = vec4(vec3(0.62, 0.86, 1.0) * a * 0.18, 1.0);
 }`;
 
 /** 從海面斜射下來的光束：加法混合的長條面，越深越淡 */
