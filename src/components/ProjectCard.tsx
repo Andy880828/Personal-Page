@@ -22,7 +22,7 @@ const ACCENT: Record<string, string> = {
 export default function ProjectCard({ project, featured = false }: { project: Project; featured?: boolean }) {
   const accent = ACCENT[project.categories[0] ?? 'web'] ?? '#4ff0d2';
   return (
-    <TiltCard className="glass h-full overflow-hidden rounded-3xl">
+    <TiltCard className="panel h-full overflow-hidden rounded-3xl">
       <article
         aria-labelledby={`p-${project.slug}`}
         className={`flex h-full min-w-0 flex-col ${featured ? 'md:grid md:grid-cols-[1.1fr_1fr]' : ''}`}

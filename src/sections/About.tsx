@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { profile } from '@/content/profile';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
+import ScienceNote from '@/components/ScienceNote';
 import Picture from '@/components/Picture';
 import avatar from '@/assets/img/avatar.jpg?w=240;480&format=avif;webp;jpg&as=picture';
 
@@ -65,6 +66,9 @@ export default function About() {
             </dl>
           </div>
         </aside>
+      </div>
+      <div className="relative mx-auto mt-16 max-w-6xl">
+        <ScienceNote section="about" />
       </div>
     </section>
   );

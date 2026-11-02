@@ -5,6 +5,7 @@ import type { ExperienceItem } from '@/content/types';
 import { useReveal } from '@/hooks/useReveal';
 import { formatDepth } from '@/lib/scroll';
 import SectionHeader from '@/components/SectionHeader';
+import ScienceNote from '@/components/ScienceNote';
 
 const KIND: Record<ExperienceItem['kind'], { label: string; color: string }> = {
   edu: { label: '學歷', color: '#7cc8ff' },
@@ -111,6 +112,7 @@ export default function Experience() {
             })}
           </ol>
         </div>
+        <ScienceNote section="experience" className="mt-16" />
       </div>
     </section>
   );

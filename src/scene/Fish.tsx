@@ -9,6 +9,7 @@ import {
   Object3D,
   Plane,
   SphereGeometry,
+  Vector2,
   Vector3,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -36,6 +37,7 @@ const dummy = new Object3D();
 const avoidPlane = new Plane(new Vector3(0, 0, 1), 0);
 const hit = new Vector3();
 const center = new Vector3();
+const pointerNdc = new Vector2();
 
 /** 魚群：在「關於」與「技能」兩段陪著相機游；CPU boids + InstancedMesh + 尾巴擺動 shader */
 export default function Fish({ count }: { count: number }) {
@@ -95,12 +97,27 @@ export default function Fish({ count }: { count: number }) {
     m.position.copy(center);
 
     let avoid: [number, number, number] | null = null;
+    let radius = 4;
+    let strength = 0.9;
     if (!isFrozen()) {
-      state.raycaster.setFromCamera(state.pointer, state.camera);
+      const { pulse } = useSiteStore.getState();
+      const age = pulse ? (performance.now() - pulse.t) / 1000 : Infinity;
       avoidPlane.constant = -center.z;
-      if (state.raycaster.ray.intersectPlane(avoidPlane, hit)) avoid = [hit.x - center.x, hit.y - center.y, 0];
+      if (age < 1.2) {
+        // 點擊驚散：從點擊點用更大的範圍、更強的推力把魚群推開，1.2 秒內衰減
+        pointerNdc.set(pulse!.x, pulse!.y);
+        state.raycaster.setFromCamera(pointerNdc, state.camera);
+        if (state.raycaster.ray.intersectPlane(avoidPlane, hit)) {
+          avoid = [hit.x - center.x, hit.y - center.y, 0];
+          radius = 9;
+          strength = 3.2 * (1 - age / 1.2);
+        }
+      } else {
+        state.raycaster.setFromCamera(state.pointer, state.camera);
+        if (state.raycaster.ray.intersectPlane(avoidPlane, hit)) avoid = [hit.x - center.x, hit.y - center.y, 0];
+      }
     }
-    stepSchool(school, sceneDelta(delta), avoid);
+    stepSchool(school, sceneDelta(delta), avoid, radius, strength);
 
     const p = school.pos;
     const v = school.vel;

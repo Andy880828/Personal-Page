@@ -3,6 +3,7 @@ import { FileText, Send } from 'lucide-react';
 import { profile } from '@/content/profile';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
+import ScienceNote from '@/components/ScienceNote';
 import Picture from '@/components/Picture';
 import { GithubIcon, FacebookIcon } from '@/components/BrandIcons';
 import interests from '@/assets/img/interests.webp?w=640;1256&format=avif;webp&as=picture';
@@ -99,7 +100,7 @@ export default function Contact() {
           </div>
 
           <div data-reveal>
-            <form onSubmit={onSubmit} className="glass rounded-3xl p-7 sm:p-9" aria-describedby="contact-status">
+            <form onSubmit={onSubmit} className="panel rounded-3xl p-7 sm:p-9" aria-describedby="contact-status">
               <h3 className="text-xl font-bold text-foam">寄一封信給我</h3>
               <div className="mt-6 grid gap-4">
                 <label className="grid gap-1.5 text-sm text-mist">
@@ -135,6 +136,8 @@ export default function Contact() {
             </form>
           </div>
         </div>
+
+        <ScienceNote section="contact" className="mt-16" />
 
         <footer className="mt-[16vh] flex flex-col gap-3 border-t border-foam/10 pt-8 text-sm text-haze sm:flex-row sm:items-baseline sm:justify-between">
           <p className="text-foam">感謝你的造訪。</p>

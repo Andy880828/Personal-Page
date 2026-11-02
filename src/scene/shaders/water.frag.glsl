@@ -10,11 +10,13 @@ varying float vRing;
 void main() {
   vec3 V = normalize(cameraPosition - vWorld);
   float dist = length(cameraPosition - vWorld);
-  // 細節法線：兩層流動雜訊，讓高光碎成閃爍的光點
-  vec2 q = vWorld.xz * 0.9;
-  float n1 = vnoise(q + uTime * vec2(0.35, 0.2));
-  float n2 = vnoise(q * 2.3 - uTime * vec2(0.25, 0.4));
-  vec3 detail = vec3(n1 - 0.5, 0.0, n2 - 0.5) * 0.35 * exp(-dist * 0.02);
+  // 細節法線：兩層慢速流動的雜訊，只在近處有作用。
+  // 速度與幅度都刻意很小：太快或太尖的高光會讓整片海面每一幀都在閃。
+  vec2 q = vWorld.xz * 0.7;
+  float n1 = vnoise(q + uTime * vec2(0.05, 0.03));
+  float n2 = vnoise(q * 1.9 - uTime * vec2(0.035, 0.06));
+  float detailAmp = 0.16 * exp(-dist * 0.045);
+  vec3 detail = vec3(n1 - 0.5, 0.0, n2 - 0.5) * detailAmp;
   vec3 N = normalize(vNormalW + detail);
 
   if (gl_FrontFacing) {
@@ -25,7 +27,9 @@ void main() {
     vec3 refl = skyColor(normalize(R)) * 0.75;
     vec3 body = uDeep + vec3(0.9, 0.45, 0.2) * 0.06 * max(vHeight + 0.2, 0.0) * max(dot(normalize(vec3(uSunDir.x, 0.0, uSunDir.z)), -V), 0.0);
     vec3 col = mix(body, refl, F);
-    float glint = pow(max(dot(R, uSunDir), 0.0), 420.0) * 4.0 + pow(max(dot(R, uSunDir), 0.0), 48.0) * 0.22;
+    // 夕陽光帶：用平滑的寬高光，不用超高次方（那會變成逐像素的閃點）
+    float s = max(dot(R, uSunDir), 0.0);
+    float glint = smoothstep(0.975, 0.999, s) * 0.9 + pow(s, 24.0) * 0.22;
     col += vec3(1.0, 0.75, 0.45) * glint;
     // 漣漪的白色波紋
     col += vec3(0.85, 0.95, 1.0) * smoothstep(0.25, 0.9, vRing) * 0.35;
@@ -39,7 +43,7 @@ void main() {
     vec3 Nd = -N;
     float cosT = max(dot(Nd, V), 0.0);
     float window = smoothstep(0.62, 0.8, cosT);
-    float shimmer = 0.6 + 0.4 * vnoise(vWorld.xz * 1.6 + uTime * 0.6);
+    float shimmer = 0.7 + 0.3 * vnoise(vWorld.xz * 1.2 + uTime * 0.12);
     vec3 skyLight = vec3(0.75, 0.9, 1.0) * 1.6 * shimmer;
     vec3 col = mix(uUnderColor * 1.6, skyLight, window);
     col += vec3(1.0, 0.8, 0.55) * pow(max(dot(-reflect(V, Nd), uSunDir), 0.0), 60.0) * 0.6;

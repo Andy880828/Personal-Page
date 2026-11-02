@@ -8,6 +8,8 @@ import { isReducedMotion, useSiteStore } from '@/store/useSiteStore';
 import Nav from '@/components/Nav';
 import DepthHUD from '@/components/DepthHUD';
 import Loader from '@/components/Loader';
+import Console from '@/components/Console';
+import { useShortcuts } from '@/hooks/useShortcuts';
 import Backdrop from '@/components/Backdrop';
 import SceneBoundary from '@/components/SceneBoundary';
 import Hero from '@/sections/Hero';
@@ -25,6 +27,20 @@ export default function Site() {
   const reduced = useSiteStore(isReducedMotion);
   const [sceneAllowed, setSceneAllowed] = useState(false);
   const firstRoute = useRef(true);
+  useShortcuts();
+
+  // 點在背景（不是互動元素）上：給場景一個脈衝（魚群驚散、聲納 ping）
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t || t.closest('a, button, input, textarea, [role="dialog"], [role="tab"], label')) return;
+      useSiteStore
+        .getState()
+        .firePulse((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    };
+    window.addEventListener('pointerdown', onDown);
+    return () => window.removeEventListener('pointerdown', onDown);
+  }, []);
 
   // GPU 分級、動態偏好（系統設定 + 使用者切換）
   useEffect(() => {
@@ -124,6 +140,7 @@ export default function Site() {
         <Contact />
       </main>
       <DepthHUD />
+      <Console />
       <Loader />
     </>
   );

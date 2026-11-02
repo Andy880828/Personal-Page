@@ -39,10 +39,10 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,backdrop-filter,border-color] duration-500 ${
+      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color] duration-500 ${
         section === 'hero'
           ? 'border-b border-transparent bg-gradient-to-b from-deep/80 via-deep/40 to-transparent'
-          : 'border-b border-foam/8 bg-deep/75 backdrop-blur-xl'
+          : 'border-b border-foam/8 bg-deep/85'
       }`}
     >
       <nav
@@ -62,7 +62,7 @@ export default function Nav() {
         </a>
 
         <div
-          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'bg-deep/70 backdrop-blur-md' : ''}`}
+          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'bg-deep/75' : ''}`}
         >
           {links.map((s) => (
             <a

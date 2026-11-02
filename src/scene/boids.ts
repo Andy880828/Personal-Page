@@ -37,8 +37,17 @@ export function createSchool(count: number, seed: number): School {
   return { count, pos, vel };
 }
 
-/** 推進一步。avoid 是區域座標中要躲開的點（滑鼠），null 表示沒有 */
-export function stepSchool(s: School, dt: number, avoid: [number, number, number] | null = null) {
+/**
+ * 推進一步。avoid 是區域座標中要躲開的點（滑鼠），null 表示沒有；
+ * avoidRadius / avoidStrength 讓「點擊驚散」用更大的範圍與更強的推力。
+ */
+export function stepSchool(
+  s: School,
+  dt: number,
+  avoid: [number, number, number] | null = null,
+  avoidRadius = 4,
+  avoidStrength = 0.9,
+) {
   if (dt <= 0) return;
   const { count, pos, vel } = s;
   const n2 = BOIDS.neighbor * BOIDS.neighbor;
@@ -92,8 +101,9 @@ export function stepSchool(s: School, dt: number, avoid: [number, number, number
       const dy = py - avoid[1];
       const dz = pz - avoid[2];
       const d2 = dx * dx + dy * dy + dz * dz;
-      if (d2 < 16) {
-        const k = (16 - d2) * 0.9;
+      const r2 = avoidRadius * avoidRadius;
+      if (d2 < r2) {
+        const k = (r2 - d2) * avoidStrength;
         const d = Math.sqrt(d2) + 1e-3;
         ax += (dx / d) * k;
         ay += (dy / d) * k;

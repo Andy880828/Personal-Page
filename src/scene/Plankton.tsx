@@ -4,10 +4,12 @@ import { AdditiveBlending, BufferAttribute, BufferGeometry, ShaderMaterial } fro
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { cameraY } from './path';
 import { sceneTime } from './time';
+import { cursorWorld } from './cursor';
 
 const vert = /* glsl */ `
 uniform float uTime;
 uniform float uPixelRatio;
+uniform vec3 uCursor;
 attribute float aSeed;
 varying float vTwinkle;
 varying float vHue;
@@ -17,7 +19,9 @@ void main() {
   p.y += sin(uTime * 0.22 + aSeed * 23.0) * 0.6;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
-  vTwinkle = pow(0.5 + 0.5 * sin(uTime * (0.8 + aSeed * 1.6) + aSeed * 60.0), 4.0);
+  // 探照燈：游標附近的浮游生物被驚擾而發光（受機械刺激的生物發光）
+  float near = 1.0 - smoothstep(2.0, 7.0, distance(p.xy, uCursor.xy));
+  vTwinkle = pow(0.5 + 0.5 * sin(uTime * (0.8 + aSeed * 1.6) + aSeed * 60.0), 4.0) + near * 1.2;
   vHue = aSeed;
   gl_PointSize = (1.4 + aSeed * 2.4) * uPixelRatio * 34.0 / max(-mv.z, 0.5);
 }`;
@@ -58,7 +62,7 @@ export default function Plankton({ count }: { count: number }) {
       depthWrite: false,
       blending: AdditiveBlending,
       fog: false,
-      uniforms: { uTime: { value: 0 }, uPixelRatio: { value: 1 } },
+      uniforms: { uTime: { value: 0 }, uPixelRatio: { value: 1 }, uCursor: { value: cursorWorld } },
     });
     return { geometry: g, material: m };
   }, [count]);

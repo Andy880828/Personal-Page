@@ -10,10 +10,10 @@ export function isFrozen(): boolean {
 }
 
 export function sceneTime(state: RootState): number {
-  return isFrozen() ? FROZEN_TIME : state.clock.elapsedTime;
+  return isFrozen() ? FROZEN_TIME : state.clock.elapsedTime * flags.timeScale;
 }
 
 /** 每幀 delta：凍結時為 0（物理模擬停住），否則夾在 1/20 秒內避免切分頁回來時暴衝 */
 export function sceneDelta(delta: number): number {
-  return isFrozen() ? 0 : Math.min(delta, 1 / 20);
+  return isFrozen() ? 0 : Math.min(delta, 1 / 20) * flags.timeScale;
 }

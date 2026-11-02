@@ -11,7 +11,8 @@ import Water from './Water';
 import LightShafts from './LightShafts';
 import MarineSnow from './MarineSnow';
 import Fish from './Fish';
-import SkillBubbles from './SkillBubbles';
+import SkillHelix from './SkillHelix';
+import CursorLight from './CursorLight';
 import ProjectProbe from './ProjectProbe';
 import Jellyfish from './Jellyfish';
 import Plankton from './Plankton';
@@ -119,7 +120,8 @@ export function SceneContents({ budget }: { budget: ReturnType<typeof sceneBudge
       <LightShafts />
       <MarineSnow count={budget.snow} />
       <Fish count={budget.fish} />
-      <SkillBubbles transmission={budget.transmission} />
+      <SkillHelix />
+      <CursorLight />
       <ProjectProbe />
       <Jellyfish />
       <Plankton count={budget.plankton} />
@@ -133,7 +135,11 @@ export default function SceneRoot() {
   const ready = useSiteStore((s) => s.sceneReady);
   const reduced = useReducedMotion();
   const [degraded, setDegraded] = useState(false);
-  const budget = useMemo(() => sceneBudget(degraded ? 1 : (tier ?? 1), flags.test), [tier, degraded]);
+  const budget = useMemo(() => {
+    const b = sceneBudget(tier ?? 1, flags.test);
+    // 效能不足時只關後製、降 DPR；粒子與魚的數量不變（重建幾何會讓畫面跳一下）
+    return degraded ? { ...b, postprocessing: false, dpr: [1, 1] as [number, number] } : b;
+  }, [tier, degraded]);
   const demand = reduced || flags.test;
 
   useEffect(() => {
@@ -156,7 +162,7 @@ export default function SceneRoot() {
         frameloop={demand ? 'demand' : 'always'}
         camera={{ fov: 52, near: 0.1, far: 420, position: [0, SKY_HEIGHT, 0] }}
         gl={{
-          antialias: !budget.postprocessing,
+          antialias: false,
           powerPreference: 'high-performance',
           alpha: false,
           stencil: false,

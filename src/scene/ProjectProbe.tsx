@@ -35,6 +35,8 @@ export default function ProjectProbe() {
   const rings = useRef<(Mesh | null)[]>([]);
   const ping = useRef<Mesh>(null);
   const spin = useRef(0);
+  const burst = useRef(0);
+  const lastPulse = useRef(0);
   const size = useThree((s) => s.size);
   const color = useMemo(() => ACCENT.all!.clone(), []);
 
@@ -89,6 +91,13 @@ export default function ProjectProbe() {
     ringMat.color.copy(color);
     pingMat.color.copy(color);
 
+    const { pulse } = useSiteStore.getState();
+    if (pulse && pulse.t !== lastPulse.current && w > 0.3) {
+      lastPulse.current = pulse.t;
+      burst.current = 1;
+      spin.current = Math.max(spin.current, 0.8);
+    }
+    burst.current = Math.max(0, burst.current - dt * 0.9);
     spin.current = Math.max(0, spin.current - dt * 0.8);
     const speed = 0.25 + spin.current * 3;
     if (core.current) {
@@ -101,9 +110,11 @@ export default function ProjectProbe() {
       r.rotation.set(t * (0.2 + i * 0.13) + i, t * (0.31 - i * 0.07), i * 1.1);
     });
     if (ping.current) {
-      const phase = (t * 0.45) % 1;
-      ping.current.scale.setScalar(1.6 + phase * 5.5);
-      pingMat.opacity = (1 - phase) * 0.35 * w;
+      // 平時慢慢脈動；點擊後從中心爆發一圈更亮更大的聲納
+      const b = burst.current;
+      const phase = b > 0 ? 1 - b : (t * 0.45) % 1;
+      ping.current.scale.setScalar(1.6 + phase * (b > 0 ? 9 : 5.5));
+      pingMat.opacity = (1 - phase) * (b > 0 ? 0.9 : 0.35) * w;
     }
   });
 
