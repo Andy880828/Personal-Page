@@ -29,13 +29,13 @@ npm run test:e2e       # Playwright：視覺回歸與互動（會自己 build �
 npm run lhci           # Lighthouse CI（用 Playwright 附帶的 Chromium）
 ```
 
-| 指令                                       | 用途                                                              |
-| ------------------------------------------ | ----------------------------------------------------------------- |
-| `npm run test:visual:update`               | 畫面有意改變時，更新視覺回歸基準圖（`tests/e2e/__screenshots__`） |
-| `npm run fonts`                            | 改了文案之後重新子集化字體（需要 `pip install fonttools brotli`） |
-| `npm run images -- <來源> <輸出名> <寬度>` | 產生新的母圖到 `src/assets/img`                                   |
-| `npm run og`                               | 重新產生社群分享圖 `public/og.jpg`（先 `npm run build`）          |
-| `npm run analyze`                          | 開啟 bundle 視覺化報告                                            |
+| 指令                                       | 用途                                                                                                                                                      |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run test:visual:update`               | 畫面有意改變時，更新視覺回歸基準圖（`tests/e2e/__screenshots__`）；基準圖以 CI 為準（CI 容差 2%、本機 4%），CI 失敗時可從 artifact 的 `*-actual.png` 取代 |
+| `npm run fonts`                            | 改了文案之後重新子集化字體（需要 `pip install fonttools brotli`）                                                                                         |
+| `npm run images -- <來源> <輸出名> <寬度>` | 產生新的母圖到 `src/assets/img`                                                                                                                           |
+| `npm run og`                               | 重新產生社群分享圖 `public/og.jpg`（先 `npm run build`）                                                                                                  |
+| `npm run analyze`                          | 開啟 bundle 視覺化報告                                                                                                                                    |
 
 網址參數：`?tier=0-3` 強制 GPU 等級、`?test=1` 確定性模式（固定時間與亂數）、`?debug` 顯示效能面板、`?perf=1` 回報 frame time。
 
