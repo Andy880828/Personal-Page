@@ -15,9 +15,8 @@ import {
 } from 'three';
 import { FAUNA } from '@/content/fauna';
 import { flags } from '@/lib/env';
-import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
-import { floorHeight } from './floor';
+import { floorHeight, rockJitter } from './floor';
 import { FLOOR_Y, rigY, sectionWeight } from './path';
 import { holdWork, loadModel, releaseWork } from './models';
 import { isFrozen, sceneTime } from './time';
@@ -149,12 +148,11 @@ const PLACEMENTS: Placement[] = [
 /** 礁區的岩坡（低多邊形、扁平著色），珊瑚擺在上面 */
 function reefRock() {
   const g = new IcosahedronGeometry(1, 2);
-  const rng = createRng(SCENE_SEED + 61);
   const p = g.attributes.position!;
   const v = new Vector3();
   for (let i = 0; i < p.count; i++) {
     v.fromBufferAttribute(p, i);
-    const k = 0.82 + rng() * 0.3;
+    const k = 0.82 + rockJitter(v.x, v.y, v.z, 61) * 0.3;
     p.setXYZ(i, v.x * k, v.y * k, v.z * k);
   }
   g.computeVertexNormals();

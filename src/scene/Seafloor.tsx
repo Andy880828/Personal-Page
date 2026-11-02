@@ -22,7 +22,7 @@ import {
 import { createRng, SCENE_SEED } from '@/lib/seed';
 import { useSiteStore } from '@/store/useSiteStore';
 import { FLOOR_Y } from './path';
-import { floorHeight } from './floor';
+import { floorHeight, rockJitter } from './floor';
 import { sceneTime } from './time';
 
 const VENTS: [number, number, number][] = [
@@ -75,11 +75,11 @@ export default function Seafloor() {
     terrain.computeVertexNormals();
 
     const rng = createRng(SCENE_SEED + 43);
-    const rocks = Array.from({ length: 9 }, () => {
+    const rocks = Array.from({ length: 9 }, (_, n) => {
       const g = new IcosahedronGeometry(1, 1);
       const rp = g.attributes.position!;
       for (let i = 0; i < rp.count; i++) {
-        const k = 0.75 + rng() * 0.5;
+        const k = 0.75 + rockJitter(rp.getX(i), rp.getY(i), rp.getZ(i), n) * 0.5;
         rp.setXYZ(i, rp.getX(i) * k, rp.getY(i) * k * 0.7, rp.getZ(i) * k);
       }
       g.computeVertexNormals();
