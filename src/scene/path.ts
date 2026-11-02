@@ -1,4 +1,4 @@
-import { clamp, easeInOutCubic, lerp, smoothstep } from '@/lib/math';
+import { clamp, lerp, smoothstep } from '@/lib/math';
 
 /** 每一段在世界座標中佔的垂直距離 */
 export const SECTION_SPACING = 30;
@@ -12,14 +12,25 @@ export const FLOOR_SPACING = 12;
 /** 海床高度：最深的相機位置再往下一點 */
 export const FLOOR_Y = DIVE_BOTTOM - 4 * SECTION_SPACING - FLOOR_SPACING - 13;
 
-/** pos → 相機高度。第 0 段（海面）從空中穿過水面，之後每段等速下潛，最後一段減速。 */
+/**
+ * pos → 相機高度。第 0 段（海面）從空中穿過水面，之後每段等速下潛，最後一段減速停在海床上。
+ * 三段接合處的速度連續（不會在進水或到海床時頓一下）：
+ * - 海面：h(t) = (m−2)t³ + (3−m)t²，起點速度 0、終點速度剛好接上水下的等速下潛
+ * - 海床：f(u) = 6u³ − 24u² + 30u，起點速度 = 每段 30、終點速度 0、總共再降 12
+ */
+const DIVE_START = 0.08;
 export function cameraY(pos: number): number {
   if (pos < 1) {
-    const t = easeInOutCubic(clamp((pos - 0.08) / 0.92));
-    return lerp(SKY_HEIGHT, DIVE_BOTTOM, t);
+    const t = clamp((pos - DIVE_START) / (1 - DIVE_START));
+    const drop = SKY_HEIGHT - DIVE_BOTTOM;
+    const m = (SECTION_SPACING * (1 - DIVE_START)) / drop;
+    const h = (m - 2) * t * t * t + (3 - m) * t * t;
+    return SKY_HEIGHT - drop * h;
   }
   if (pos < 5) return DIVE_BOTTOM - (pos - 1) * SECTION_SPACING;
-  return DIVE_BOTTOM - 4 * SECTION_SPACING - Math.min(1, pos - 5) * FLOOR_SPACING;
+  const u = Math.min(1, pos - 5);
+  const f = ((6 * u - 24) * u + 30) * u * (FLOOR_SPACING / 12);
+  return DIVE_BOTTOM - 4 * SECTION_SPACING - f;
 }
 
 /** 相機俯角（弧度，負值往下看）：海面上看向夕陽海面，水下逐漸平視 */

@@ -40,6 +40,16 @@ describe('捲動 → 段落位置', () => {
     }
   });
 
+  it('下潛速度在段落邊界連續（不會頓一下）：斷點兩側的 dpos/dy 差 < 2%', () => {
+    const e = 0.5;
+    for (let i = 1; i < b.length - 1; i++) {
+      const y = b[i]!;
+      const left = (scrollToPos(y, b) - scrollToPos(y - e, b)) / e;
+      const right = (scrollToPos(y + e, b) - scrollToPos(y, b)) / e;
+      expect(Math.abs(left - right) / Math.max(left, right), `邊界 ${i}`).toBeLessThan(0.02);
+    }
+  });
+
   it('段落很短時斷點仍然嚴格遞增', () => {
     const tight = computeBreakpoints([0, 10, 12, 14, 16, 18], VH, 20);
     for (let i = 1; i < tight.length; i++) expect(tight[i]!).toBeGreaterThan(tight[i - 1]!);

@@ -16,10 +16,11 @@ uniform float uCell;
 uniform float uGrid;
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-  // 掃描帶：高 18% 的水平帶，uBand 是帶的下緣（由上往下 0 → 1.18）；ascii on 時整個畫面
+  // 掃描帶：高 18% 的水平帶，uBand 是帶的下緣（由上往下 0 → 1.18），上下緣各羽化 4%；ascii on 時整個畫面
   float y = 1.0 - uv.y;
-  float inBand = max(uAll, step(uBand - 0.18, y) * step(y, uBand));
-  if (inBand < 0.5) {
+  float band = smoothstep(uBand - 0.18, uBand - 0.14, y) * (1.0 - smoothstep(uBand - 0.04, uBand, y));
+  float inBand = max(uAll, band);
+  if (inBand < 0.002) {
     outputColor = inputColor;
     return;
   }
@@ -34,7 +35,10 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   vec2 auv = (vec2(mod(glyph, uGrid), floor(glyph / uGrid)) + vec2(f.x, 1.0 - f.y)) / uGrid;
   float a = texture2D(uAtlas, auv).a;
   vec3 ink = mix(vec3(0.31, 0.94, 0.82), c * 1.8 + 0.1, 0.45);
-  outputColor = vec4(mix(c * 0.12, ink, a), inputColor.a);
+  // 掃描帶只把字疊上去、不壓暗底下的畫面（壓暗在真 GPU 上看起來是一條黑影刷過）；ascii on 才整頁換成暗底字元畫
+  vec3 under = mix(inputColor.rgb, c * 0.12, uAll);
+  vec3 outc = mix(under, ink, a * mix(0.55, 1.0, uAll));
+  outputColor = vec4(mix(inputColor.rgb, outc, inBand), inputColor.a);
 }`;
 
 class AsciiBandEffect extends Effect {

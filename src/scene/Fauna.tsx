@@ -315,7 +315,7 @@ function ReefRock() {
   return <mesh ref={mesh} geometry={geometry} material={material} scale={[6.5, 3, 4.5]} rotation-y={0.4} />;
 }
 
-/** 依段落鄰近才載入模型（前後各一段）；測試模式一次全部載入，視覺基準才穩 */
+/** 先載入鄰近段落的模型，場景就緒後閒置時再載其他段；測試模式一次全部載入，視覺基準才穩 */
 export default function Fauna({ tier }: { tier: number }) {
   const [near, setNear] = useState<Set<number>>(() => new Set(flags.test ? [0, 1, 2, 3, 4, 5] : []));
 
@@ -330,9 +330,23 @@ export default function Fauna({ tier }: { tier: number }) {
       });
     };
     update(useSiteStore.getState().pos);
-    return useSiteStore.subscribe((st, prev) => {
+    // 場景就緒後，趁閒置把其他段的模型也先載好、編譯好：不要在捲進新段落的那一刻才下載與編譯 shader（會頓一下）
+    let idle = 0;
+    const prefetch = () => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      const all = () => setNear(new Set([0, 1, 2, 3, 4, 5]));
+      idle = w.requestIdleCallback ? w.requestIdleCallback(all, { timeout: 4000 }) : window.setTimeout(all, 2000);
+    };
+    if (useSiteStore.getState().sceneReady) prefetch();
+    const unsub = useSiteStore.subscribe((st, prev) => {
       if (Math.floor(st.pos) !== Math.floor(prev.pos)) update(st.pos);
+      if (st.sceneReady && !prev.sceneReady) prefetch();
     });
+    return () => {
+      unsub();
+      window.cancelIdleCallback?.(idle);
+      window.clearTimeout(idle);
+    };
   }, []);
 
   return (

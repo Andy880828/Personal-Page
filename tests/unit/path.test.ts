@@ -35,3 +35,19 @@ describe('相機路徑', () => {
     expect(fogDensity(5)).toBeGreaterThan(fogDensity(1));
   });
 });
+
+describe('相機路徑的速度連續', () => {
+  it('進水（pos 1）與到海床（pos 5）兩側的下潛速度一樣；到底時速度歸零', async () => {
+    const { cameraY } = await import('@/scene/path');
+    const e = 1e-4;
+    const slope = (p: number, dir: 1 | -1) => (cameraY(p + dir * e) - cameraY(p)) / (dir * e);
+    for (const p of [1, 5]) {
+      const l = slope(p, -1);
+      const r = slope(p, 1);
+      expect(Math.abs(l - r) / Math.abs(r), `pos ${p}`).toBeLessThan(0.01);
+    }
+    expect(Math.abs(slope(6, -1))).toBeLessThan(0.01);
+    // 單調往下
+    for (let p = 0.1; p < 6; p += 0.01) expect(cameraY(p + 0.01)).toBeLessThanOrEqual(cameraY(p) + 1e-9);
+  });
+});
