@@ -39,8 +39,14 @@ jobs:
           path: bundle-report.html
       - name: 安裝 Playwright Chromium
         run: npx playwright install --with-deps chromium
+      # 基準圖以 CI 的渲染為準：commit 訊息含 [update-snapshots] 時重新產生，並上傳成 artifact 供 commit 回 repo
       - name: 視覺回歸與互動測試
-        run: npm run test:e2e
+        run: npm run test:e2e -- ${{ contains(github.event.head_commit.message, '[update-snapshots]') && '--update-snapshots' || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: tests/e2e/__screenshots__
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
