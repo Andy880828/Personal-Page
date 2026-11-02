@@ -6,6 +6,7 @@ import { scrollToSection } from '@/lib/scroller';
 import { useSiteStore } from '@/store/useSiteStore';
 import { profile } from '@/content/profile';
 import MotionToggle from './MotionToggle';
+import DepthReadout from './DepthReadout';
 
 export default function Nav() {
   const section = useSiteStore((s) => s.section);
@@ -22,10 +23,14 @@ export default function Nav() {
   const links = SECTIONS.filter((s) => s.id !== 'hero');
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40">
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,backdrop-filter,border-color] duration-500 ${
+        section === 'hero' ? 'border-b border-transparent' : 'border-b border-foam/8 bg-deep/70 backdrop-blur-xl'
+      }`}
+    >
       <nav
         aria-label="主要導覽"
-        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-4"
+        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-3.5"
       >
         <a
           href="/"
@@ -39,7 +44,9 @@ export default function Nav() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-1 rounded-full glass px-2 py-1 md:flex">
+        <div
+          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'glass' : ''}`}
+        >
           {links.map((s) => (
             <a
               key={s.id}
@@ -57,6 +64,7 @@ export default function Nav() {
           <MotionToggle />
         </div>
 
+        <DepthReadout className="ml-auto md:hidden" />
         <button
           type="button"
           className="glass inline-flex size-11 items-center justify-center rounded-full text-foam md:hidden"

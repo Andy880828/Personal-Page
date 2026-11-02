@@ -47,7 +47,7 @@ export default function Skills() {
           depth="100 m"
           label="Skills"
           title="五顆氣泡，五種工具箱"
-          lead="點右邊漂浮的氣泡，或用下面的分頁切換。"
+          lead="點畫面裡漂浮的氣泡，或用下面的分頁切換。"
         />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">

@@ -17,6 +17,8 @@ export default defineConfig({
       output: {
         // 3D 相關程式只在場景 lazy import 後才下載；這裡只給它們固定的 chunk 名稱，方便 size-limit 量測
         codeSplitting: {
+          // 只把符合 test 的模組放進群組，不要連帶吸走它們依賴的 React（否則首屏會靜態載入 3D chunk）
+          includeDependenciesRecursively: false,
           groups: [
             { name: 'three', test: /node_modules[\\/]three[\\/]/, priority: 30 },
             {
@@ -26,7 +28,8 @@ export default defineConfig({
             },
             {
               name: 'r3f',
-              test: /node_modules[\\/](@react-three[\\/](fiber|drei)|react-reconciler|its-fine|suspend-react|three-stdlib|three-mesh-bvh|maath|@monogrid|camera-controls|troika-[^\\/]+|meshline|stats-gl|@use-gesture|tunnel-rat|detect-gpu|hls\.js|@mediapipe)[\\/]/,
+              // 只放主場景一定會用到的；除錯面板（r3f-perf）才用到的 troika 等留在自己的 chunk
+              test: /node_modules[\\/](@react-three[\\/](fiber|drei)|react-reconciler|its-fine|suspend-react)[\\/]/,
               priority: 10,
             },
           ],

@@ -25,7 +25,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
     <TiltCard className="glass h-full overflow-hidden rounded-3xl">
       <article
         aria-labelledby={`p-${project.slug}`}
-        className={`flex h-full flex-col ${featured ? 'md:grid md:grid-cols-[1.1fr_1fr]' : ''}`}
+        className={`flex h-full min-w-0 flex-col ${featured ? 'md:grid md:grid-cols-[1.1fr_1fr]' : ''}`}
       >
         <div className={`relative overflow-hidden ${featured ? 'md:order-2 md:h-full' : 'aspect-[16/9]'}`}>
           {project.image ? (
@@ -40,7 +40,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
           ) : null}
         </div>
 
-        <div className="flex flex-1 flex-col p-6 sm:p-8">
+        <div className="flex min-w-0 flex-1 flex-col p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.7rem] tracking-widest uppercase">
             <span style={{ color: accent }}>{project.categories.map((c) => categoryLabels[c]).join(' · ')}</span>
             <span className="text-haze tabular-nums">{project.year}</span>

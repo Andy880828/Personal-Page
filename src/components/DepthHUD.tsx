@@ -11,7 +11,6 @@ export default function DepthHUD() {
   const value = useRef<HTMLSpanElement>(null);
   const zone = useRef<HTMLSpanElement>(null);
   const needle = useRef<HTMLDivElement>(null);
-  const mobile = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     let lastText = '';
@@ -20,7 +19,6 @@ export default function DepthHUD() {
       if (text !== lastText) {
         lastText = text;
         if (value.current) value.current.textContent = text;
-        if (mobile.current) mobile.current.textContent = `${text} m`;
       }
       if (zone.current) zone.current.textContent = SECTIONS[posToSectionIndex(pos)]!.zone;
       if (needle.current) needle.current.style.transform = `translateY(${(pos / SECTION_COUNT) * 100}%)`;
@@ -65,12 +63,6 @@ export default function DepthHUD() {
           </span>
         </div>
       </div>
-      <span
-        ref={mobile}
-        className="glass fixed right-4 bottom-4 z-30 rounded-full px-3 py-1 font-mono text-xs text-foam tabular-nums lg:hidden"
-      >
-        0 m
-      </span>
     </div>
   );
 }

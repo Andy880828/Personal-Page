@@ -64,7 +64,7 @@ export default function Projects() {
           {list.map((p, i) => {
             const featured = filter === 'all' && i < 2;
             return (
-              <li key={p.slug} className={featured ? 'md:col-span-2' : ''} data-project={p.slug}>
+              <li key={p.slug} className={`min-w-0 ${featured ? 'md:col-span-2' : ''}`} data-project={p.slug}>
                 <ProjectCard project={p} featured={featured} />
               </li>
             );

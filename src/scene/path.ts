@@ -7,19 +7,25 @@ export const DIVE_BOTTOM = -8;
 /** 海面上的相機高度 */
 export const SKY_HEIGHT = 5.5;
 
-/** pos → 相機高度。第 0 段（海面）從空中穿過水面，之後每段等速下潛。 */
+/** 最後一段（海床）下潛速度變慢，相機停在海床上方 */
+export const FLOOR_SPACING = 12;
+/** 海床高度：最深的相機位置再往下一點 */
+export const FLOOR_Y = DIVE_BOTTOM - 4 * SECTION_SPACING - FLOOR_SPACING - 13;
+
+/** pos → 相機高度。第 0 段（海面）從空中穿過水面，之後每段等速下潛，最後一段減速。 */
 export function cameraY(pos: number): number {
   if (pos < 1) {
     const t = easeInOutCubic(clamp((pos - 0.08) / 0.92));
     return lerp(SKY_HEIGHT, DIVE_BOTTOM, t);
   }
-  return DIVE_BOTTOM - (pos - 1) * SECTION_SPACING;
+  if (pos < 5) return DIVE_BOTTOM - (pos - 1) * SECTION_SPACING;
+  return DIVE_BOTTOM - 4 * SECTION_SPACING - Math.min(1, pos - 5) * FLOOR_SPACING;
 }
 
 /** 相機俯角（弧度，負值往下看）：海面上看向夕陽海面，水下逐漸平視 */
 export function cameraPitch(pos: number): number {
   if (pos < 1) return lerp(-0.2, 0.06, smoothstep(0.1, 0.9, pos));
-  return lerp(0.06, -0.08, smoothstep(4.6, 5.6, pos));
+  return lerp(0.06, -0.4, smoothstep(4.6, 5.7, pos));
 }
 
 /** 第 i 段的「主角位置」在世界座標的 y */
@@ -72,7 +78,8 @@ export function waterColor(pos: number): [number, number, number] {
 
 /** 水下霧濃度：越深越濃 */
 export function fogDensity(pos: number): number {
-  return lerp(0.028, 0.05, smoothstep(1, 5, pos));
+  // 海床段變清澈一點，讓地形與熱泉看得到
+  return lerp(0.026, 0.034, smoothstep(1, 4.5, pos)) - 0.014 * smoothstep(4.9, 5.6, pos);
 }
 
 /** 從海面往下的光量（0–1），給光束、海雪亮度用 */

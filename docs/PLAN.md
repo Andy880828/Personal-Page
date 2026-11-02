@@ -5,17 +5,17 @@
 
 ## 進度
 
-| 階段 | 狀態 | 紀錄 |
-|---|---|---|
-| 計畫（本檔） | [x] 2026-11-02 | 使用者已確認四項決策 |
-| 開放問題回答 | [ ] | 見文末六題 |
-| Phase 0 盤點與資產 | [ ] | |
-| Phase 1 骨架（DOM 版 + CI） | [ ] | |
-| Phase 2 核心 3D 場景 | [ ] | |
-| Phase 3 互動元素 | [ ] | |
-| Phase 4 收斂與驗證 | [ ] | |
-| Phase 5 impeccable 視覺審視 | [ ] | |
-| PR 合併、Vercel production 確認 | [ ] | |
+| 階段                            | 狀態           | 紀錄                 |
+| ------------------------------- | -------------- | -------------------- |
+| 計畫（本檔）                    | [x] 2026-11-02 | 使用者已確認四項決策 |
+| 開放問題回答                    | [ ]            | 見文末六題           |
+| Phase 0 盤點與資產              | [ ]            |                      |
+| Phase 1 骨架（DOM 版 + CI）     | [ ]            |                      |
+| Phase 2 核心 3D 場景            | [ ]            |                      |
+| Phase 3 互動元素                | [ ]            |                      |
+| Phase 4 收斂與驗證              | [ ]            |                      |
+| Phase 5 impeccable 視覺審視     | [ ]            |                      |
+| PR 合併、Vercel production 確認 | [ ]            |                      |
 
 ---
 
@@ -32,24 +32,25 @@
 
 ## 技術棧（版本為 2026-11-02 npm latest，實作時以 `npm view` 為準）
 
-| 層 | 選擇 | 理由 |
-|---|---|---|
-| 建置 | Vite 8 + `@vitejs/plugin-react` 6 + TypeScript 7 | 現有 Vercel 設定直接沿用 |
-| UI | React 19.3、`react-router` 8（單頁 + hash/section 導航，三條 route 保留） | |
-| 樣式 | Tailwind 4（`@tailwindcss/vite`，CSS-first `@theme`） | 不再有 `tailwind.config.js` 與 `output.css` |
-| 3D | `three` 0.187、`@react-three/fiber` 9.8、`@react-three/drei` 10.7、`@react-three/postprocessing` 3.2 | pmndrs 全家桶 |
-| 2D shader 背景 | `@paper-design/shaders-react` 0.0.82（Apache-2.0，**鎖版本** `0.0.x` 會 breaking） | MeshGradient / GrainGradient / Water 類背景，超輕量，不開 3D 的段落用它 |
-| 動畫 | `gsap` 3.15（+ ScrollTrigger、SplitText，現已全免費）、`@gsap/react`、`lenis` 1.3 | Awwwards 系標配；Lenis 用 `gsap.ticker` 驅動，一個 scroll source |
-| 狀態 | `zustand` 5（深度、章節、reduced-motion、GPU tier） | |
-| 開發輔助 | `leva`、`r3f-perf`（只在 `?debug` 載入） | |
-| 圖片 | `vite-imagetools`（產 AVIF/WebP + 尺寸） | 解決 9.9 MB 問題 |
-| 測試 | `vitest` 5 + `@react-three/test-renderer` 9；`@playwright/test` 1.64（視覺回歸）；`size-limit` 14；`@lhci/cli` 0.15 | 見「驗證」 |
-| 圖示 | `lucide-react` 或 `@icons-pack/react-simple-icons`（tree-shake） | 移除 Font Awesome CDN |
-| 聯絡 | 保留 `@emailjs/browser`，key 改讀 `import.meta.env.VITE_EMAILJS_*`（public key 本來就是公開的，但不要寫死） | |
+| 層             | 選擇                                                                                                                | 理由                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 建置           | Vite 8 + `@vitejs/plugin-react` 6 + TypeScript 7                                                                    | 現有 Vercel 設定直接沿用                                                |
+| UI             | React 19.3、`react-router` 8（單頁 + hash/section 導航，三條 route 保留）                                           |                                                                         |
+| 樣式           | Tailwind 4（`@tailwindcss/vite`，CSS-first `@theme`）                                                               | 不再有 `tailwind.config.js` 與 `output.css`                             |
+| 3D             | `three` 0.187、`@react-three/fiber` 9.8、`@react-three/drei` 10.7、`@react-three/postprocessing` 3.2                | pmndrs 全家桶                                                           |
+| 2D shader 背景 | `@paper-design/shaders-react` 0.0.82（Apache-2.0，**鎖版本** `0.0.x` 會 breaking）                                  | MeshGradient / GrainGradient / Water 類背景，超輕量，不開 3D 的段落用它 |
+| 動畫           | `gsap` 3.15（+ ScrollTrigger、SplitText，現已全免費）、`@gsap/react`、`lenis` 1.3                                   | Awwwards 系標配；Lenis 用 `gsap.ticker` 驅動，一個 scroll source        |
+| 狀態           | `zustand` 5（深度、章節、reduced-motion、GPU tier）                                                                 |                                                                         |
+| 開發輔助       | `leva`、`r3f-perf`（只在 `?debug` 載入）                                                                            |                                                                         |
+| 圖片           | `vite-imagetools`（產 AVIF/WebP + 尺寸）                                                                            | 解決 9.9 MB 問題                                                        |
+| 測試           | `vitest` 5 + `@react-three/test-renderer` 9；`@playwright/test` 1.64（視覺回歸）；`size-limit` 14；`@lhci/cli` 0.15 | 見「驗證」                                                              |
+| 圖示           | `lucide-react` 或 `@icons-pack/react-simple-icons`（tree-shake）                                                    | 移除 Font Awesome CDN                                                   |
+| 聯絡           | 保留 `@emailjs/browser`，key 改讀 `import.meta.env.VITE_EMAILJS_*`（public key 本來就是公開的，但不要寫死）         |                                                                         |
 
 **不用**：Nuxt/Next（純靜態作品集不需要 SSR）、`@react-three/rapier`（沒有物理需求，省 1 MB wasm）、Vue Bits（換 React 後改參考 React Bits，MIT+Commons Clause，個人站可用）。
 
 ### 參考資源（給實作者找靈感與元件，不是全部都要用）
+
 - Paper Shaders：<https://shaders.paper.design>、<https://github.com/paper-design/shaders>（vanilla 與 React 版都有）
 - 21st.dev 上 MIT 的 R3F hero：「Living Fluid Hero」、「Prism Hero」（MeshTransmissionMaterial 折射水晶）、「Hero Particles WEBGL」；ThreeUI（threeui.com，MIT，109 個 three.js 元件，shadcn registry）
 - React Bits <https://reactbits.dev>（文字動畫：SplitText、ScrollReveal；背景：Particles、Aurora、Liquid）
@@ -61,28 +62,28 @@
 
 路由仍提供 `/`、`/about`、`/project`（對應捲到該段 + 可分享），404 導回 `/`。全站繁中為主、英文副標（姓名/職稱雙語）。
 
-| 深度帶 | 段落 | 3D / 視覺 | 內容來源 |
-|---|---|---|---|
-| 0 m 海面 | **Hero** | 全螢幕 R3F 場景：俯視水面（Gerstner/噪聲波 shader + 折射 + 太陽光斑），滑鼠造成漣漪；姓名 `林敬勛 / Ching-Hsun Lin` 以 3D 文字或 SplitText 浮出；副標改為使用者確認的現職（**待確認**，見開放問題）；「往下潛」提示 | 舊 Hero |
-| 0–200 m 透光帶 | **簡介 + 技能** | 相機下潛，光線變成體積光束（god rays，postprocessing `GodRays` 或自製 radial blur）；技能做成**漂浮的玻璃／氣泡群**（`MeshTransmissionMaterial`，hover 放大、點擊展開：前端 / 後端 / 資料庫 / 雲端與 agent / 生物研究五組）。旁邊游過魚群（GPU boids 或 instanced mesh 跟隨曲線，200–500 隻） | 舊 MainView 技能輪播 + AboutView 五組技能，合併去重 |
-| 200–1000 m | **作品集** | 每個作品是一張「深海探測器」卡片：3D 傾斜（pointer tilt）+ 玻璃質感 + 專案截圖；背景粒子像海雪（marine snow）往上飄表示下潛。篩選：`agent 工具 / 自架 / 資料 / 網站 / 生物` | `content/projects.ts`（下節） |
-| 1000–4000 m | **經歷時間軸** | 深度計 HUD：左側固定「深度 × 年份」數字隨捲動跳動；時間軸節點是發光生物（bioluminescence，`Sparkles` + bloom） | 舊 AboutView 學經歷，補 2026 |
-| 海底 | **關於我 / 興趣 / 聯絡** | 相機落到海床，沉船或熱泉（低多邊形 procedural 幾何即可，不載 glTF 大模型）；興趣標籤；聯絡表單（EmailJS）與 GitHub / Facebook / Resume 連結；「感謝你的造訪」 | 舊 AboutView + App.vue modal |
+| 深度帶         | 段落                     | 3D / 視覺                                                                                                                                                                                                                                                                                     | 內容來源                                            |
+| -------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| 0 m 海面       | **Hero**                 | 全螢幕 R3F 場景：俯視水面（Gerstner/噪聲波 shader + 折射 + 太陽光斑），滑鼠造成漣漪；姓名 `林敬勛 / Ching-Hsun Lin` 以 3D 文字或 SplitText 浮出；副標改為使用者確認的現職（**待確認**，見開放問題）；「往下潛」提示                                                                           | 舊 Hero                                             |
+| 0–200 m 透光帶 | **簡介 + 技能**          | 相機下潛，光線變成體積光束（god rays，postprocessing `GodRays` 或自製 radial blur）；技能做成**漂浮的玻璃／氣泡群**（`MeshTransmissionMaterial`，hover 放大、點擊展開：前端 / 後端 / 資料庫 / 雲端與 agent / 生物研究五組）。旁邊游過魚群（GPU boids 或 instanced mesh 跟隨曲線，200–500 隻） | 舊 MainView 技能輪播 + AboutView 五組技能，合併去重 |
+| 200–1000 m     | **作品集**               | 每個作品是一張「深海探測器」卡片：3D 傾斜（pointer tilt）+ 玻璃質感 + 專案截圖；背景粒子像海雪（marine snow）往上飄表示下潛。篩選：`agent 工具 / 自架 / 資料 / 網站 / 生物`                                                                                                                   | `content/projects.ts`（下節）                       |
+| 1000–4000 m    | **經歷時間軸**           | 深度計 HUD：左側固定「深度 × 年份」數字隨捲動跳動；時間軸節點是發光生物（bioluminescence，`Sparkles` + bloom）                                                                                                                                                                                | 舊 AboutView 學經歷，補 2026                        |
+| 海底           | **關於我 / 興趣 / 聯絡** | 相機落到海床，沉船或熱泉（低多邊形 procedural 幾何即可，不載 glTF 大模型）；興趣標籤；聯絡表單（EmailJS）與 GitHub / Facebook / Resume 連結；「感謝你的造訪」                                                                                                                                 | 舊 AboutView + App.vue modal                        |
 
 **作品資料**（`src/content/projects.ts`，每筆：slug、名稱、一句話、標籤、年份、repo、demo、截圖、分類、狀態）：
 
-| 分類 | 專案 | 備註 |
-|---|---|---|
-| agent 工具 | **scout**（personal-lab 子專案，Go，零依賴科技資訊雷達 CLI） | 連 `Andy880828/personal-lab/tree/main/scout` |
-| agent 工具 | **syssec**（Go，agent 當資安管理員用的 CLI，查最新漏洞並判斷伺服器是否受影響） | 2026-11 還在推，確認 README |
-| agent 工具 | **andy-claude-kit**（私人 Claude marketplace / skills） | |
-| 自架 | **homelab**（Caddy + Uptime Kuma + LiteLLM 的 agent 架設 prompt；網域 chlinandy.com） | 連 personal-lab |
-| 資料 | **stock-analysis-app**（Python，投資紀錄與顧問 APP） | |
-| 資料 | **local-transcribe**（Python，本地轉錄與聲源辨識，需 GPU） | |
-| 資料／生物 | **Trim2Sort**（Python GUI，Sanger + NGS 序列分析，eDNA 資料流） | 保留，更新描述 |
-| 網站 | **RecipeCube**（Vue + ASP.NET Core API 食材管理） | 保留；demo 網址 chlinandys.com 已停用 → 改 repo only |
-| 網站 | **fitness_challenge**（TypeScript，demo fitness-challenge-seven.vercel.app） | |
-| 網站 | **nature-footprint-studio**（Vue，軒齊生態工作室，demo nature-footprint-studio.vercel.app） | 照片有版權，只放連結與自己截圖 |
+| 分類       | 專案                                                                                        | 備註                                                 |
+| ---------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| agent 工具 | **scout**（personal-lab 子專案，Go，零依賴科技資訊雷達 CLI）                                | 連 `Andy880828/personal-lab/tree/main/scout`         |
+| agent 工具 | **syssec**（Go，agent 當資安管理員用的 CLI，查最新漏洞並判斷伺服器是否受影響）              | 2026-11 還在推，確認 README                          |
+| agent 工具 | **andy-claude-kit**（私人 Claude marketplace / skills）                                     |                                                      |
+| 自架       | **homelab**（Caddy + Uptime Kuma + LiteLLM 的 agent 架設 prompt；網域 chlinandy.com）       | 連 personal-lab                                      |
+| 資料       | **stock-analysis-app**（Python，投資紀錄與顧問 APP）                                        |                                                      |
+| 資料       | **local-transcribe**（Python，本地轉錄與聲源辨識，需 GPU）                                  |                                                      |
+| 資料／生物 | **Trim2Sort**（Python GUI，Sanger + NGS 序列分析，eDNA 資料流）                             | 保留，更新描述                                       |
+| 網站       | **RecipeCube**（Vue + ASP.NET Core API 食材管理）                                           | 保留；demo 網址 chlinandys.com 已停用 → 改 repo only |
+| 網站       | **fitness_challenge**（TypeScript，demo fitness-challenge-seven.vercel.app）                |                                                      |
+| 網站       | **nature-footprint-studio**（Vue，軒齊生態工作室，demo nature-footprint-studio.vercel.app） | 照片有版權，只放連結與自己截圖                       |
 
 實作時先用 `gh api repos/Andy880828/<repo>` 確認每個 repo 的 `private` 旗標與 README，**私有 repo 不放 GitHub 連結**，只放說明。
 
@@ -113,16 +114,16 @@ Personal-Page/
 
 ## 效能與大小預算（size-limit 與 Lighthouse CI 強制）
 
-| 項目 | 預算 |
-|---|---|
-| 首屏 JS（含 React + router + GSAP + Lenis，不含 three） | ≤ 120 KB gzip |
-| three + r3f + drei chunk（lazy，Hero 出現後才載） | ≤ 250 KB gzip |
-| postprocessing chunk（lazy，僅 tier ≥ 2 載入） | ≤ 80 KB gzip |
-| 全部 JS 總和 | ≤ 500 KB gzip |
-| 圖片總和（AVIF/WebP，imagetools 輸出） | ≤ 1.5 MB；單張 ≤ 200 KB；舊 PNG/JPG 原檔移到 `raw/`（gitignore）或直接刪 |
-| 字體 | ≤ 2 個 woff2 子集（繁中用 Noto Sans TC 子集化或 system-ui 回退；英文一個 display 字體）≤ 300 KB |
-| Lighthouse（desktop）| Performance ≥ 85、Accessibility ≥ 95、Best Practices ≥ 95、SEO ≥ 95 |
-| 執行期 | desktop 60 fps；mobile tier 1：關 postprocessing、boids 數量減半、DPR ≤ 1.5；`prefers-reduced-motion`：停 Lenis 慣性、場景改靜態一幀、所有 GSAP 動畫改瞬時 |
+| 項目                                                    | 預算                                                                                                                                                       |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 首屏 JS（含 React + router + GSAP + Lenis，不含 three） | ≤ 120 KB gzip                                                                                                                                              |
+| three + r3f + drei chunk（lazy，Hero 出現後才載）       | ≤ 250 KB gzip                                                                                                                                              |
+| postprocessing chunk（lazy，僅 tier ≥ 2 載入）          | ≤ 80 KB gzip                                                                                                                                               |
+| 全部 JS 總和                                            | ≤ 500 KB gzip                                                                                                                                              |
+| 圖片總和（AVIF/WebP，imagetools 輸出）                  | ≤ 1.5 MB；單張 ≤ 200 KB；舊 PNG/JPG 原檔移到 `raw/`（gitignore）或直接刪                                                                                   |
+| 字體                                                    | ≤ 2 個 woff2 子集（繁中用 Noto Sans TC 子集化或 system-ui 回退；英文一個 display 字體）≤ 300 KB                                                            |
+| Lighthouse（desktop）                                   | Performance ≥ 85、Accessibility ≥ 95、Best Practices ≥ 95、SEO ≥ 95                                                                                        |
+| 執行期                                                  | desktop 60 fps；mobile tier 1：關 postprocessing、boids 數量減半、DPR ≤ 1.5；`prefers-reduced-motion`：停 Lenis 慣性、場景改靜態一幀、所有 GSAP 動畫改瞬時 |
 
 GPU 分級（`lib/gpu.ts`）：以 `WEBGL_debug_renderer_info` + `devicePixelRatio` + `hardwareConcurrency` 粗分 0–3；tier 0（無 WebGL）顯示 Paper Shaders 2D 背景 + 靜態 OG 圖，網站內容完整可讀。這也是視覺回歸測試用的「確定性模式」入口。
 
@@ -139,16 +140,19 @@ GPU 分級（`lib/gpu.ts`）：以 `WEBGL_debug_renderer_info` + `devicePixelRat
 ## 實作階段（給 Opus 派工；每階段結尾要能 `npm run build && npm run test` 綠燈並 commit）
 
 ### Phase 0 — 盤點與資產（0.5 天）
+
 - 新分支 `rebuild/deep-sea`。把舊 `src/` 改名 `legacy/`（最後一階段刪除），抽出可重用素材：`M105090005.jpg`（大頭照）、`個人.png`、作品截圖、`diver-1.png`、三個魚/珊瑚 SVG（可轉成 3D 場景的 sprite 或剪影）。
 - 用 `gh api` 抓 10 個作品 repo 的描述、語言、private 旗標、homepage，寫進 `src/content/projects.ts` 草稿；對沒有截圖的（scout、homelab、syssec、andy-claude-kit、stock-analysis-app、local-transcribe）用 Playwright 對 README 或 demo 截圖，或做 1200×750 的程式碼風格封面（深海色票）。
 - 寫 `docs/DESIGN.md`：色票（海面 `#dff3ff` → 透光帶 `#0b4f7a` → 深海 `#02101f` → 海底 `#010409`；強調色生物光 `#4ff0d2` / `#ffb86b`）、字體、動效時長曲線、深度對映表。
 
 ### Phase 1 — 骨架（1 天）
+
 - `npm create vite@latest -- --template react-ts` 重建，裝上表依賴，Tailwind 4、路由、Lenis+GSAP ticker、zustand store、`content/` 全部文案、六個 DOM 段落（無 3D，先用 Paper Shaders `MeshGradient` 當背景）。
 - ESLint/TS/Prettier/Vitest/size-limit/CI 全部就位；此時就要有第一個 Playwright 截圖 baseline。
 - 驗收：純 DOM 版已經是可讀、可導航、RWD、a11y 通過的完整網站（這就是 tier 0 回退版）。
 
 ### Phase 2 — 核心 3D 場景（2–3 天）
+
 - `SceneRoot`：fixed Canvas、`dpr=[1, tier>=2 ? 2 : 1.5]`、`frameloop="demand"` 在 reduced-motion、`Preload`、`AdaptiveDpr`。
 - `Water`：俯視水面 shader（頂點位移 + 法線 + 菲涅爾 + 太陽高光），pointer 漣漪以 uniform 陣列（≤ 8 個）傳入。
 - 相機路徑：`depth` 0 → 1 對應 camera y 從 +5 到 −60，pitch 從俯視到平視；`Lights` 隨深度變暗、霧 `fogExp2` 顏色跟深度帶。
@@ -157,6 +161,7 @@ GPU 分級（`lib/gpu.ts`）：以 `WEBGL_debug_renderer_info` + `devicePixelRat
 - 驗收：fps 量測寫成 Playwright 測試（`?test=1&perf=1` 回報 60 幀平均 frame time < 20 ms on CI swiftshader 只做 smoke）。
 
 ### Phase 3 — 互動元素（2 天）
+
 - `Boids`：GPU（drei `useFBO` + ping-pong）或 CPU 簡化版 instanced（300 隻，tier 1：120），跟隨滑鼠微避讓；魚形用低多邊形程序幾何或舊 SVG 擠出。
 - `SkillBubbles`：五顆 `MeshTransmissionMaterial` 球（tier<2 用 `MeshPhysicalMaterial` 替代），`Float` 漂浮，hover 放大，點擊時 DOM 面板展開對應技能文字。
 - `ProjectCard` 3D tilt + 玻璃；作品段落背景海雪加速。
@@ -165,6 +170,7 @@ GPU 分級（`lib/gpu.ts`）：以 `WEBGL_debug_renderer_info` + `devicePixelRat
 - Hero 文字：SplitText 逐字浮出，載入完成（`useProgress` 100%）才播。
 
 ### Phase 4 — 收斂與驗證（1 天）
+
 - 所有預算跑綠：size-limit、lhci、Playwright baseline 更新並人工檢視。
 - 行動版實機（iOS Safari、Android Chrome）檢查：觸控漣漪、無橫向捲動、Canvas 不吃觸控捲動。
 - SEO/OG：`index.html` meta、`og.png` 由 Playwright 對 Hero 截圖產生、`robots.txt`、`sitemap.xml`（三條 route）。
@@ -172,12 +178,14 @@ GPU 分級（`lib/gpu.ts`）：以 `WEBGL_debug_renderer_info` + `devicePixelRat
 - README 重寫（繁中：技術棧、`npm run` 指令、預算表、如何更新 `content/`）。
 
 ### Phase 5 — impeccable 視覺審視（0.5 天）
+
 - 安裝：`/plugin marketplace add pbakaus/impeccable` → `/plugin` 安裝；或 `npx skills add pbakaus/impeccable`。
 - 依序跑：`/impeccable critique`（UX 整體）→ `/impeccable audit`（27 條 anti-pattern 檢查：漸層濫用、Inter 萬用、卡片套卡片、間距擠壓）→ 針對報告跑 `typeset`、`colorize`、`animate`、`polish`、`adapt`（RWD）、`harden`（邊界狀態：長文、無圖、慢網）。
 - 每輪 impeccable 修改後重跑 Playwright 截圖並更新 baseline，commit message 註明是哪個 impeccable 指令的結果。
 - 最後產出 `docs/REVIEW.md`：critique 原文、採納／不採納的理由。
 
 ### 交付
+
 - PR `rebuild/deep-sea` → `main`，描述附：Vercel preview、Lighthouse 分數截圖、size-limit 表、五張視覺 baseline。
 - 合併後確認 Vercel production 更新，`personal-page-gules.vercel.app` 可用；若要綁 `chlinandy.com` 子網域（例如 `me.chlinandy.com`）是另一個任務。
 

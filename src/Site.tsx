@@ -91,7 +91,10 @@ export default function Site() {
   useEffect(() => {
     if (!flags.test && !flags.perf) return;
     window.__site = {
-      scrollToPos: (p: number) => scrollToPosition(p),
+      scrollToPos: (p: number) => {
+        scrollToPosition(p);
+        (window as Window & { __invalidate?: () => void }).__invalidate?.();
+      },
       frames: () => (window as Window & { __frames?: number }).__frames ?? 0,
       ready: () => useSiteStore.getState().sceneReady,
       tier: () => useSiteStore.getState().tier,
