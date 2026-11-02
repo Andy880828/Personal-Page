@@ -1,0 +1,8 @@
+dist
+node_modules
+public/fonts
+playwright-report
+test-results
+tests/e2e/**/*-snapshots
+.lighthouseci
+package-lock.json
