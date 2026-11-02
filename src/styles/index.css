@@ -1,0 +1,170 @@
+@import 'tailwindcss';
+@source not '../../legacy';
+
+@font-face {
+  font-family: 'Noto Sans TC Subset';
+  src: url('/fonts/noto-sans-tc.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Subset';
+  src: url('/fonts/jetbrains-mono.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: 'Noto Sans TC Subset', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Subset', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* 深度色票：海面 → 透光帶 → 深海 → 海床 */
+  --color-foam: #dff3ff;
+  --color-shallow: #0b4f7a;
+  --color-midnight: #04203a;
+  --color-deep: #02101f;
+  --color-abyss: #010409;
+  /* 生物光（主強調）與熱泉（次強調） */
+  --color-biolum: #4ff0d2;
+  --color-ember: #ffb86b;
+  --color-coral: #ff7eb6;
+  /* 文字 */
+  --color-ink: #e8f4fb;
+  --color-mist: #9dbccf;
+  --color-haze: #6b8ea5;
+
+  --ease-tide: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-swell: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-deep);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 106.25%; /* 17px：中文內文的舒適尺寸 */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: color-mix(in oklab, var(--color-biolum) 45%, transparent) transparent;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow-x: clip;
+    line-height: 1.75;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-biolum) 35%, transparent);
+    color: var(--color-foam);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-biolum);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  /* 段落標籤：深度 + 英文名，等寬字 */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-biolum);
+  }
+
+  /* 水下的玻璃面板：只用一層，不疊卡片 */
+  .glass {
+    background: color-mix(in oklab, var(--color-deep) 58%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid color-mix(in oklab, var(--color-foam) 12%, transparent);
+  }
+
+  .hairline {
+    border-color: color-mix(in oklab, var(--color-foam) 14%, transparent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--color-mist);
+    border: 1px solid color-mix(in oklab, var(--color-foam) 16%, transparent);
+  }
+}
+
+@layer components {
+  .rise-char {
+    display: inline-block;
+    animation: rise 1.3s var(--ease-tide) both;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0.02;
+    transform: translateY(70%) rotateX(-70deg);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+html[data-test] *,
+html[data-test] *::before,
+html[data-test] *::after {
+  animation: none !important;
+  transition: none !important;
+  caret-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] *::before,
+html[data-motion='reduce'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

@@ -1,0 +1,8 @@
+[
+  { "name": "首屏 JS（React + 網站本體）", "path": "dist/assets/index-*.js", "limit": "120 KB", "gzip": true },
+  { "name": "動態套件（GSAP + Lenis，首屏後載入）", "path": "dist/assets/motion-impl-*.js", "limit": "60 KB", "gzip": true },
+  { "name": "全部 JS", "path": "dist/assets/*.js", "limit": "500 KB", "gzip": true },
+  { "name": "CSS", "path": "dist/assets/*.css", "limit": "15 KB", "gzip": true },
+  { "name": "字體", "path": "dist/fonts/*.woff2", "limit": "300 KB", "gzip": false, "brotli": false },
+  { "name": "圖片（所有格式合計）", "path": "dist/assets/*.{avif,webp,jpg,png}", "limit": "1500 KB", "gzip": false, "brotli": false }
+]
