@@ -28,7 +28,7 @@ import { scanMaterial } from './scanMaterial';
  * 模型的「頭」朝哪個軸：攝影測量的魚頭朝 -x、雀鯛朝 +z；擺尾 shader 依這個決定哪一端是尾巴。
  *
  * 所有生物都用 scanMaterial（和海床等深線同一套「被聲納掃出來」的語言），不用模型原本的顏色。
- * 每隻只在自己那一段出現（sectionWeight 寬 0.55），而且擺在該段 DOM 留下的空位：
+ * 每隻只在自己那一段出現（sectionWeight 寬 0.45，段落交界時不會兩段的生物同框），而且擺在該段 DOM 留下的空位：
  * 礁在 About 左下、柳珊瑚在 Skills 左下角、管水母在作品段右緣、鮟鱇在經歷段左半 YEAR 下方的空白。
  */
 type Motion = 'swim' | 'drift' | 'still' | 'crawl';
@@ -228,7 +228,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     const g = group.current;
     if (!g || !model) return;
     const { pos } = useSiteStore.getState();
-    const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.55);
+    const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.45);
     g.visible = w > 0.001;
     if (!g.visible) return;
     const t = sceneTime(state);
@@ -307,7 +307,7 @@ function ReefRock() {
     const m = mesh.current;
     if (!m) return;
     const { pos } = useSiteStore.getState();
-    m.visible = sectionWeight(pos, 1, 0.55) > 0.001;
+    m.visible = sectionWeight(pos, 1, 0.45) > 0.001;
     if (!m.visible) return;
     const portrait = size.width < size.height;
     m.position.set(portrait ? -1 : -10, rigY(pos, 1, 10) + (portrait ? -13.6 : -9.6), portrait ? -22 : -22);

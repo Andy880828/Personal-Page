@@ -87,9 +87,11 @@ export default function Skills() {
           depth="100 m · 透光帶"
           title="一段序列，五個基因"
           lead={
-            tier
-              ? '像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能；大螢幕上也可以拖曳右邊的雙螺旋、點任一區段。'
-              : '像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能。'
+            <>
+              像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能
+              {/* 拖曳雙螺旋只在大螢幕有（手機上螺旋退到背景，不能操作） */}
+              {tier ? <span className="hidden lg:inline">；也可以拖曳右邊的雙螺旋、點任一區段</span> : null}。
+            </>
           }
         />
 

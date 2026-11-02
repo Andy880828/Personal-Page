@@ -2,6 +2,7 @@ uniform float uTime;
 uniform vec3 uDeep;
 uniform vec3 uUnderColor;
 uniform float uUnderDensity;
+uniform float uFade;
 varying vec3 vWorld;
 varying vec3 vNormalW;
 varying float vHeight;
@@ -45,11 +46,12 @@ void main() {
     float window = smoothstep(0.62, 0.8, cosT);
     float shimmer = 0.7 + 0.3 * vnoise(vWorld.xz * 1.2 + uTime * 0.12);
     vec3 skyLight = vec3(0.75, 0.9, 1.0) * 1.6 * shimmer;
-    vec3 col = mix(uUnderColor * 1.6, skyLight, window);
+    vec3 col = mix(uUnderColor * 1.25, skyLight, window);
     col += vec3(1.0, 0.8, 0.55) * pow(max(dot(-reflect(V, Nd), uSunDir), 0.0), 60.0) * 0.6;
     float fog = 1.0 - exp(-pow(dist * uUnderDensity, 2.0));
-    col = mix(col, uUnderColor, fog);
-    gl_FragColor = vec4(col, 1.0);
+    // 遠處與淡出時用透明度露出真正的背景，而不是混成「看起來一樣」的水色：
+    // 水面經過色調映射、背景清除色不會，兩者混色永遠對不齊，地平線會留一條接縫
+    gl_FragColor = vec4(col, (1.0 - fog) * uFade);
   }
   #include <tonemapping_fragment>
   #include <colorspace_fragment>

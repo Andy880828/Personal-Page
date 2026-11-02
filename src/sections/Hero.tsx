@@ -23,9 +23,9 @@ export default function Hero() {
             <span className="mx-3 text-ember" aria-hidden="true">
               —
             </span>
-            {profile.role}
-            <span className="mx-3 text-ember">/</span>
-            {profile.roleSecond}
+            {/* 職稱各自不斷行：寧可整個換到下一行，也不要把「Data & Workflow / Engineer」拆開 */}
+            <span className="whitespace-nowrap">{profile.role}</span> {/* 斜線兩側要有空白，窄螢幕才能在這裡換行 */}
+            <span className="mx-1 text-ember">/</span> <span className="whitespace-nowrap">{profile.roleSecond}</span>
           </p>
           <p className="mt-2 text-base text-foam/90 sm:text-lg [text-shadow:0_2px_14px_rgb(1_4_9/0.7)]">
             {profile.roleZh}

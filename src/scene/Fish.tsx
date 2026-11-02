@@ -69,29 +69,30 @@ export default function Fish({ count, kind = 'reef' }: { count: number; kind?: '
       shader.uniforms.uTime = { value: 0 };
       shader.uniforms.uLantern = { value: 0 };
       m.userData.shader = shader;
-      // 燈籠魚模式（中層帶）：身體變暗，腹側一排很淡的發光點，顏色是這條魚的分類
+      // 燈籠魚模式（中層帶）：和其他生物同一種掃描語言——身體幾乎全黑、冷色輪廓光；
+      // 腹側一排小發光點是這條魚的作品分類色（篩選分群時看得出誰是誰），尾巴不發光
       shader.fragmentShader = shader.fragmentShader
         .replace(
           '#include <common>',
-          '#include <common>\nuniform float uLantern;\nvarying vec3 vTag;\nvarying float vBelly;',
+          '#include <common>\nuniform float uLantern;\nvarying vec3 vTag;\nvarying vec3 vLocal;',
         )
         .replace(
           '#include <color_fragment>',
-          '#include <color_fragment>\ndiffuseColor.rgb *= mix(1.0, 0.22, uLantern);',
+          '#include <color_fragment>\ndiffuseColor.rgb *= mix(1.0, 0.08, uLantern);',
         )
         .replace(
           '#include <emissivemap_fragment>',
-          '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vTag * uLantern * vBelly * 0.9;',
+          `#include <emissivemap_fragment>
+          float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 2.4);
+          float dots = step(0.6, fract(vLocal.z * 16.0)) * smoothstep(-0.03, -0.09, vLocal.y) * step(-0.18, vLocal.z);
+          totalEmissiveRadiance += (vec3(0.31, 0.94, 0.82) * rim * 0.55 + vTag * dots * 0.7) * uLantern;`,
         );
       shader.vertexShader = shader.vertexShader
         .replace(
           '#include <common>',
-          '#include <common>\nuniform float uTime;\nattribute vec3 aTag;\nvarying vec3 vTag;\nvarying float vBelly;',
+          '#include <common>\nuniform float uTime;\nattribute vec3 aTag;\nvarying vec3 vTag;\nvarying vec3 vLocal;',
         )
-        .replace(
-          '#include <begin_vertex>',
-          '#include <begin_vertex>\nvTag = aTag;\nvBelly = smoothstep(-0.02, -0.12, position.y) * step(abs(position.x), 0.12);',
-        )
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvTag = aTag;\nvLocal = position;')
         .replace(
           '#include <begin_vertex>',
           `#include <begin_vertex>

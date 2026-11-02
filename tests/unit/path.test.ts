@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { cameraY, sectionWeight, waterColor, fogDensity, rigY, SKY_HEIGHT, DIVE_BOTTOM } from '@/scene/path';
 
 describe('相機路徑', () => {
@@ -37,17 +37,37 @@ describe('相機路徑', () => {
 });
 
 describe('相機路徑的速度連續', () => {
-  it('進水（pos 1）與到海床（pos 5）兩側的下潛速度一樣；到底時速度歸零', async () => {
-    const { cameraY } = await import('@/scene/path');
+  afterEach(async () => {
+    const { setSectionSpans } = await import('@/scene/path');
+    setSectionSpans([1, 1, 1, 1, 1, 1]);
+  });
+
+  it('依各段捲動長度分配下潛距離：每捲 1 px 潛一樣遠，段落邊界兩側速度相同（作品段很長也不會變慢）', async () => {
+    const { cameraY, setSectionSpans } = await import('@/scene/path');
+    // 實測的段落長度（px，1440 寬）：作品段是其他段的 3–4 倍
+    const spans = [1350, 1002, 1119, 3500, 1950, 1278];
+    setSectionSpans(spans);
     const e = 1e-4;
-    const slope = (p: number, dir: 1 | -1) => (cameraY(p + dir * e) - cameraY(p)) / (dir * e);
-    for (const p of [1, 5]) {
-      const l = slope(p, -1);
-      const r = slope(p, 1);
+    // pos 對 px 是逐段線性，所以 dy/dpx = (dy/dpos) / 該段長度
+    const perPx = (p: number, dir: 1 | -1) => {
+      const i = Math.min(5, Math.floor(dir < 0 ? p - e : p));
+      return (cameraY(p + dir * e) - cameraY(p)) / (dir * e) / spans[i]!;
+    };
+    const mid = perPx(3.5, 1);
+    for (const p of [1, 2, 3, 4, 5]) {
+      const l = perPx(p, -1);
+      const r = perPx(p, 1);
       expect(Math.abs(l - r) / Math.abs(r), `pos ${p}`).toBeLessThan(0.01);
     }
-    expect(Math.abs(slope(6, -1))).toBeLessThan(0.01);
-    // 單調往下
+    for (const p of [1.5, 2.5, 4.5]) expect(Math.abs(perPx(p, 1) - mid) / Math.abs(mid), `pos ${p}`).toBeLessThan(0.01);
+    // 到底時速度歸零、全程單調往下、海床位置不變
+    expect(Math.abs((cameraY(6) - cameraY(6 - e)) / e)).toBeLessThan(0.01);
     for (let p = 0.1; p < 6; p += 0.01) expect(cameraY(p + 0.01)).toBeLessThanOrEqual(cameraY(p) + 1e-9);
+  });
+
+  it('六段等長時和固定間距一致（預設值）', async () => {
+    const { cameraY, SECTION_SPACING, DIVE_BOTTOM } = await import('@/scene/path');
+    expect(cameraY(2)).toBeCloseTo(DIVE_BOTTOM - SECTION_SPACING);
+    expect(cameraY(5)).toBeCloseTo(DIVE_BOTTOM - 4 * SECTION_SPACING);
   });
 });

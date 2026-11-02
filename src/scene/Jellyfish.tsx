@@ -101,11 +101,10 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
   const items = useMemo(() => {
     const rng = createRng(SCENE_SEED + 21);
     const bell = new SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-    const top = cameraY(3.0);
-    const bottom = cameraY(4.3);
     return Array.from({ length: count }, (_, i) => {
       // 降低飽和與亮度：水母是遠處的微光，不能比內容搶眼
-      const color = new Color(COLORS[i % COLORS.length]!).lerp(new Color('#7cc8ff'), 0.45).multiplyScalar(0.5);
+      // 和其他生物同一種掃描語言：單一冷色、很暗，亮度只差一點（COLORS 只用來錯開亮度）
+      const color = new Color('#4ff0d2').lerp(new Color(COLORS[i % COLORS.length]!), 0.12).multiplyScalar(0.42);
       const phase = rng() * 6.28;
       const uniforms = {
         uTime: { value: 0 },
@@ -139,7 +138,8 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
         }),
         uniforms,
         x: side * (10 + rng() * 6),
-        y: top + (bottom - top) * ((i + rng() * 0.6) / count),
+        // 在中層帶裡的相對位置；實際高度每幀依相機路徑算（路徑依版面量測結果而定）
+        frac: (i + rng() * 0.6) / count,
         z: -16 - rng() * 16,
         scale: 0.45 + rng() * 0.5,
         drift: rng() * 6.28,
@@ -153,15 +153,17 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
     const t = sceneTime(state);
     const camY = state.camera.position.y;
     const pos = useSiteStore.getState().pos;
-    if (group.current) group.current.visible = pos > 2.7 && pos < 4.4;
+    if (group.current) group.current.visible = pos > 2.7 && pos < 4.0;
+    const top = cameraY(3.0);
+    const bottom = cameraY(3.95);
     items.forEach((it, i) => {
+      const y = top + (bottom - top) * it.frac;
       it.uniforms.uTime.value = t;
       it.uniforms.uExcite.value *= Math.exp(-sceneDelta(delta) * 1.4);
-      const d = Math.abs(it.y - camY);
+      const d = Math.abs(y - camY);
       it.uniforms.uFade.value = 1 - Math.min(1, Math.max(0, (d - 10) / 12));
       const g = groups.current[i];
-      if (g)
-        g.position.set(it.x + Math.sin(t * 0.2 + it.drift) * 0.8, it.y + Math.sin(t * 0.35 + it.drift) * 1.2, it.z);
+      if (g) g.position.set(it.x + Math.sin(t * 0.2 + it.drift) * 0.8, y + Math.sin(t * 0.35 + it.drift) * 1.2, it.z);
     });
   });
 

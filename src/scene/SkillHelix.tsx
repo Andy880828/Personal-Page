@@ -160,14 +160,16 @@ export default function SkillHelix() {
     const g = group.current;
     if (!g) return;
     const { pos, activeSkill, hoverSkill } = useSiteStore.getState();
-    const w = sectionWeight(pos, SECTION, 0.85);
+    // 窄一點：pos 2.0 之後才出現，不壓到關於段的大頭照與證照
+    const w = sectionWeight(pos, SECTION, 0.5);
     g.visible = w > 0.001;
     if (!g.visible) return;
     const t = sceneTime(state);
     const dt = sceneDelta(delta);
     const portrait = size.width < size.height;
-    g.position.set(portrait ? 0.3 : 4.6, rigY(pos, SECTION, 10) + (portrait ? 3.5 : -0.4), portrait ? -15 : -13.5);
-    g.scale.setScalar((portrait ? 0.58 : 0.82) * MathUtils.lerp(0.7, 1, w));
+    // 直式螢幕：退到右緣的遠處當背景，不疊在分頁按鈕後面
+    g.position.set(portrait ? 3.2 : 4.6, rigY(pos, SECTION, 10) + (portrait ? 1 : -0.4), portrait ? -20 : -13.5);
+    g.scale.setScalar((portrait ? 0.5 : 0.82) * MathUtils.lerp(0.7, 1, w));
     g.rotation.z = -0.2;
     g.rotation.x = 0.1;
 

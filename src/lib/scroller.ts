@@ -3,6 +3,7 @@ import { SECTIONS, type SectionId } from './sections';
 import { computeBreakpoints, posToDepth, posToSectionIndex, posToScroll, scrollToPos } from './scroll';
 import { loadMotion } from './motion';
 import { useSiteStore } from '@/store/useSiteStore';
+import { setSectionSpans } from '@/scene/path';
 
 /**
  * 全站唯一的捲動來源。
@@ -27,6 +28,8 @@ export function measure() {
   });
   const maxScroll = Math.max(0, document.documentElement.scrollHeight - vh);
   breakpoints = computeBreakpoints(tops, vh, maxScroll);
+  // 3D 下潛距離依各段的捲動長度分配：每捲 1 px 潛一樣遠
+  setSectionSpans(breakpoints.slice(1).map((b, i) => b - breakpoints[i]!));
   update();
 }
 

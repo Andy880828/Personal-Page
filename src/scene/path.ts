@@ -13,24 +13,54 @@ export const FLOOR_SPACING = 12;
 export const FLOOR_Y = DIVE_BOTTOM - 4 * SECTION_SPACING - FLOOR_SPACING - 13;
 
 /**
- * pos → 相機高度。第 0 段（海面）從空中穿過水面，之後每段等速下潛，最後一段減速停在海床上。
- * 三段接合處的速度連續（不會在進水或到海床時頓一下）：
- * - 海面：h(t) = (m−2)t³ + (3−m)t²，起點速度 0、終點速度剛好接上水下的等速下潛
- * - 海床：f(u) = 6u³ − 24u² + 30u，起點速度 = 每段 30、終點速度 0、總共再降 12
+ * 每一段實際的捲動長度（px，由 lib/scroller 量完版面後設定）。
+ * 水下四段（關於、技能、作品、經歷）共潛 4 × SECTION_SPACING，依各段的捲動長度分配：
+ * 每捲 1 px 都潛一樣的距離，作品段很長也不會讓下潛變慢（舊做法是每段潛一樣遠，作品段速度只剩約 1/4）。
+ * 預設六段等長，等於舊行為；單元測試直接用它。
  */
+let spans = [1, 1, 1, 1, 1, 1];
+export function setSectionSpans(next: number[]) {
+  if (next.length === spans.length && next.every((v) => v > 0)) spans = next.slice();
+}
+export function getSectionSpans(): readonly number[] {
+  return spans;
+}
+
+const UNDER = 4 * SECTION_SPACING;
 const DIVE_START = 0.08;
+
+/** 水下每 px 捲動的下潛距離 */
+function divePerPx(): number {
+  return UNDER / (spans[1]! + spans[2]! + spans[3]! + spans[4]!);
+}
+
+/**
+ * pos → 相機高度。第 0 段（海面）從空中穿過水面，水下四段依捲動長度等速下潛，最後一段減速停在海床上。
+ * 接合處速度連續：
+ * - 海面：h(t) = (m−2)t³ + (3−m)t²，起點速度 0、終點速度接上水下的等速
+ * - 海床：Hermite，起點速度接上水下的等速、終點速度 0、總共再降 FLOOR_SPACING
+ */
 export function cameraY(pos: number): number {
+  const c = divePerPx();
   if (pos < 1) {
     const t = clamp((pos - DIVE_START) / (1 - DIVE_START));
     const drop = SKY_HEIGHT - DIVE_BOTTOM;
-    const m = (SECTION_SPACING * (1 - DIVE_START)) / drop;
+    // 終點斜率（以 t 為單位）；m ≤ 3 才單調
+    const m = Math.min(3, (c * spans[0]! * (1 - DIVE_START)) / drop);
     const h = (m - 2) * t * t * t + (3 - m) * t * t;
     return SKY_HEIGHT - drop * h;
   }
-  if (pos < 5) return DIVE_BOTTOM - (pos - 1) * SECTION_SPACING;
+  if (pos < 5) {
+    const i = Math.floor(pos);
+    let y = DIVE_BOTTOM;
+    for (let k = 1; k < i; k++) y -= c * spans[k]!;
+    return y - (pos - i) * c * spans[i]!;
+  }
   const u = Math.min(1, pos - 5);
-  const f = ((6 * u - 24) * u + 30) * u * (FLOOR_SPACING / 12);
-  return DIVE_BOTTOM - 4 * SECTION_SPACING - f;
+  // 起點斜率 s0（以 u 為單位）；s0 ≤ 3·FLOOR_SPACING 才單調
+  const s0 = Math.min(3 * FLOOR_SPACING, c * spans[5]!);
+  const f = (u * u * u - 2 * u * u + u) * s0 + (3 * u * u - 2 * u * u * u) * FLOOR_SPACING;
+  return DIVE_BOTTOM - UNDER - f;
 }
 
 /** 相機俯角（弧度，負值往下看）：海面上看向夕陽海面，水下逐漸平視 */

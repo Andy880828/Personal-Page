@@ -5,7 +5,7 @@ interface Props {
   /** 這一段的深度與海洋分層，例如「100 m · 透光帶」 */
   depth: string;
   title: string;
-  lead?: string;
+  lead?: React.ReactNode;
 }
 
 /**
