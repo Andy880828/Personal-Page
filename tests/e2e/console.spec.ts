@@ -40,7 +40,8 @@ test.describe('指令列與快捷鍵', () => {
     await input.fill('dive 1200');
     await input.press('Enter');
     const hud = page.getByTestId('hud');
-    await expect(hud).toContainText('1,200');
+    // 捲動位置會被取整成整數像素，換算回深度可能差 1–2 m
+    await expect(hud).toContainText(/1,(19[89]|20[0-2])m/);
     await expect(hud).toContainText('121 atm');
   });
 
