@@ -131,7 +131,9 @@ export default function Site() {
         </SceneBoundary>
       )}
       <Nav />
-      <main id="main" className="relative z-10">
+      <Console />
+      {/* 右側儀表（lg 以上）佔 12.5rem，內容欄位為它讓出空間，不互相覆蓋；1640px 以上才夠寬，不用讓 */}
+      <main id="main" className="relative z-10 lg:pr-[12.5rem] min-[1640px]:pr-0">
         <Hero />
         <About />
         <Skills />
@@ -140,7 +142,6 @@ export default function Site() {
         <Contact />
       </main>
       <DepthHUD />
-      <Console />
       <Loader />
     </>
   );

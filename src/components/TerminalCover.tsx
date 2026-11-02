@@ -9,7 +9,7 @@ export default function TerminalCover({ prompt, lines, accent }: Props) {
   return (
     <div
       aria-hidden="true"
-      className="relative flex h-full min-h-36 flex-col justify-end overflow-hidden bg-abyss/80 p-5 pt-10 font-mono text-[0.72rem] leading-relaxed sm:text-xs"
+      className="relative flex h-full w-full min-w-0 flex-col justify-end overflow-hidden min-h-36 bg-abyss/80 p-5 pt-10 font-mono text-[0.72rem] leading-relaxed sm:text-xs"
     >
       <span
         className="pointer-events-none absolute -top-16 -right-10 size-56 rounded-full opacity-40 blur-3xl"

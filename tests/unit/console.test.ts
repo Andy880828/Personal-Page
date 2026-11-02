@@ -8,6 +8,7 @@ describe('指令列', () => {
     const r = runCommand('help', ctx);
     expect(r.lines).toHaveLength(COMMANDS.length);
     expect(r.lines.join('\n')).toContain('dive');
+    for (const l of r.lines) expect(l.split('\t')).toHaveLength(2);
   });
 
   it('goto 與別名、未知段落', () => {

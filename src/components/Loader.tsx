@@ -12,7 +12,7 @@ export default function Loader() {
     <div
       role="status"
       aria-live="polite"
-      className="glass fixed bottom-4 left-4 z-30 flex items-center gap-3 rounded-full py-1.5 pr-4 pl-3 font-mono text-xs text-mist"
+      className="glass fixed bottom-4 left-1/2 z-30 -translate-x-1/2 flex items-center gap-3 rounded-full py-1.5 pr-4 pl-3 font-mono text-xs text-mist"
     >
       <span className="relative h-1 w-16 overflow-hidden rounded-full bg-foam/15">
         <span

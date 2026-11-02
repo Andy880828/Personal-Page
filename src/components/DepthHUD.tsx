@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { SECTIONS, SECTION_COUNT } from '@/lib/sections';
 import { formatDepth } from '@/lib/scroll';
 import { useSiteStore } from '@/store/useSiteStore';
 import { formatLight, lightFraction, pressureAtm, temperatureC, zoneAt } from '@/content/science';
 
-/** 把深度（公尺）換算成深度計的刻度位置 0–1：刻度和段落一樣是不等距的，所以用段落區間內插 */
+/** 深度（公尺）→ 刻度位置 0–1：對數尺度，淺水的變化（溫躍層、光的衰減）才看得到，像真正的 CTD 剖面圖 */
+const MAX_DEPTH = 4000;
 function depthToScale(depth: number): number {
-  for (let i = 0; i < SECTIONS.length; i++) {
-    const s = SECTIONS[i]!;
-    if (depth <= s.depthEnd) return (i + (depth - s.depthStart) / (s.depthEnd - s.depthStart)) / SECTION_COUNT;
-  }
-  return 1;
+  return Math.log10(1 + Math.max(0, depth)) / Math.log10(1 + MAX_DEPTH);
 }
+function scaleToDepth(y: number): number {
+  return Math.pow(10, y * Math.log10(1 + MAX_DEPTH)) - 1;
+}
+const TICKS = [0, 10, 100, 200, 1000, 4000];
 
 const W = 64;
 const H = 100;
@@ -24,10 +24,7 @@ function useProfilePaths() {
     const tMax = temperatureC(0);
     for (let i = 0; i <= 80; i++) {
       const y = i / 80;
-      // 刻度 → 深度（反函式）：找出 y 落在哪一段
-      const seg = Math.min(SECTION_COUNT - 1, Math.floor(y * SECTION_COUNT));
-      const s = SECTIONS[seg]!;
-      const depth = s.depthStart + (y * SECTION_COUNT - seg) * (s.depthEnd - s.depthStart);
+      const depth = scaleToDepth(y);
       const tx = (temperatureC(depth) / tMax) * W;
       // 光用對數尺度：1 → 1e-8 對應 W → 0
       const lf = lightFraction(depth);
@@ -62,7 +59,7 @@ export default function DepthHUD() {
       lastDepth = d;
       if (depthEl.current) depthEl.current.textContent = formatDepth(d);
       const z = zoneAt(d);
-      if (zoneEl.current) zoneEl.current.textContent = d >= 3800 ? '海床' : d < 1 ? '海面' : `${z.zh} · ${z.en}`;
+      if (zoneEl.current) zoneEl.current.textContent = d >= 3990 ? '海床' : d < 1 ? '海面' : `${z.zh} · ${z.en}`;
       if (pressEl.current) pressEl.current.textContent = pressureAtm(d).toFixed(d < 100 ? 1 : 0);
       if (tempEl.current) tempEl.current.textContent = temperatureC(d).toFixed(1);
       if (lightEl.current) lightEl.current.textContent = formatLight(lightFraction(d));
@@ -82,37 +79,52 @@ export default function DepthHUD() {
   return (
     <div aria-hidden="true" className="pointer-events-none">
       <div
-        className="fixed top-1/2 right-4 z-30 hidden w-[11.5rem] -translate-y-1/2 rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono lg:block"
+        className="fixed top-24 right-4 z-30 hidden w-[11.5rem] rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono lg:block"
         data-testid="hud"
       >
-        <p className="text-[0.6rem] tracking-[0.22em] text-mist uppercase">ctd · telemetry</p>
+        <p className="flex items-center justify-between text-[0.7rem] tracking-[0.18em] text-mist uppercase">
+          telemetry
+          <span className="flex gap-2 normal-case tracking-normal">
+            <span>
+              <span className="mr-1 inline-block h-px w-3 bg-ember align-middle" />T
+            </span>
+            <span>
+              <span className="mr-1 inline-block h-px w-3 bg-foam/50 align-middle" />光
+            </span>
+          </span>
+        </p>
 
         <div className="mt-2 flex gap-3">
           {/* 深度刻度 */}
-          <div className="relative h-[34vh] w-px bg-foam/15">
-            {SECTIONS.map((s, i) => (
+          <div className="relative h-[26vh] w-px bg-foam/15">
+            {TICKS.map((t) => (
               <span
-                key={s.id}
+                key={t}
                 className="absolute -left-1 h-px w-2 bg-foam/35"
-                style={{ top: `${(i / SECTION_COUNT) * 100}%` }}
+                style={{ top: `${depthToScale(t) * 100}%` }}
               />
             ))}
             <div ref={needle} className="absolute inset-x-0 top-0 h-full">
               <span className="absolute -left-[4px] size-[9px] rounded-full border-2 border-deep bg-biolum" />
             </div>
           </div>
-          <div className="flex h-[34vh] flex-col justify-between text-[0.62rem] text-ink/85 tabular-nums">
-            {SECTIONS.map((s) => (
-              <span key={s.id}>{formatDepth(s.depthStart)}</span>
+          <div className="relative h-[26vh] w-9 text-[0.7rem] text-ink/85 tabular-nums">
+            {TICKS.map((t) => (
+              <span
+                key={t}
+                className="absolute -translate-y-1/2 leading-none"
+                style={{ top: `${depthToScale(t) * 100}%` }}
+              >
+                {formatDepth(t)}
+              </span>
             ))}
-            <span>4,000</span>
           </div>
           {/* 溫度（琥珀）與光（白）的剖面 */}
           <svg
             viewBox={`0 0 ${W} ${H}`}
             preserveAspectRatio="none"
             width="100%"
-            className="h-[34vh] min-w-0 flex-1 overflow-visible"
+            className="h-[26vh] min-w-0 flex-1 overflow-visible"
           >
             <path
               d={lights}
@@ -135,24 +147,15 @@ export default function DepthHUD() {
             />
           </svg>
         </div>
-        <div className="mt-1 flex justify-end gap-3 text-[0.55rem] text-haze">
-          <span>
-            <span className="mr-1 inline-block h-px w-3 bg-ember align-middle" />T
-          </span>
-          <span>
-            <span className="mr-1 inline-block h-px w-3 bg-foam/50 align-middle" />光
-          </span>
-        </div>
-
         <div className="mt-3 border-t border-foam/10 pt-3">
           <div className="text-2xl text-foam tabular-nums">
             <span ref={depthEl}>0</span>
             <span className="ml-1 text-xs text-mist">m</span>
           </div>
-          <span ref={zoneEl} className="block text-[0.62rem] tracking-widest text-ink/85">
+          <span ref={zoneEl} className="block text-[0.7rem] tracking-widest text-ink/85">
             海面
           </span>
-          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[0.68rem] tabular-nums">
+          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[0.72rem] tabular-nums">
             <dt className="text-haze">壓力</dt>
             <dd className="text-right text-ink">
               <span ref={pressEl}>1.0</span> atm

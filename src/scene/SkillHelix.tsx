@@ -135,7 +135,7 @@ export default function SkillHelix() {
     const t = sceneTime(state);
     const dt = sceneDelta(delta);
     const portrait = size.width < size.height;
-    g.position.set(portrait ? 0.3 : 4.6, rigY(pos, SECTION, 10) - 0.4, portrait ? -15 : -13.5);
+    g.position.set(portrait ? 0.3 : 4.6, rigY(pos, SECTION, 10) + (portrait ? 3.5 : -0.4), portrait ? -15 : -13.5);
     g.scale.setScalar((portrait ? 0.58 : 0.82) * MathUtils.lerp(0.7, 1, w));
     g.rotation.z = -0.2;
     g.rotation.x = 0.1;

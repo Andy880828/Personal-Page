@@ -100,6 +100,18 @@ test.describe('互動', () => {
   });
 });
 
+test.describe('版面', () => {
+  test('手機：每個段落都不會橫向溢出', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobile', '只在手機版');
+    await openTestMode(page);
+    for (const pos of [0, 1.5, 2.5, 3.5, 4.5, 5.6]) {
+      await scrollToPos(page, pos);
+      const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+      expect(sw, `pos ${pos}`).toBeLessThanOrEqual(iw);
+    }
+  });
+});
+
 test.describe('降級與效能', () => {
   test('減少動態：載入完成後畫面靜止（rAF 每秒少於 5 次）', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });

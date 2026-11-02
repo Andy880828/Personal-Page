@@ -49,7 +49,7 @@ export default function Projects() {
               type="button"
               aria-pressed={filter === f}
               onClick={() => setFilter(f)}
-              className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+              className={`min-h-11 rounded-full border px-4 py-1.5 text-sm transition-colors ${
                 filter === f ? 'border-transparent bg-foam text-deep' : 'hairline text-mist hover:text-foam'
               }`}
             >

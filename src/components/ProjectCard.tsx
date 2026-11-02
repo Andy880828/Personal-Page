@@ -85,7 +85,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
                 href={project.repo}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-foam hover:text-biolum"
+                className="-my-2 inline-flex items-center gap-1.5 py-2 text-foam hover:text-biolum"
               >
                 <GithubIcon size={16} />
                 原始碼<span className="sr-only">（{project.name}，GitHub）</span>
@@ -96,7 +96,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
                 href={project.demo}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-foam hover:text-biolum"
+                className="-my-2 inline-flex items-center gap-1.5 py-2 text-foam hover:text-biolum"
               >
                 <ExternalLink size={16} aria-hidden="true" />
                 線上展示<span className="sr-only">（{project.name}）</span>
