@@ -5,7 +5,7 @@
 - 線上：<https://personal-page-gules.vercel.app>（`/about`、`/project` 會直接捲到對應段落）
 - 設計規範：[`docs/DESIGN.md`](docs/DESIGN.md)；重構計畫：[`docs/PLAN.md`](docs/PLAN.md)；視覺審視紀錄：[`docs/REVIEW.md`](docs/REVIEW.md)
 
-照片皆具版權，僅供參考，翻印必究。
+照片版權屬原作者，未經同意請勿轉載。
 
 ## 技術棧
 
@@ -42,7 +42,7 @@ npm run lhci           # Lighthouse CI（用 Playwright 附帶的 Chromium）
 
 網址參數：`?tier=0-3` 強制 GPU 等級、`?test=1` 確定性模式（固定時間與亂數）、`?debug` 顯示效能面板、`?perf=1` 回報 frame time、`?slow=0.02` 放慢場景時間（找閃爍用）。
 
-站內指令列（按 `/`）：`help`、`ls`、`cat <技能|作品|zone>`、`dive <公尺>`、`ascii on|off` 等。
+站內指令列（按 `/`）：`help`、`ls`、`cat <skill|project|zone>`、`here`、`contact`、`dive <公尺>`、`ascii on|off` 等。
 
 ## 更新內容
 
@@ -97,4 +97,4 @@ CI 沒有 GPU，會被分到 tier 0（純 DOM 版），所以 Lighthouse 量的�
 
 ## 部署
 
-Vercel（`vercel.json`）。聯絡表單需要在 Vercel 的 Environment Variables 設定三個 EmailJS 值（見 `.env.example`），沒設定時表單會顯示「暫時關閉」並引導改用 GitHub / Facebook。
+Vercel（`vercel.json`）。聯絡表單需要在 Vercel 的 Environment Variables 設定三個 EmailJS 值（見 `.env.example`），沒設定時不顯示表單，改顯示 Email、履歷、GitHub 與 Facebook。

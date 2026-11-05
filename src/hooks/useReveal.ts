@@ -21,13 +21,15 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
           .toArray<HTMLElement>('[data-reveal]', scope.current)
           .filter((el) => el.getBoundingClientRect().top > window.innerHeight * 0.92);
         if (!items.length) return;
-        gsap.set(items, { autoAlpha: 0, y: 28, filter: 'blur(6px)' });
+        // 只用 opacity，不用 autoAlpha（autoAlpha 會設 visibility: hidden，還沒浮出的連結與按鈕就 Tab 不到）；
+        // 模糊也降到 2px，捲動途中不會拍到糊掉的標題
+        gsap.set(items, { opacity: 0, y: 28, filter: 'blur(2px)' });
         ScrollTrigger.batch(items, {
           start: 'top 88%',
           once: true,
           onEnter: (batch) =>
             gsap.to(batch, {
-              autoAlpha: 1,
+              opacity: 1,
               y: 0,
               filter: 'blur(0px)',
               duration: 1.1,
@@ -38,7 +40,19 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
         });
       }, scope.current);
     });
+    // 鍵盤使用者 Tab 到還沒浮出的元素時，立刻讓它出現
+    const el = scope.current;
+    const onFocus = (e: FocusEvent) => {
+      const target = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-reveal]');
+      if (target) {
+        target.style.opacity = '1';
+        target.style.transform = 'none';
+        target.style.filter = 'none';
+      }
+    };
+    el?.addEventListener('focusin', onFocus);
     return () => {
+      el?.removeEventListener('focusin', onFocus);
       cancelled = true;
       ctx?.revert();
     };

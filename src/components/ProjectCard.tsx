@@ -42,7 +42,7 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col p-6 sm:p-8">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.7rem] tracking-widest uppercase">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.72rem] tracking-wider">
             <span style={{ color: accent }}>{project.categories.map((c) => categoryLabels[c]).join(' · ')}</span>
             <span className="text-haze tabular-nums">{project.year}</span>
             {project.status === 'active' && (
@@ -57,7 +57,10 @@ export default function ProjectCard({ project, featured = false }: { project: Pr
             {project.name}
             {project.nameZh && <span className="ml-3 text-base font-medium text-mist">{project.nameZh}</span>}
           </h3>
+          {/* 成果與角色：只放站主提供的事實，沒有就不顯示 */}
+          {project.outcome && <p className="mt-3 font-mono text-sm text-ember">{project.outcome}</p>}
           <p className="mt-3 text-ink/90">{project.summary}</p>
+          {project.role && <p className="mt-2 text-sm text-mist">{project.role}</p>}
 
           {project.highlights.length > 0 && (
             <ul className="mt-4 space-y-1.5 text-sm text-mist">

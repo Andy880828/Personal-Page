@@ -11,7 +11,7 @@ interface Line {
   prompt?: string;
 }
 
-const GREETING: Line[] = [{ kind: 'out', text: 'dive-console 2.0 · 輸入 help 看指令，Esc 關閉' }];
+const GREETING: Line[] = [{ kind: 'out', text: 'dive-console · 輸入 help 看指令，Esc 關閉' }];
 
 /**
  * 站內指令列：按 `/` 或右下角按鈕開啟。
@@ -75,6 +75,9 @@ export default function Console() {
         break;
       case 'ascii':
         s.setAscii(a.on);
+        break;
+      case 'open':
+        window.open(a.url, '_blank', 'noopener');
         break;
       case 'clear':
         setLines([]);

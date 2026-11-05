@@ -84,13 +84,12 @@ export default function Skills() {
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           id="skills"
-          depth="100 m · 透光帶"
-          title="一段序列，五個基因"
+          title="技能：五個方向"
           lead={
             <>
-              像 eDNA 一樣把技能讀出來：用下面的分頁切換五組技能
+              點分頁切換五組技能，每組列出做過的事與常用工具
               {/* 拖曳雙螺旋只在大螢幕有（手機上螺旋退到背景，不能操作） */}
-              {tier ? <span className="hidden lg:inline">；也可以拖曳右邊的雙螺旋、點任一區段</span> : null}。
+              {tier ? <span className="hidden lg:inline">；右邊的雙螺旋也可以拖曳、點選</span> : null}。
             </>
           }
         />
@@ -133,9 +132,7 @@ export default function Skills() {
             >
               <p className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: current.color }}>
                 {current.nameEn}
-                <span className="ml-3 normal-case tracking-normal text-haze">
-                  locus skill/{current.id} · {current.tools.length} tools
-                </span>
+                <span className="ml-3 normal-case tracking-normal text-haze">{current.tools.length} 項工具</span>
               </p>
               <p
                 aria-hidden="true"
@@ -143,7 +140,7 @@ export default function Skills() {
               >
                 <Sequence seg={skills.indexOf(current)} color={current.color} />
               </p>
-              <h3 className="mt-2 text-2xl font-bold text-foam sm:text-3xl">{current.name}</h3>
+              <h3 className="mt-2 text-2xl font-bold text-foam">{current.name}</h3>
               <p className="mt-4 text-lg text-ink/90">{current.summary}</p>
               <ul className="mt-6 grid gap-x-6 gap-y-2 sm:grid-cols-2">
                 {current.strengths.map((t) => (
@@ -166,21 +163,9 @@ export default function Skills() {
               </ul>
             </div>
           </div>
-          {/* 右欄：有 3D 時留白給雙螺旋，右緣放區段圖例；沒有 3D（tier 0）時畫一條靜態的 SVG 雙螺旋 */}
+          {/* 右欄：有 3D 時留白給雙螺旋；沒有 3D（tier 0）時畫一條靜態的 SVG 雙螺旋（分類名稱只在左邊的分頁出現一次） */}
           <div aria-hidden="true" className="relative hidden min-h-[28rem] lg:block">
             {tier === 0 && <HelixFallback active={active} />}
-            <ol className="absolute top-6 left-0 flex flex-col gap-5 font-mono text-[0.66rem] tracking-[0.18em] uppercase">
-              {skills.map((s) => (
-                <li
-                  key={s.id}
-                  className={`flex items-center gap-2 transition-opacity ${s.id === active ? 'opacity-100' : 'opacity-75'}`}
-                  style={{ color: s.color }}
-                >
-                  <span className="h-px w-6" style={{ background: s.color }} />
-                  {s.nameEn}
-                </li>
-              ))}
-            </ol>
           </div>
         </div>
       </div>

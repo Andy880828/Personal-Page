@@ -13,18 +13,18 @@ beforeEach(() => {
 describe('技能分頁', () => {
   it('點分頁會切換內容並同步到 store（3D 氣泡讀同一個值）', () => {
     render(<Skills />);
-    fireEvent.click(screen.getByRole('tab', { name: /工作流程數位化/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /^流程數位化/ }));
     expect(useSiteStore.getState().activeSkill).toBe('workflow');
     expect(screen.getByRole('tabpanel')).toHaveTextContent('PostgreSQL');
   });
 
   it('方向鍵在分頁間移動（WAI-ARIA tabs）', () => {
     render(<Skills />);
-    const first = screen.getByRole('tab', { name: /資料探勘/ });
+    const first = screen.getByRole('tab', { name: /^資料探勘/ });
     first.focus();
     fireEvent.keyDown(first, { key: 'ArrowRight' });
     expect(useSiteStore.getState().activeSkill).toBe('viz');
-    fireEvent.keyDown(screen.getByRole('tab', { name: /數據可視化/ }), { key: 'End' });
+    fireEvent.keyDown(screen.getByRole('tab', { name: /^資料視覺化/ }), { key: 'End' });
     expect(useSiteStore.getState().activeSkill).toBe('web');
   });
 });

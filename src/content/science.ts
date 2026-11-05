@@ -26,7 +26,7 @@ export const ZONES: readonly Zone[] = [
   {
     id: 'mesopelagic',
     zh: '中層帶',
-    alias: '曙光帶',
+    alias: '微光帶',
     en: 'Mesopelagic',
     from: 200,
     to: 1000,
@@ -39,12 +39,12 @@ export const ZONES: readonly Zone[] = [
     en: 'Bathypelagic',
     from: 1000,
     to: 4000,
-    blurb: '完全沒有陽光，唯一的光來自生物發光。溫度接近 4 °C 以下，壓力超過 100 大氣壓。',
+    blurb: '完全沒有陽光，唯一的光來自生物發光。水溫約 4 °C 以下，壓力超過 100 大氣壓。',
   },
   {
     id: 'abyssopelagic',
     zh: '深淵帶',
-    alias: '深海平原',
+    alias: '深淵層',
     en: 'Abyssopelagic',
     from: 4000,
     to: 6000,
@@ -117,7 +117,7 @@ const sup = (n: number) =>
     .map((c) => (c === '-' ? '⁻' : SUP[Number(c)]))
     .join('');
 
-/** 格式化成表層光的比例：1% 以上用百分比，更小的用 10 的次方（曙光帶還有微光，不寫成 0） */
+/** 格式化成表層光的比例：1% 以上用百分比，更小的用 10 的次方（微光帶還有一點光，不寫成 0） */
 export function formatLight(fraction: number): string {
   if (fraction >= 0.01) return `${(fraction * 100).toFixed(0)}%`;
   if (fraction >= 1e-4) return `${(fraction * 100).toPrecision(2)}%`;
@@ -202,13 +202,13 @@ export const NOTES: ScienceNote[] = [
   {
     section: 'skills',
     title: '環境 DNA（eDNA）',
-    body: '魚在水裡留下的黏液、鱗片與排泄物都帶有 DNA。取一瓶水、過濾、萃取、用 12S 或 COI 引子做 PCR 再定序，比對資料庫就能列出這條溪裡有哪些魚，不用抓到牠。我的碩士論文與 Trim2Sort 做的就是這件事。',
-    seen: '右邊的雙螺旋：五個技能像五個基因，被讀出來。',
+    body: '魚在水裡留下的黏液、鱗片與排泄物都帶有 DNA。取一瓶水、過濾、萃取、用 12S 或 COI 引子做 PCR 再定序，比對資料庫就能列出這條溪裡有哪些魚，不必真的抓到魚。我的碩士論文與 Trim2Sort 做的就是這件事。',
+    seen: '右邊的雙螺旋：右邊的雙螺旋分成五段，每段對應一組技能。',
     sources: [7],
   },
   {
     section: 'projects',
-    title: '中層帶 200–1000 m：曙光帶',
+    title: '中層帶 200–1000 m：微光帶',
     body: '每天黃昏，數十億噸的浮游動物與小魚從這裡往上游到表層覓食，天亮再回來，是地球上最大規模的遷徙。往下飄的「海雪」則是深海食物的主要來源。',
     seen: '海雪一路往上飄（因為你在下潛），水母在微光裡發光。',
     sources: [3, 5, 6],
@@ -223,7 +223,7 @@ export const NOTES: ScienceNote[] = [
   {
     section: 'contact',
     title: '海床 4000 m：熱泉',
-    body: '壓力約 400 大氣壓。海底熱泉噴出的流體可達約 400 °C，因為壓力太大所以不會沸騰；周圍的細菌靠化學合成而不是陽光取得能量，養活整個群落。',
+    body: '壓力約 400 大氣壓。海底熱泉噴出的流體可達 400 °C，因為壓力太大所以不會沸騰；周圍的細菌靠化學合成而不是陽光取得能量，養活整個群落。',
     seen: '黑煙囪與上升的熱泉粒子，地面的微光是棲息在海床的發光生物。',
     sources: [8],
   },

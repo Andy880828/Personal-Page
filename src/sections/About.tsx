@@ -18,7 +18,7 @@ export default function About() {
     >
       <div className="relative mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
         <div>
-          <SectionHeader id="about" depth="10 m · 透光帶" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
+          <SectionHeader id="about" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
           <div className="mt-8 space-y-5 text-lg text-ink/90">
             {profile.intro.map((p) => (
               <p key={p} data-reveal>
@@ -53,7 +53,7 @@ export default function About() {
           </figure>
 
           <div data-reveal>
-            <h3 className="text-lg font-bold text-foam">證照</h3>
+            <h3 className="text-lg font-bold text-foam">語言成績與證照</h3>
             <dl className="mt-4 divide-y divide-foam/10 border-y border-foam/10">
               {profile.certificates.map((c) => (
                 <div key={c.name} className="flex items-baseline justify-between gap-6 py-3">

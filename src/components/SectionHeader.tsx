@@ -1,9 +1,9 @@
 import SplitHeading from './SplitHeading';
+import { SECTIONS, type SectionId } from '@/lib/sections';
+import { formatDepth } from '@/lib/scroll';
 
 interface Props {
-  id: string;
-  /** 這一段的深度與海洋分層，例如「100 m · 透光帶」 */
-  depth: string;
+  id: SectionId;
   title: string;
   lead?: React.ReactNode;
 }
@@ -12,7 +12,14 @@ interface Props {
  * 段落標題：標題本身是主角；深度像測深繩的刻度，放在標題同一列的右端，
  * 用一條細線連過去（不做標題上方的小標）。
  */
-export default function SectionHeader({ id, depth, title, lead }: Props) {
+/** 深度刻度一律從 lib/sections 讀（段落起始深度 · 分層），和導覽選單、儀表同一個來源 */
+function depthLabel(id: SectionId): string {
+  const s = SECTIONS.find((x) => x.id === id)!;
+  return `${formatDepth(s.depthStart)} m · ${s.zone}`;
+}
+
+export default function SectionHeader({ id, title, lead }: Props) {
+  const depth = depthLabel(id);
   return (
     <header>
       <div className="flex items-baseline gap-5">

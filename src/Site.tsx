@@ -135,7 +135,7 @@ export default function Site() {
       <Nav />
       <Console />
       {/* 右側儀表（lg 以上）佔 10rem，內容欄位為它讓出空間，不互相覆蓋；1600px 以上才夠寬，不用讓 */}
-      <main id="main" className="relative z-10 lg:pr-[10rem] min-[1600px]:pr-0">
+      <main id="main" className="relative z-10 xl:pr-[10rem] min-[1600px]:pr-0">
         <Hero />
         <About />
         <Skills />

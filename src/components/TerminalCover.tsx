@@ -20,14 +20,17 @@ export default function TerminalCover({ prompt, lines, accent }: Props) {
         <span className="size-2 rounded-full bg-foam/20" />
         <span className="size-2 rounded-full bg-foam/20" />
       </div>
-      <p className="truncate text-foam">
-        <span style={{ color: accent }}>$</span> {prompt}
-      </p>
-      {lines.map((l) => (
-        <p key={l} className="truncate text-mist">
-          {l}
+      {/* 窄卡片放不下時橫向捲動，不截斷、不重疊 */}
+      <div tabIndex={-1} className="min-w-0 overflow-x-auto [scrollbar-width:none]">
+        <p className="whitespace-pre text-foam">
+          <span style={{ color: accent }}>$</span> {prompt}
         </p>
-      ))}
+        {lines.map((l) => (
+          <p key={l} className="whitespace-pre text-mist">
+            {l}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }

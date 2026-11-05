@@ -76,7 +76,7 @@ export default function DepthHUD() {
   return (
     <div aria-hidden="true" className="pointer-events-none">
       <div
-        className="fixed top-24 right-4 z-30 hidden w-[9rem] rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono lg:block"
+        className="fixed top-24 right-4 z-30 hidden w-[9rem] rounded-2xl border border-foam/10 bg-deep/85 px-3 py-3 font-mono xl:block"
         data-testid="hud"
       >
         <div className="flex gap-3">

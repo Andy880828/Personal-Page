@@ -15,6 +15,7 @@ export type ConsoleAction =
   | { type: 'tier'; tier: number }
   | { type: 'motion'; reduce: boolean }
   | { type: 'ascii'; on: boolean }
+  | { type: 'open'; url: string }
   | { type: 'clear' }
   | { type: 'close' };
 
@@ -65,15 +66,21 @@ function zoneReport(section: SectionId): string[] {
 
 export const COMMANDS: { name: string; usage: string; help: string }[] = [
   { name: 'help', usage: 'help', help: '列出所有指令' },
-  { name: 'ls', usage: 'ls [sections|projects|skills]', help: '列出目前這段可以 cat 的東西，或段落、作品、技能' },
+  {
+    name: 'ls',
+    usage: 'ls [sections|projects|skills]',
+    help: '不加參數列出這一段能 cat 的項目；加參數列出全部段落、作品或技能',
+  },
   { name: 'goto', usage: 'goto <section>', help: '捲到某段：about、skills、projects、experience、contact、hero' },
   { name: 'dive', usage: 'dive <公尺>', help: '潛到指定深度（0–4000）' },
-  { name: 'ctd', usage: 'ctd', help: '目前深度的壓力、水溫、光量與分層' },
+  { name: 'here', usage: 'here', help: '目前深度的壓力、水溫、光量與分層（右側儀表的數值）' },
   { name: 'cat', usage: 'cat <skill|project|zone>', help: '顯示技能、作品，或這段深度帶的說明與來源' },
   { name: 'whoami', usage: 'whoami', help: '這個網站的主人' },
+  { name: 'contact', usage: 'contact', help: 'Email、履歷與其他聯絡方式' },
+  { name: 'resume', usage: 'resume', help: '開啟履歷（新分頁）' },
   { name: 'tier', usage: 'tier [0-3]', help: '查看或切換 3D 等級（切換會重新載入）' },
   { name: 'motion', usage: 'motion on|off', help: '開關動態效果' },
-  { name: 'ascii', usage: 'ascii on|off', help: '整個畫面改用字元畫（需要 3D 與動態效果）' },
+  { name: 'ascii', usage: 'ascii on|off', help: '整個畫面改成字元畫（需要 3D 等級 2 以上）' },
   { name: 'clear', usage: 'clear', help: '清空畫面' },
   { name: 'exit', usage: 'exit', help: '關閉指令列（或按 Esc）' },
 ];
@@ -99,11 +106,11 @@ export function ctdReport(depth: number): string[] {
   const d = Math.max(0, Math.round(depth));
   const z = zoneAt(d);
   return [
-    `depth     ${formatDepth(d)} m`,
-    `zone      ${z.zh}（${z.en}, ${z.from}–${z.to} m）`,
-    `pressure  ${pressureAtm(d).toFixed(1)} atm`,
-    `temp      ${temperatureC(d).toFixed(1)} °C（典型亞熱帶西北太平洋剖面，概略）`,
-    `light     ${formatLight(lightFraction(d))} of surface light`,
+    `深度  ${formatDepth(d)} m`,
+    `分層  ${z.zh}（${z.en}，${formatDepth(z.from)}–${formatDepth(z.to)} m）`,
+    `壓力  ${pressureAtm(d).toFixed(1)} atm`,
+    `水溫  ${temperatureC(d).toFixed(1)} °C（西北太平洋典型剖面，概略值）`,
+    `光量  海面的 ${formatLight(lightFraction(d))}`,
   ];
 }
 
@@ -140,10 +147,11 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
     }
     case 'dive': {
       const m = Number(arg.replace(/m$/, ''));
-      if (!Number.isFinite(m)) return { lines: ['dive: 要給一個公尺數，例如 dive 1200'] };
+      if (!Number.isFinite(m)) return { lines: ['dive：請輸入公尺數，例如 dive 1200'] };
       const depth = Math.min(4000, Math.max(0, m));
       return { lines: [`↓ ${formatDepth(depth)} m`, ...ctdReport(depth)], action: { type: 'dive', depth } };
     }
+    case 'here':
     case 'ctd':
       return { lines: ctdReport(ctx.depth) };
     case 'cat': {
@@ -166,30 +174,47 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
             pj.summary,
             ...pj.highlights.map((h) => `- ${h}`),
             `tags: ${pj.tags.join(', ')}`,
-            pj.repo ? `repo: ${pj.repo}` : `repo: （私人）${pj.note ?? ''}`,
+            ...(pj.demo ? [`線上展示：${pj.demo}`] : []),
+            pj.repo ? `原始碼：${pj.repo}` : '原始碼：未公開',
           ],
         };
       return { lines: [`cat: 找不到 ${arg}（試試 ls skills 或 ls projects）`] };
     }
     case 'whoami':
       return {
-        lines: [`${profile.name} / ${profile.nameEn}`, `${profile.role} · ${profile.roleSecond}`, profile.links.github],
+        lines: [
+          `${profile.name} / ${profile.nameEn}`,
+          profile.roleZh,
+          `${profile.role} · ${profile.roleSecond}`,
+          profile.email,
+        ],
       };
+    case 'contact':
+      return {
+        lines: [
+          `Email   ${profile.email}`,
+          `履歷    ${profile.links.resume}`,
+          `GitHub  ${profile.links.github}`,
+          `Facebook  ${profile.links.facebook}`,
+        ],
+      };
+    case 'resume':
+      return { lines: [`↗ ${profile.links.resume}`], action: { type: 'open', url: profile.links.resume } };
     case 'tier': {
-      if (!arg) return { lines: [`tier ${ctx.tier ?? '（偵測中）'}：0 純 DOM、1 省電、2 完整、3 高階`] };
+      if (!arg) return { lines: [`目前 3D 等級 ${ctx.tier ?? '（偵測中）'}：0 不用 3D、1 省電、2 標準、3 全效果`] };
       const t = Number(arg);
       if (![0, 1, 2, 3].includes(t)) return { lines: ['tier: 只能是 0–3'] };
       return { lines: [`切換到 tier ${t}，重新載入…`], action: { type: 'tier', tier: t } };
     }
     case 'motion': {
       if (arg !== 'on' && arg !== 'off')
-        return { lines: [`motion: 目前${ctx.reduced ? 'off' : 'on'}；用 motion on 或 motion off`] };
+        return { lines: [`motion：目前 ${ctx.reduced ? 'off' : 'on'}，用 motion on 或 motion off 切換`] };
       return { lines: [`motion ${arg}`], action: { type: 'motion', reduce: arg === 'off' } };
     }
     case 'ascii': {
       if (arg !== 'on' && arg !== 'off')
-        return { lines: [`ascii: 目前${ctx.ascii ? 'on' : 'off'}；用 ascii on 或 ascii off`] };
-      const note = ctx.tier !== null && ctx.tier < 2 ? '（這個 3D 等級沒有後製，看不到效果）' : '';
+        return { lines: [`ascii：目前 ${ctx.ascii ? 'on' : 'off'}，用 ascii on 或 ascii off 切換`] };
+      const note = ctx.tier !== null && ctx.tier < 2 ? '（目前的 3D 等級不支援字元畫）' : '';
       return { lines: [`ascii ${arg}${note}`], action: { type: 'ascii', on: arg === 'on' } };
     }
     case 'clear':

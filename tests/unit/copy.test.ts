@@ -15,6 +15,8 @@ const BANNED: [string, RegExp][] = [
   ),
   ['field note', /field note/i],
   ['CTD', /(?<![A-Za-z])CTD(?![A-Za-z])/],
+  // 台灣用語：視覺化、資料（不用「可視化」）
+  ['可視化', /可視化/],
   ['emoji', /\p{Emoji_Presentation}/u],
 ];
 
@@ -26,6 +28,11 @@ const files = [
   ...readdirSync(path.join(root, 'src/sections'))
     .filter((f) => f.endsWith('.tsx'))
     .map((f) => `src/sections/${f}`),
+  // 元件與指令列的文字也是網站文案（以前沒掃，「ctd」「純 DOM」「後製」因此漏掉）
+  ...readdirSync(path.join(root, 'src/components'))
+    .filter((f) => f.endsWith('.tsx'))
+    .map((f) => `src/components/${f}`),
+  'src/lib/console.ts',
   'index.html',
   'README.md',
 ];

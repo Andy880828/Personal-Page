@@ -19,9 +19,12 @@ export default function Projects() {
   );
   // 全部：只有前四個進行中的作品是卡片，其餘（含已封存的早期作品）放在最後的精簡列表，作品段才不會長到看不出地標；
   // 篩選後符合的都用卡片
-  const active = list.filter((p) => p.status !== 'archived');
-  const current = filter === 'all' ? active.slice(0, 4) : active;
-  const earlier = [...(filter === 'all' ? active.slice(4) : []), ...list.filter((p) => p.status === 'archived')];
+  // 全部：只有站主挑的精選作品是卡片（有截圖、有線上展示、最能代表定位的放前面），其餘進「其他作品」清單；
+  // 篩選後符合的作品都用卡片，已封存的早期作品一律放清單
+  const featuredList = projects.filter((p) => p.featured !== undefined).sort((a, b) => a.featured! - b.featured!);
+  const current = filter === 'all' ? featuredList : list.filter((p) => p.status !== 'archived');
+  const earlier =
+    filter === 'all' ? list.filter((p) => p.featured === undefined) : list.filter((p) => p.status === 'archived');
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: projects.length };
     for (const p of projects) for (const k of p.categories) c[k] = (c[k] ?? 0) + 1;
@@ -38,9 +41,8 @@ export default function Projects() {
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           id="projects"
-          depth="200 m · 中層帶"
-          title="最近在潛的地方"
-          lead="現在主要做三件事：從資料裡找答案、把流程做成系統、讓程式替人跑完一段工作。網站與 eDNA 資料流是更早的作品，也留在這裡。"
+          title="精選作品"
+          lead="上面三個最能代表我現在做的事：用資料計分的活動平台、把 eDNA 定序資料整理成物種名錄的工具、替主機查漏洞的 CLI。其他作品列在下面，用分類鈕可以只看某一類。"
         />
 
         <div role="group" aria-label="依類別篩選作品" className="mt-10 flex flex-wrap gap-2" data-reveal>
@@ -66,7 +68,8 @@ export default function Projects() {
 
         <ul className="mt-8 grid gap-6 md:grid-cols-2">
           {current.map((p, i) => {
-            const featured = filter === 'all' && i < 2;
+            // 精選的第一個用寬卡片，其餘兩兩並排
+            const featured = filter === 'all' && i < 1;
             return (
               <li key={p.slug} className={`min-w-0 ${featured ? 'md:col-span-2' : ''}`} data-project={p.slug}>
                 <ProjectCard project={p} featured={featured} />
@@ -87,10 +90,16 @@ export default function Projects() {
                   >
                     <h4 id={`p-${p.slug}`} className="font-bold text-foam">
                       {p.name}
-                      <span className="ml-2 font-mono text-xs font-normal text-mist tabular-nums">{p.year}</span>
+                      {p.nameZh && <span className="ml-2 text-sm font-medium text-mist">{p.nameZh}</span>}
+                      <span className="ml-2 font-mono text-xs font-normal text-haze tabular-nums">{p.year}</span>
                     </h4>
                     <p className="text-sm text-ink/85">{p.summary}</p>
                     <p className="flex gap-4 text-sm">
+                      {p.demo && (
+                        <a href={p.demo} target="_blank" rel="noreferrer" className="text-foam hover:text-biolum">
+                          線上展示<span className="sr-only">（{p.name}）</span>
+                        </a>
+                      )}
                       {p.repo && (
                         <a href={p.repo} target="_blank" rel="noreferrer" className="text-foam hover:text-biolum">
                           原始碼<span className="sr-only">（{p.name}）</span>

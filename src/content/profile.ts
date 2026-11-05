@@ -2,14 +2,16 @@ export const profile = {
   name: '林敬勛',
   nameEn: 'Ching-Hsun Lin',
   role: 'Data & Workflow Engineer',
-  roleSecond: 'Oceanographer',
+  roleSecond: 'Oceanography M.S.',
   roleZh: '資料與流程工程師，海洋科學出身',
   hometown: '高雄',
   intro: [
-    '我來自高雄，在中山大學讀完海洋科學系與研究所，碩士做的是溪流環境 DNA（eDNA）。',
-    '後來轉進軟體：從 Vue、ASP.NET 的全端網站，到台郡科技的數據分析；現在專注在資料探勘與數據可視化、工作流程數位化，以及把 agent 放進實際流程裡。',
-    '我喜歡把混亂的資料整理成可以被驗證的系統，不管那份資料來自一條溪、一台伺服器，還是一份減脂挑戰賽的 InBody 報告。',
+    '我來自高雄，在中山大學讀完海洋科學系學士與碩士，碩士研究溪流的環境 DNA（eDNA）。',
+    '後來轉進軟體：先在資展國際學全端網站（Vue、ASP.NET），再到台郡科技做資料分析。現在做三件事：資料探勘與視覺化、流程數位化，以及讓 Agent（會自己呼叫工具、跑完多個步驟的程式）接手重複的工作。',
+    '我喜歡把亂掉的資料整理成別人能驗證的系統，不管那份資料來自一條溪、一台伺服器，還是一份減脂挑戰賽的 InBody 報告。',
   ],
+  /** 公開的聯絡信箱（站主同意公開） */
+  email: 'andy0010502@gmail.com',
   links: {
     github: 'https://github.com/Andy880828',
     facebook:
@@ -20,7 +22,7 @@ export const profile = {
     { name: 'TOEIC Listening & Reading', value: '910' },
     { name: 'TOEIC Writing', value: '170' },
     { name: 'TOEIC Speaking', value: '160' },
-    { name: 'PADI Advanced Open Water Diver', value: 'AOW' },
+    { name: 'PADI 進階開放水域潛水員', value: 'AOW' },
   ],
   interests: ['登山', '潛水', '衝浪', '旅遊', '唱歌', '看魚', '玩遊戲'],
 } as const;

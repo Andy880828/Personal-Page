@@ -35,7 +35,7 @@ describe('指令列', () => {
     expect(runCommand('ls skills', ctx).lines).toHaveLength(5);
     expect(runCommand('cat mining', ctx).lines[0]).toContain('資料探勘');
     expect(runCommand('cat syssec', ctx).lines.join('\n')).toContain('github.com');
-    expect(runCommand('cat scout', ctx).lines.join('\n')).toContain('私人');
+    expect(runCommand('cat scout', ctx).lines.join('\n')).toContain('未公開');
     expect(runCommand('cat nope', ctx).lines[0]).toContain('找不到');
   });
 
@@ -50,15 +50,23 @@ describe('指令列', () => {
     expect(zone).toMatch(/https:\/\//);
   });
 
+  it('contact、resume、whoami 帶 Email；here 是目前深度（ctd 仍可用）', () => {
+    expect(runCommand('contact', ctx).lines.join('\n')).toContain('@');
+    expect(runCommand('whoami', ctx).lines.join('\n')).toContain('@');
+    expect(runCommand('resume', ctx).action).toMatchObject({ type: 'open' });
+    expect(runCommand('here', ctx).lines.join('\n')).toContain('深層帶');
+    expect(runCommand('ctd', ctx).lines).toEqual(runCommand('here', ctx).lines);
+  });
+
   it('ascii on|off', () => {
     expect(runCommand('ascii on', ctx).action).toEqual({ type: 'ascii', on: true });
     expect(runCommand('ascii off', ctx).action).toEqual({ type: 'ascii', on: false });
     expect(runCommand('ascii', ctx).action).toBeUndefined();
-    expect(runCommand('ascii on', { ...ctx, tier: 1 }).lines[0]).toContain('看不到');
+    expect(runCommand('ascii on', { ...ctx, tier: 1 }).lines[0]).toContain('不支援');
   });
 
   it('tier、motion、clear、exit、未知指令', () => {
-    expect(runCommand('tier', ctx).lines[0]).toContain('tier 2');
+    expect(runCommand('tier', ctx).lines[0]).toContain('3D 等級 2');
     expect(runCommand('tier 0', ctx).action).toEqual({ type: 'tier', tier: 0 });
     expect(runCommand('tier 7', ctx).action).toBeUndefined();
     expect(runCommand('motion off', ctx).action).toEqual({ type: 'motion', reduce: true });

@@ -14,7 +14,7 @@ export default function Hero() {
         <div className="max-w-6xl">
           <h1
             id="hero-title"
-            className="text-[clamp(4.5rem,15vw,12.5rem)] leading-[0.95] font-black tracking-tight text-foam [text-shadow:0_6px_40px_rgb(1_4_9/0.45)]"
+            className="text-[clamp(3.75rem,11vw,9.5rem)] leading-[0.95] font-black tracking-tight text-foam [text-shadow:0_6px_40px_rgb(1_4_9/0.45)]"
           >
             <RiseText text={profile.name} />
           </h1>
@@ -55,9 +55,21 @@ export default function Hero() {
             >
               直接看作品
             </a>
+            <a
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection('contact');
+              }}
+              className="rounded-full px-4 py-3 text-foam underline decoration-foam/40 underline-offset-4 transition-colors hover:decoration-foam"
+            >
+              聯絡我
+            </a>
           </div>
           <p className="mt-8 font-mono text-xs text-foam/85 tabular-nums [text-shadow:0_1px_10px_rgb(1_4_9/0.8)]">
             0 m · 22.6°N 120.3°E · {profile.hometown}
+            {/* 指令列只在桌機有入口 */}
+            <span className="hidden md:inline"> · 按 / 開指令列</span>
           </p>
         </div>
       </div>

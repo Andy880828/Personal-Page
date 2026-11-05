@@ -58,7 +58,7 @@ export default function Nav() {
           href="/"
           onClick={go(SECTIONS[0]!)}
           className="group flex items-baseline gap-2 rounded-md text-foam"
-          aria-label={`${profile.name}，回到海面`}
+          aria-label={`${profile.name}，回到頁首`}
         >
           <span className="text-lg font-black tracking-wider">{profile.name}</span>
           <span className="hidden font-mono text-[0.7rem] tracking-[0.2em] text-ink/90 uppercase sm:inline">
@@ -101,7 +101,7 @@ export default function Nav() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" ref={menu} className="glass mx-4 rounded-2xl p-3 md:hidden">
+        <div id="mobile-menu" ref={menu} className="mx-4 rounded-2xl border border-foam/10 bg-deep/95 p-3 md:hidden">
           <ul className="grid grid-cols-2 gap-1">
             {links.map((s) => (
               <li key={s.id}>

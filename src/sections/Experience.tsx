@@ -6,12 +6,18 @@ import SectionHeader from '@/components/SectionHeader';
 import { Stratum } from '@/components/Strata';
 import { shortSha } from '@/lib/sha';
 
-const KIND: Record<ExperienceItem['kind'], { label: string; color: string }> = {
-  edu: { label: '學歷', color: '#7cc8ff' },
-  work: { label: '工作', color: '#ffb86b' },
-  abroad: { label: '海外', color: '#ff7eb6' },
-  build: { label: '開發', color: '#4ff0d2' },
+/**
+ * 經歷種類不用分類色（技能與作品已經用那五色代表分類，同一個顏色不該有兩種意思），
+ * 改用中性色的節點形狀：工作與專案是實心、學歷與海外是空心。
+ */
+const KIND: Record<ExperienceItem['kind'], { label: string; filled: boolean }> = {
+  edu: { label: '學歷', filled: false },
+  work: { label: '工作', filled: true },
+  abroad: { label: '海外', filled: false },
+  build: { label: '專案', filled: true },
 };
+const NODE = '#dff3ff';
+const STRATUM = '#9dbccf';
 
 export default function Experience() {
   const scope = useRef<HTMLElement>(null);
@@ -42,14 +48,9 @@ export default function Experience() {
       className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          id="experience"
-          depth="1,000 m · 深層帶"
-          title="一路潛下來的軌跡"
-          lead="新的在上，越往下越早。"
-        />
+        <SectionHeader id="experience" title="經歷與學歷" lead="由新到舊：個人專案、工作與學歷。" />
 
-        <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.5fr)_minmax(0,1.5fr)]">
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}
           <div aria-hidden="true" className="hidden lg:block">
             <div className="sticky top-[30vh] font-mono">
@@ -70,34 +71,53 @@ export default function Experience() {
                   }}
                   data-index={i}
                   data-reveal
-                  className="relative isolate py-7"
+                  className={`relative isolate ${item.minor ? 'py-4' : 'py-7'}`}
                 >
-                  <Stratum color={k.color} index={i} total={experience.length} />
+                  <Stratum color={STRATUM} index={i} total={experience.length} />
                   <span
                     aria-hidden="true"
-                    className="absolute top-9 -left-[calc(2rem+5px)] size-[9px] rounded-full transition-[box-shadow,transform] duration-500 sm:-left-[calc(2.5rem+5px)]"
+                    className={`absolute ${item.minor ? 'top-[1.35rem]' : 'top-9'} -left-[calc(2rem+5px)] size-[9px] rounded-full border-2 transition-[box-shadow,transform] duration-500 sm:-left-[calc(2.5rem+5px)]`}
                     style={{
-                      background: k.color,
-                      boxShadow: isActive ? `0 0 0 5px ${k.color}33` : 'none',
+                      borderColor: NODE,
+                      background: k.filled ? NODE : 'var(--color-deep)',
+                      boxShadow: isActive ? '0 0 0 5px rgb(223 243 255 / 0.15)' : 'none',
                       transform: isActive ? 'scale(1.35)' : 'scale(1)',
                     }}
                   />
                   <p className="font-mono text-sm text-mist tabular-nums">
-                    <span aria-hidden="true" className="mr-3 text-ember/80">
-                      {shortSha(item)}
-                    </span>
                     <time dateTime={item.start.replace('/', '-')}>{item.start}</time>
                     {' – '}
-                    {item.end ? <time dateTime={item.end.replace('/', '-')}>{item.end}</time> : '現在'}
-                    <span className="ml-3 text-xs tracking-widest" style={{ color: k.color }}>
-                      {k.label}
+                    {item.end ? <time dateTime={item.end.replace('/', '-')}>{item.end}</time> : '至今'}
+                    <span className="ml-3 text-xs tracking-widest text-haze">{k.label}</span>
+                    {/* 沉積層的短碼：很淡的裝飾，不搶日期 */}
+                    <span aria-hidden="true" className="ml-3 text-[0.7rem] text-haze/60">
+                      {shortSha(item)}
                     </span>
                   </p>
-                  <h3 className="mt-2 text-xl font-bold text-foam sm:text-2xl">{item.org}</h3>
-                  <p className="mt-1 text-ink/85">
-                    {item.title}
-                    {item.note && <span className="text-mist">｜{item.note}</span>}
-                  </p>
+                  {item.minor ? (
+                    <p className="mt-1 text-ink/85">
+                      <span className="font-bold text-foam">{item.org}</span>
+                      <span className="text-mist">｜{item.title}</span>
+                    </p>
+                  ) : (
+                    <>
+                      <h3 className="mt-2 text-xl font-bold text-foam sm:text-2xl">{item.org}</h3>
+                      <p className="mt-1 text-ink/85">
+                        {item.title}
+                        {item.note && <span className="text-mist">｜{item.note}</span>}
+                      </p>
+                      {item.highlights && item.highlights.length > 0 && (
+                        <ul className="mt-3 space-y-1.5 text-sm text-mist">
+                          {item.highlights.map((h) => (
+                            <li key={h} className="flex gap-2.5">
+                              <span aria-hidden="true" className="mt-[0.65em] h-px w-2.5 shrink-0 bg-foam/40" />
+                              {h}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
                 </li>
               );
             })}

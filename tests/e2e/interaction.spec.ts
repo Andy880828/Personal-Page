@@ -44,9 +44,9 @@ test.describe('互動', () => {
   test('技能分頁：點擊與方向鍵切換', async ({ page }) => {
     await openTestMode(page);
     await scrollToPos(page, 2.5);
-    await page.getByRole('tab', { name: /工作流程數位化/ }).click();
+    await page.getByRole('tab', { name: /^流程數位化/ }).click();
     await expect(page.getByRole('tabpanel')).toContainText('PostgreSQL');
-    await page.getByRole('tab', { name: /工作流程數位化/ }).press('ArrowRight');
+    await page.getByRole('tab', { name: /^流程數位化/ }).press('ArrowRight');
     await expect(page.getByRole('tab', { name: /Agent 應用/ })).toBeFocused();
     await expect(page.getByRole('tabpanel')).toContainText('Claude Code');
   });
@@ -55,9 +55,9 @@ test.describe('互動', () => {
     await openTestMode(page);
     await scrollToPos(page, 3.2);
     await expect(page.locator('#projects article')).toHaveCount(10);
-    await page.getByRole('button', { name: /^網站/ }).click();
+    await page.getByRole('button', { name: /^全端網站/ }).click();
     await expect(page.locator('#projects article')).toHaveCount(3);
-    await expect(page.getByRole('button', { name: /^網站/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^全端網站/ })).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: /^全部/ }).click();
     await expect(page.locator('#projects article')).toHaveCount(10);
   });
@@ -71,13 +71,13 @@ test.describe('互動', () => {
     await openTestMode(page);
     await scrollToPos(page, 5.6);
     const form = page.locator('#contact form');
-    await form.getByRole('button', { name: '送出' }).click();
+    await form.getByRole('button', { name: '寄出' }).click();
     // 原生驗證擋下：沒有送出
     expect(sent).toBe(0);
     await form.getByLabel('姓名').fill('測試');
     await form.getByLabel('Email').fill('test@example.com');
     await form.getByLabel('訊息').fill('你好，這是自動化測試。');
-    await form.getByRole('button', { name: '送出' }).click();
+    await form.getByRole('button', { name: '寄出' }).click();
     await expect(page.getByRole('status').filter({ hasText: '收到了' })).toBeVisible();
     expect(sent).toBe(1);
   });
@@ -152,5 +152,27 @@ test.describe('降級與效能', () => {
     info.annotations.push({ type: 'avgFrameMs（SwiftShader，僅供參考）', description: perf.avgFrameMs.toFixed(1) });
     expect(perf.avgFrameMs).toBeGreaterThan(0);
     expect(perf.avgFrameMs).toBeLessThan(2000);
+  });
+});
+
+test.describe('第六輪：聯絡與精選作品', () => {
+  test('聯絡段有可以直接點的 Email，指令列 contact 也有', async ({ page }) => {
+    await page.goto('/?tier=0');
+    const mail = page.locator('#contact a[href^="mailto:"]').first();
+    await expect(mail).toBeVisible();
+    await expect(mail).toContainText('@');
+    await expect(page.locator('#contact')).not.toContainText('開 issue');
+  });
+
+  test('「全部」時卡片只放精選作品：FORGE、Trim2Sort、syssec；FORGE 的線上展示連結看得到', async ({ page }) => {
+    await page.goto('/project?tier=0');
+    const cards = page.locator('#projects > div > ul > li[data-project]');
+    await expect(cards).toHaveCount(3);
+    expect(await cards.evaluateAll((els) => els.map((e) => e.getAttribute('data-project')))).toEqual([
+      'fitness-challenge',
+      'trim2sort',
+      'syssec',
+    ]);
+    await expect(page.locator('[data-project="fitness-challenge"] a', { hasText: '線上展示' })).toBeVisible();
   });
 });

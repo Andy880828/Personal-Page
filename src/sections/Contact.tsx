@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { FileText, Send } from 'lucide-react';
+import { Check, Copy, FileText, Mail, Send } from 'lucide-react';
 import { profile } from '@/content/profile';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
@@ -18,6 +18,42 @@ const emailReady = Boolean(EMAIL.service && EMAIL.template && EMAIL.key);
 
 const field =
   'w-full rounded-xl border border-foam/20 bg-abyss/60 px-4 py-3 text-ink placeholder:text-haze focus-visible:border-biolum focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-biolum';
+
+/** Email：可以直接點開信件，也可以一鍵複製（很多人用網頁版信箱，mailto 開不起來） */
+function EmailRow() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* 剪貼簿被擋：使用者還是可以點信箱連結 */
+    }
+  };
+  return (
+    <div className="flex items-stretch gap-2">
+      <a
+        href={`mailto:${profile.email}`}
+        className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-biolum/40 px-4 py-3 text-foam transition-colors hover:border-biolum hover:text-biolum"
+      >
+        <Mail size={18} aria-hidden="true" className="shrink-0" />
+        <span className="truncate font-mono text-sm sm:text-base">{profile.email}</span>
+      </a>
+      <button
+        type="button"
+        onClick={copy}
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-foam/15 px-3 text-sm text-mist transition-colors hover:border-biolum/60 hover:text-biolum"
+      >
+        {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+        {copied ? '已複製' : '複製'}
+      </button>
+      <span className="sr-only" role="status">
+        {copied ? 'Email 已複製到剪貼簿' : ''}
+      </span>
+    </div>
+  );
+}
 
 export default function Contact() {
   const scope = useRef<HTMLElement>(null);
@@ -41,8 +77,8 @@ export default function Contact() {
   };
 
   const links = [
-    { href: profile.links.github, label: 'GitHub', icon: <GithubIcon size={18} /> },
     { href: profile.links.resume, label: '履歷', icon: <FileText size={18} aria-hidden="true" /> },
+    { href: profile.links.github, label: 'GitHub', icon: <GithubIcon size={18} /> },
     { href: profile.links.facebook, label: 'Facebook', icon: <FacebookIcon size={18} /> },
   ];
 
@@ -54,12 +90,7 @@ export default function Contact() {
       className="relative px-5 pt-24 pb-10 lg:pt-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          id="contact"
-          depth="4,000 m · 海床"
-          title="到海床了，打聲招呼吧"
-          lead="工作機會、合作、或只是想聊魚，都歡迎。"
-        />
+        <SectionHeader id="contact" title="到海床了，打聲招呼吧" lead="工作機會、合作，或只是想聊魚，都歡迎。" />
 
         <div className="mt-12 grid gap-12 lg:grid-cols-2">
           <div className="space-y-10">
@@ -84,7 +115,7 @@ export default function Contact() {
 
             <div data-reveal>
               <h3 className="text-lg font-bold text-foam">不在工作的時候</h3>
-              <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-2xl font-bold text-foam">
+              <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-lg font-medium text-ink/90">
                 {profile.interests.map((it) => (
                   <li key={it}>{it}</li>
                 ))}
@@ -101,12 +132,16 @@ export default function Contact() {
             </figure>
           </div>
 
-          <div data-reveal>
+          {/* 手機上聯絡卡排在興趣與照片之前 */}
+          <div data-reveal className="order-first lg:order-none">
             {!emailReady ? (
               <div className="panel rounded-3xl p-7 sm:p-9">
-                <h3 className="text-xl font-bold text-foam">直接找我</h3>
-                <p className="mt-3 text-ink/85">最快的方式是在 GitHub 開 issue 或留言，履歷上也有聯絡方式。</p>
-                <ul className="mt-6 grid gap-3">
+                <h3 className="text-xl font-bold text-foam">聯絡我</h3>
+                <p className="mt-3 text-ink/85">寫信最快。履歷與作品原始碼也在下面。</p>
+                <div className="mt-6">
+                  <EmailRow />
+                </div>
+                <ul className="mt-3 grid gap-3">
                   {links.map((l) => (
                     <li key={l.label}>
                       <a
@@ -128,6 +163,15 @@ export default function Contact() {
             ) : (
               <form onSubmit={onSubmit} className="panel rounded-3xl p-7 sm:p-9" aria-describedby="contact-status">
                 <h3 className="text-xl font-bold text-foam">寄一封信給我</h3>
+                <p className="mt-2 text-sm text-mist">
+                  或直接寫信到{' '}
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="text-foam underline underline-offset-2 hover:text-biolum"
+                  >
+                    {profile.email}
+                  </a>
+                </p>
                 <div className="mt-6 grid gap-4">
                   <label className="grid gap-1.5 text-sm text-mist">
                     姓名
@@ -148,12 +192,14 @@ export default function Contact() {
                   className="mt-6 inline-flex items-center gap-2 rounded-full bg-biolum px-6 py-3 font-medium text-deep transition-transform enabled:hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Send size={16} aria-hidden="true" />
-                  {status === 'sending' ? '送出中…' : '送出'}
+                  {status === 'sending' ? '寄送中…' : '寄出'}
                 </button>
                 <p id="contact-status" role="status" className="mt-4 min-h-6 text-sm">
                   {status === 'sent' && <span className="text-biolum">收到了，我會盡快回覆你。</span>}
                   {status === 'error' && (
-                    <span className="text-coral">送出失敗了，內容還在，稍後再按一次送出；也可以先到 GitHub 找我。</span>
+                    <span className="text-coral">
+                      沒寄出去，內容還在。請稍後再按一次「寄出」，或直接寫信到 {profile.email}。
+                    </span>
                   )}
                 </p>
               </form>
@@ -162,16 +208,16 @@ export default function Contact() {
         </div>
 
         <footer className="mt-[16vh] flex flex-col gap-3 border-t border-foam/10 pt-8 text-sm text-haze sm:flex-row sm:items-baseline sm:justify-between">
-          <p className="text-foam">感謝你的造訪。</p>
+          <p className="text-foam">謝謝你潛到最底。</p>
           <p>
-            © {profile.name} · 照片版權所有 ·{' '}
+            © 2026 {profile.name} · 照片版權所有 ·{' '}
             <a
               href="https://github.com/Andy880828/Personal-Page#科學資料來源"
               target="_blank"
               rel="noreferrer"
               className="underline decoration-haze/50 underline-offset-2 hover:text-foam"
             >
-              資料來源
+              海洋數值來源
             </a>
           </p>
         </footer>

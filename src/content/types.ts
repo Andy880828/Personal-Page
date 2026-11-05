@@ -19,8 +19,14 @@ export interface Project {
   /** 沒截圖時封面上顯示的「終端機」內容 */
   cover?: { prompt: string; lines: string[] };
   status: 'active' | 'stable' | 'archived';
-  /** 補充說明，例如私有 repo、demo 暫停 */
+  /** 補充說明，例如原始碼未公開、線上展示已下架 */
   note?: string;
+  /** 精選排序：有值的才在「全部」狀態用卡片呈現，數字小的在前 */
+  featured?: number;
+  /** 一行成果（有數字）。只放站主提供的事實；沒有就不顯示 */
+  outcome?: string;
+  /** 個人或團隊、負責哪部分。只放站主提供的事實；沒有就不顯示 */
+  role?: string;
 }
 
 export interface SkillGroup {
@@ -41,4 +47,8 @@ export interface ExperienceItem {
   org: string;
   kind: 'edu' | 'work' | 'abroad' | 'build';
   note?: string;
+  /** 工作成果（2–3 條）；只放站主提供的事實 */
+  highlights?: string[];
+  /** 次要經歷：在時間軸上用精簡列呈現 */
+  minor?: boolean;
 }
