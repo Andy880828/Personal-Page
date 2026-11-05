@@ -60,6 +60,10 @@ void main() {
     // 窗緣的一圈亮環（折射在臨界角附近最集中）
     float rim = exp(-pow((cosT - EDGE) / 0.045, 2.0));
     vec3 col = mix(uUnderColor, sky, window) + vec3(0.6, 0.88, 1.0) * rim * 0.16;
+    // 光束的落點：窗外的水面下側往太陽方位稍微提亮、慢慢起伏，和往下打的光束接得上（不然光束頂端是亮的、天花板是暗的）
+    float toward = max(dot(normalize(vec3(look.x, 0.0, look.z) + vec3(1e-4, 0.0, 0.0)), normalize(vec3(uSunDir.x, 0.0, uSunDir.z))), 0.0);
+    float caustic = 0.6 + 0.4 * vnoise(vWorld.xz * 0.35 + uTime * 0.05);
+    col += vec3(0.42, 0.68, 0.82) * 0.11 * (1.0 - window) * (0.45 + 0.55 * toward) * caustic;
     col += vec3(1.0, 0.8, 0.55) * pow(max(dot(-reflect(V, Nd), uSunDir), 0.0), 60.0) * 0.6 * window;
     float fog = 1.0 - exp(-pow(dist * uUnderDensity, 2.0));
     // 遠處與淡出時用透明度露出真正的背景，而不是混成「看起來一樣」的水色：

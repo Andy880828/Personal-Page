@@ -24,8 +24,11 @@ varying vec2 vUv;
 varying float vDepth;
 void main() {
   float across = smoothstep(0.0, 0.5, vUv.x) * smoothstep(1.0, 0.5, vUv.x);
-  // 頂端也要淡出：傾斜平面的頂邊是一條斜的硬亮度線，下潛時會斜著掃過畫面
-  float along = smoothstep(0.0, 0.85, vUv.y) * smoothstep(1.0, 0.72, vUv.y) * smoothstep(-70.0, -4.0, vDepth);
+  // 光束從水面開始：用世界深度在水面下 0–3.5 m 內柔和地亮起來（不留一截空白，也不是一條硬邊），
+  // 亮起的位置沿光束寬度起伏，頂端不會是一條直線；往深處再慢慢淡掉
+  float wobble = 1.2 * sin(vUv.x * 6.2832 + uSeed * 9.0) + 0.6 * sin(vUv.x * 14.0 + uSeed * 23.0);
+  float top = smoothstep(0.2, -3.5 + wobble, vDepth);
+  float along = top * smoothstep(0.0, 0.85, vUv.y) * smoothstep(-70.0, -4.0, vDepth);
   float flicker = 0.65 + 0.35 * sin(uTime * 0.7 + uSeed * 6.28 + vUv.x * 3.0);
   float a = across * across * along * flicker * uIntensity;
   gl_FragColor = vec4(vec3(0.62, 0.86, 1.0) * a * 0.18, 1.0);
