@@ -58,8 +58,12 @@ test.describe('互動', () => {
     await page.getByRole('button', { name: /^全端網站/ }).click();
     await expect(page.locator('#projects article')).toHaveCount(3);
     await expect(page.getByRole('button', { name: /^全端網站/ })).toHaveAttribute('aria-pressed', 'true');
+    // 標題與說明跟著篩選換，不再寫「精選作品」
+    await expect(page.locator('#projects-title')).toHaveText('作品：全端網站');
+    await expect(page.locator('#projects')).toContainText('3 個作品。');
     await page.getByRole('button', { name: /^全部/ }).click();
     await expect(page.locator('#projects article')).toHaveCount(10);
+    await expect(page.locator('#projects-title')).toHaveText('精選作品');
   });
 
   test('聯絡表單：必填驗證與送出（攔截 EmailJS，不真的寄信）', async ({ page }) => {
@@ -101,15 +105,25 @@ test.describe('互動', () => {
 });
 
 test.describe('版面', () => {
-  test('手機：每個段落都不會橫向溢出', async ({ page }, info) => {
-    test.skip(info.project.name !== 'mobile', '只在手機版');
-    await openTestMode(page);
-    for (const pos of [0, 1.5, 2.5, 3.5, 4.5, 5.6]) {
-      await scrollToPos(page, pos);
-      const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
-      expect(sw, `pos ${pos}`).toBeLessThanOrEqual(iw);
-    }
-  });
+  // 表單開（e2e 的 build 有假的 EmailJS 設定）與表單關（正式站的聯絡卡，?form=0）都要量：
+  // 第六輪的溢出只發生在聯絡卡，舊測試只量到表單版所以沒抓到
+  for (const form of ['', '&form=0']) {
+    test(`手機：每個段落都不會橫向溢出${form ? '（聯絡卡版）' : ''}`, async ({ page }, info) => {
+      test.skip(info.project.name !== 'mobile', '只在手機版');
+      for (const width of [390, 360]) {
+        await page.setViewportSize({ width, height: 844 });
+        await openTestMode(page, form);
+        for (const pos of [0, 1.5, 2.5, 3.5, 4.5, 5.6, 6]) {
+          await scrollToPos(page, pos);
+          const [sw, cw] = await page.evaluate(() => [
+            document.documentElement.scrollWidth,
+            document.documentElement.clientWidth,
+          ]);
+          expect(sw, `${width} 寬 pos ${pos}`).toBeLessThanOrEqual(cw);
+        }
+      }
+    });
+  }
 });
 
 test.describe('降級與效能', () => {

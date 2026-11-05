@@ -12,7 +12,7 @@ export const experience: ExperienceItem[] = [
   },
   // 台郡的工作成果待站主提供後放進 highlights（不編）
   { start: '2025/04', end: '2026/03', title: '數據分析工程師', org: '台郡科技', kind: 'work' },
-  { start: '2024/06', end: '2024/11', title: '全端就業養成班', org: '資展國際', kind: 'edu' },
+  { start: '2024/06', end: '2024/11', title: '全端就業養成班', org: '資展國際', kind: 'training' },
   { start: '2024/01', end: '2024/02', title: '研究助理', org: '國立中山大學', kind: 'work', minor: true },
   {
     start: '2023/06',

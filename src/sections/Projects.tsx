@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { Lock } from 'lucide-react';
 import { categoryLabels, projects } from '@/content/projects';
 import type { ProjectCategory } from '@/content/types';
 import { useReveal } from '@/hooks/useReveal';
@@ -17,8 +18,6 @@ export default function Projects() {
     () => (filter === 'all' ? projects : projects.filter((p) => p.categories.includes(filter))),
     [filter],
   );
-  // 全部：只有前四個進行中的作品是卡片，其餘（含已封存的早期作品）放在最後的精簡列表，作品段才不會長到看不出地標；
-  // 篩選後符合的都用卡片
   // 全部：只有站主挑的精選作品是卡片（有截圖、有線上展示、最能代表定位的放前面），其餘進「其他作品」清單；
   // 篩選後符合的作品都用卡片，已封存的早期作品一律放清單
   const featuredList = projects.filter((p) => p.featured !== undefined).sort((a, b) => a.featured! - b.featured!);
@@ -41,8 +40,12 @@ export default function Projects() {
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           id="projects"
-          title="精選作品"
-          lead="上面三個最能代表我現在做的事：用資料計分的活動平台、把 eDNA 定序資料整理成物種名錄的工具、替主機查漏洞的 CLI。其他作品列在下面，用分類鈕可以只看某一類。"
+          title={filter === 'all' ? '精選作品' : `作品：${categoryLabels[filter]}`}
+          lead={
+            filter === 'all'
+              ? '最前面三個最能代表我現在做的事：用資料計分的活動平台、把 eDNA 定序資料整理成物種名錄的工具，以及替主機查漏洞的指令列工具。其他作品在後面的清單；用分類鈕可以只看某一類。'
+              : `${list.length} 個作品。`
+          }
         />
 
         <div role="group" aria-label="依類別篩選作品" className="mt-10 flex flex-wrap gap-2" data-reveal>
@@ -80,21 +83,22 @@ export default function Projects() {
 
         {earlier.length > 0 && (
           <div className="mt-14" data-reveal>
-            <h3 className="text-lg font-bold text-foam">{filter === 'all' ? '其他作品' : '更早的作品'}</h3>
+            <h3 className="text-lg font-bold text-foam">{filter === 'all' ? '其他作品' : '已封存的作品'}</h3>
             <ul className="mt-4 divide-y divide-foam/10 border-y border-foam/10">
               {earlier.map((p) => (
                 <li key={p.slug} data-project={p.slug} className="min-w-0">
                   <article
                     aria-labelledby={`p-${p.slug}`}
-                    className="grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] sm:items-baseline"
+                    className="grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)_9rem] sm:items-baseline"
                   >
                     <h4 id={`p-${p.slug}`} className="font-bold text-foam">
                       {p.name}
-                      {p.nameZh && <span className="ml-2 text-sm font-medium text-mist">{p.nameZh}</span>}
                       <span className="ml-2 font-mono text-xs font-normal text-haze tabular-nums">{p.year}</span>
+                      {/* 中文副名換到第二行、整段不斷行，不會斷成「本地轉錄與講／者辨識」 */}
+                      {p.nameZh && <span className="block text-sm font-medium text-mist">{p.nameZh}</span>}
                     </h4>
                     <p className="text-sm text-ink/85">{p.summary}</p>
-                    <p className="flex gap-4 text-sm">
+                    <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm sm:justify-end">
                       {p.demo && (
                         <a href={p.demo} target="_blank" rel="noreferrer" className="text-foam hover:text-biolum">
                           線上展示<span className="sr-only">（{p.name}）</span>
@@ -102,10 +106,16 @@ export default function Projects() {
                       )}
                       {p.repo && (
                         <a href={p.repo} target="_blank" rel="noreferrer" className="text-foam hover:text-biolum">
-                          原始碼<span className="sr-only">（{p.name}）</span>
+                          原始碼<span className="sr-only">（{p.name}，GitHub）</span>
                         </a>
                       )}
-                      {p.note && <span className="text-mist">{p.note}</span>}
+                      {!p.repo && (
+                        <span className="inline-flex items-center gap-1.5 text-mist">
+                          <Lock size={13} aria-hidden="true" />
+                          原始碼未公開
+                        </span>
+                      )}
+                      {p.repo && p.note && <span className="text-mist">{p.note}</span>}
                     </p>
                   </article>
                 </li>

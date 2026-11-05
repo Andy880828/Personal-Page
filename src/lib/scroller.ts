@@ -108,6 +108,17 @@ export function scrollToSection(id: SectionId, immediate = false) {
   }
 }
 
+/** 捲到頁面上某個元素（例如首屏「代表作」連到的作品卡），元素頂端停在導覽列下方 */
+export function scrollToElement(el: HTMLElement) {
+  const target = el.getBoundingClientRect().top + window.scrollY - 96;
+  if (lenis) lenis.scrollTo(target, { duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
+  else {
+    const smooth = document.documentElement.dataset.motion !== 'reduce';
+    window.scrollTo({ top: target, behavior: (smooth ? 'smooth' : 'instant') as ScrollBehavior });
+    update();
+  }
+}
+
 /** 捲到某個深度（公尺）：用深度樣條反解出捲動位置 */
 export function scrollToDepth(depth: number) {
   const target = scrollForDepth(Math.max(0, Math.min(4000, depth)), breakpoints);

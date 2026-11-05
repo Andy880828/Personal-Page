@@ -45,7 +45,7 @@ export interface ExperienceItem {
   end: string | null;
   title: string;
   org: string;
-  kind: 'edu' | 'work' | 'abroad' | 'build';
+  kind: 'edu' | 'training' | 'work' | 'abroad' | 'build';
   note?: string;
   /** 工作成果（2–3 條）；只放站主提供的事實 */
   highlights?: string[];

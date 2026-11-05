@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Check, Copy, FileText, Mail, Send } from 'lucide-react';
 import { profile } from '@/content/profile';
+import { flags } from '@/lib/env';
 import { useReveal } from '@/hooks/useReveal';
 import SectionHeader from '@/components/SectionHeader';
 import Picture from '@/components/Picture';
@@ -14,7 +15,7 @@ const EMAIL = {
   template: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
   key: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
 };
-const emailReady = Boolean(EMAIL.service && EMAIL.template && EMAIL.key);
+const emailReady = Boolean(EMAIL.service && EMAIL.template && EMAIL.key) && !flags.noForm;
 
 const field =
   'w-full rounded-xl border border-foam/20 bg-abyss/60 px-4 py-3 text-ink placeholder:text-haze focus-visible:border-biolum focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-biolum';
@@ -38,11 +39,12 @@ function EmailRow() {
         className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-biolum/40 px-4 py-3 text-foam transition-colors hover:border-biolum hover:text-biolum"
       >
         <Mail size={18} aria-hidden="true" className="shrink-0" />
-        <span className="truncate font-mono text-sm sm:text-base">{profile.email}</span>
+        <span className="min-w-0 font-mono text-sm break-all xl:text-base">{profile.email}</span>
       </a>
       <button
         type="button"
         onClick={copy}
+        aria-label={copied ? 'Email 已複製' : '複製 Email'}
         className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-foam/15 px-3 text-sm text-mist transition-colors hover:border-biolum/60 hover:text-biolum"
       >
         {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
@@ -92,9 +94,9 @@ export default function Contact() {
       <div className="mx-auto max-w-6xl">
         <SectionHeader id="contact" title="到海床了，打聲招呼吧" lead="工作機會、合作，或只是想聊魚，都歡迎。" />
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-2">
-          <div className="space-y-10">
-            {/* 表單關閉時右邊的「直接找我」卡片已經有這三個連結，這排就不重複顯示 */}
+        <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2">
+          <div className="min-w-0 space-y-10 lg:order-2">
+            {/* 表單關閉時「聯絡我」卡片已經有這三個連結，這排就不重複顯示 */}
             {emailReady && (
               <ul className="flex flex-wrap gap-3" data-reveal>
                 {links.map((l) => (
@@ -133,7 +135,7 @@ export default function Contact() {
           </div>
 
           {/* 手機上聯絡卡排在興趣與照片之前 */}
-          <div data-reveal className="order-first lg:order-none">
+          <div data-reveal className="order-first min-w-0 lg:order-1">
             {!emailReady ? (
               <div className="panel rounded-3xl p-7 sm:p-9">
                 <h3 className="text-xl font-bold text-foam">聯絡我</h3>
@@ -207,17 +209,17 @@ export default function Contact() {
           </div>
         </div>
 
-        <footer className="mt-[16vh] flex flex-col gap-3 border-t border-foam/10 pt-8 text-sm text-haze sm:flex-row sm:items-baseline sm:justify-between">
+        <footer className="mt-[16vh] flex flex-col gap-3 border-t border-foam/10 pt-8 text-sm text-haze sm:flex-row sm:items-baseline sm:justify-between md:pl-14">
           <p className="text-foam">謝謝你潛到最底。</p>
           <p>
-            © 2026 {profile.name} · 照片版權所有 ·{' '}
+            © 2026 {profile.name} · 照片版權所有，未經同意請勿轉載 ·{' '}
             <a
               href="https://github.com/Andy880828/Personal-Page#科學資料來源"
               target="_blank"
               rel="noreferrer"
               className="underline decoration-haze/50 underline-offset-2 hover:text-foam"
             >
-              海洋數值來源
+              科學資料來源
             </a>
           </p>
         </footer>

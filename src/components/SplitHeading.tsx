@@ -5,6 +5,7 @@ import { useReducedMotion } from '@/store/useSiteStore';
 
 interface Props {
   as?: ElementType;
+  id?: string;
   className?: string;
   children: ReactNode;
 }
@@ -13,7 +14,7 @@ interface Props {
  * 段落標題：進入畫面時逐字從水裡浮上來（GSAP SplitText）。讀屏器讀到的是完整文字。
  * 已經在畫面內的標題不做動畫，避免動態套件晚到時閃爍。
  */
-export default function SplitHeading({ as: Tag = 'h2', className, children }: Props) {
+export default function SplitHeading({ as: Tag = 'h2', id, className, children }: Props) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -49,7 +50,7 @@ export default function SplitHeading({ as: Tag = 'h2', className, children }: Pr
   }, [reduced]);
 
   return (
-    <Tag ref={ref} className={className} style={{ perspective: '600px' }}>
+    <Tag ref={ref} id={id} className={className} style={{ perspective: '600px' }}>
       {children}
     </Tag>
   );

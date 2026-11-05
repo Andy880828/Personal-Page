@@ -13,6 +13,9 @@ const projectSchema = z.object({
   nameZh: z.string().optional(),
   summary: z.string().min(10).max(90),
   highlights: z.array(z.string().min(2)).max(3),
+  featured: z.number().int().positive().optional(),
+  outcome: z.string().optional(),
+  role: z.string().optional(),
   tags: z.array(z.string()).min(1).max(6),
   year: z.number().int().min(2019).max(2030),
   categories: z.array(z.enum(['mining', 'viz', 'workflow', 'agent', 'web'])).min(1),
@@ -33,8 +36,15 @@ describe('作品資料', () => {
     expect(new Set(projects.map((p) => p.slug)).size).toBe(projects.length);
   });
 
-  it('每個作品都有封面（截圖或終端機封面）', () => {
-    for (const p of projects) expect(Boolean(p.image || p.cover), p.slug).toBe(true);
+  it('精選作品都有封面（截圖或終端機封面）；終端機封面只放真的指令輸出，沒有就不放', () => {
+    for (const p of projects.filter((x) => x.featured !== undefined))
+      expect(Boolean(p.image || p.cover), p.slug).toBe(true);
+  });
+
+  it('精選作品剛好三個、排序不重複', () => {
+    const f = projects.filter((x) => x.featured !== undefined).map((x) => x.featured);
+    expect(f).toHaveLength(3);
+    expect(new Set(f).size).toBe(3);
   });
 
   it('沒有公開 repo 的作品要說明原因', () => {

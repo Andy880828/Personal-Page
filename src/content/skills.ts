@@ -1,6 +1,6 @@
 import type { SkillGroup } from './types';
 
-/** 主方向在前：資料探勘 → 可視化 → 流程數位化 → Agent 應用 → 網站 */
+/** 主方向在前：資料探勘 → 資料視覺化 → 流程數位化 → Agent 應用 → 全端網站 */
 export const skills: SkillGroup[] = [
   {
     id: 'mining',
@@ -8,12 +8,12 @@ export const skills: SkillGroup[] = [
     nameEn: 'Data Mining',
     color: '#4ff0d2',
     summary:
-      '一條溪的 eDNA 定序、一家工廠的產線紀錄、我自己的投資紀錄，都是同一套步驟：清理、比對、檢定、寫成能重算的筆記。',
+      '一條溪的 eDNA 定序、一家工廠的產線紀錄、我自己的投資紀錄，都是同一套步驟：清理、比對、檢定，最後寫成別人能重現的分析筆記。',
     strengths: [
-      '資料清理與特徵整理',
+      '資料清理與特徵工程',
       '統計檢定與時間序列',
       'eDNA 定序資料處理（剪引子、去重、BLAST 比對）',
-      '把結論寫成別人能重算的筆記',
+      '分析流程可重現（程式與筆記一起交付）',
     ],
     tools: ['Python', 'Pandas', 'R', 'SQL', 'BLAST+', 'Cutadapt', 'USEARCH'],
   },
@@ -23,7 +23,7 @@ export const skills: SkillGroup[] = [
     nameEn: 'Data Visualization',
     color: '#7cc8ff',
     summary: '讓圖表先回答問題，再談好看；這個網站本身就是一張把深度換算成壓力、水溫、光的圖。',
-    strengths: ['圖表選型與尺度（線性、對數）', '儀表板設計', '互動式與 3D 視覺化', '配色與可讀性'],
+    strengths: ['圖表選型與尺度（線性、對數）', '互動式與 3D 視覺化', '配色與可讀性'],
     tools: ['Matplotlib', 'Three.js'],
   },
   {
@@ -42,10 +42,10 @@ export const skills: SkillGroup[] = [
     color: '#ffb86b',
     summary: '讓程式替人跑完整段流程（查漏洞、整理資訊、轉逐字稿），每一步的輸出都留下來，可以逐步檢查。',
     strengths: [
-      '可被程式呼叫的 CLI（JSON 輸出、穩定錯誤碼）',
-      '流程拆解與權限邊界',
+      '讓其他程式直接呼叫的指令列工具（固定格式的 JSON 輸出與錯誤碼）',
+      '把流程拆成小步驟，限定每一步能讀寫的範圍',
       '本地執行與資料不外流',
-      '每一步輸出可檢查、可重跑',
+      '中途失敗可以從那一步重跑',
     ],
     tools: ['Go', 'Python', 'Claude Code', 'LiteLLM', 'Linux'],
   },

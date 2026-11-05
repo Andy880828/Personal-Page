@@ -12,9 +12,11 @@ import { shortSha } from '@/lib/sha';
  */
 const KIND: Record<ExperienceItem['kind'], { label: string; filled: boolean }> = {
   edu: { label: '學歷', filled: false },
+  // 職訓課程不算學歷
+  training: { label: '進修', filled: false },
   work: { label: '工作', filled: true },
   abroad: { label: '海外', filled: false },
-  build: { label: '專案', filled: true },
+  build: { label: '自主開發', filled: true },
 };
 const NODE = '#dff3ff';
 const STRATUM = '#9dbccf';
@@ -48,13 +50,13 @@ export default function Experience() {
       className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader id="experience" title="經歷與學歷" lead="由新到舊：個人專案、工作與學歷。" />
+        <SectionHeader id="experience" title="經歷與學歷" lead="由新到舊；次要經歷收成精簡列。" />
 
         <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.5fr)_minmax(0,1.5fr)]">
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}
           <div aria-hidden="true" className="hidden lg:block">
             <div className="sticky top-[30vh] font-mono">
-              <p className="text-xs tracking-[0.25em] text-haze uppercase">year</p>
+              <p className="text-xs tracking-[0.25em] text-haze">年份</p>
               <p className="text-[6rem] leading-none font-bold text-biolum tabular-nums">{current.start.slice(0, 4)}</p>
             </div>
           </div>

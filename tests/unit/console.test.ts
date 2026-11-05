@@ -62,7 +62,8 @@ describe('指令列', () => {
     expect(runCommand('ascii on', ctx).action).toEqual({ type: 'ascii', on: true });
     expect(runCommand('ascii off', ctx).action).toEqual({ type: 'ascii', on: false });
     expect(runCommand('ascii', ctx).action).toBeUndefined();
-    expect(runCommand('ascii on', { ...ctx, tier: 1 }).lines[0]).toContain('不支援');
+    expect(runCommand('ascii on', { ...ctx, tier: 1 }).lines[0]).toContain('需要 2 以上');
+    expect(runCommand('ascii on', { ...ctx, tier: 1 }).action).toBeUndefined();
   });
 
   it('tier、motion、clear、exit、未知指令', () => {

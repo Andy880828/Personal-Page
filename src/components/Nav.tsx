@@ -10,6 +10,9 @@ import DepthReadout from './DepthReadout';
 
 export default function Nav() {
   const section = useSiteStore((s) => s.section);
+  // 海面狀態（透明背景）看首屏內容是否還在畫面上，不看段落 id：
+  // 段落還算首屏時，首屏內容其實已經淡出，導覽列要先有底色
+  const atSurface = useSiteStore((s) => s.pos < 0.8);
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
@@ -40,14 +43,14 @@ export default function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-[background-color] duration-500 ${
-        section === 'hero' ? 'bg-transparent' : 'bg-deep/85'
+        atSurface ? 'bg-transparent' : 'bg-deep/85'
       }`}
     >
       {/* 海面狀態的遮罩：比列高很多、用 mask 慢慢淡掉，不在列的底緣收尾（之前 56 px 內收尾會在交界壓出一條暗線） */}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-deep/70 transition-opacity duration-500 [mask-image:linear-gradient(to_bottom,black,transparent)] ${
-          section === 'hero' ? 'opacity-100' : 'opacity-0'
+          atSurface ? 'opacity-100' : 'opacity-0'
         }`}
       />
       <nav
@@ -66,9 +69,7 @@ export default function Nav() {
           </span>
         </a>
 
-        <div
-          className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${section === 'hero' ? 'bg-deep/75' : ''}`}
-        >
+        <div className={`hidden items-center gap-1 rounded-full px-2 py-1 md:flex ${atSurface ? 'bg-deep/75' : ''}`}>
           {links.map((s) => (
             <a
               key={s.id}

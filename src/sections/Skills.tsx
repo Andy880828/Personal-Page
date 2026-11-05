@@ -84,7 +84,7 @@ export default function Skills() {
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           id="skills"
-          title="技能：五個方向"
+          title="五個方向的技能"
           lead={
             <>
               點分頁切換五組技能，每組列出做過的事與常用工具
@@ -112,7 +112,7 @@ export default function Skills() {
                     onKeyDown={(e) => onKeyDown(e, i)}
                     onPointerEnter={() => setHover(s.id)}
                     onPointerLeave={() => setHover(null)}
-                    className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
+                    className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm transition-colors ${
                       selected ? 'border-transparent bg-foam text-deep' : 'hairline text-mist hover:text-foam'
                     }`}
                   >
@@ -132,7 +132,6 @@ export default function Skills() {
             >
               <p className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: current.color }}>
                 {current.nameEn}
-                <span className="ml-3 normal-case tracking-normal text-haze">{current.tools.length} 項工具</span>
               </p>
               <p
                 aria-hidden="true"
@@ -142,7 +141,7 @@ export default function Skills() {
               </p>
               <h3 className="mt-2 text-2xl font-bold text-foam">{current.name}</h3>
               <p className="mt-4 text-lg text-ink/90">{current.summary}</p>
-              <ul className="mt-6 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              <ul className="mt-6 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                 {current.strengths.map((t) => (
                   <li key={t} className="flex gap-3 text-ink/85">
                     <span

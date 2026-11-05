@@ -52,7 +52,7 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'brain-coral',
     section: 1,
-    pos: [-12, -4.4, -22],
+    pos: [-16, -6.8, -22],
     portrait: [-3.2, -8.5, -22],
     scale: 3,
     yaw: 0.6,
@@ -61,7 +61,7 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'pavona-coral',
     section: 1,
-    pos: [-7.5, -4.8, -21],
+    pos: [-11.5, -7.2, -21],
     portrait: [0.8, -8.8, -21],
     scale: 3.2,
     yaw: 2.1,
@@ -70,7 +70,7 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'snooty-wrasse',
     section: 1,
-    pos: [-8.5, -1.6, -20],
+    pos: [-12.5, -4, -20],
     portrait: [-0.8, -5.6, -20],
     scale: 2.8,
     motion: 'swim',
@@ -80,7 +80,7 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'red-naped-wrasse',
     section: 1,
-    pos: [-11, -2.6, -18],
+    pos: [-14.5, -5, -18],
     portrait: [-2, -6.6, -18],
     scale: 2.1,
     motion: 'swim',
@@ -122,7 +122,8 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'giant-isopod',
     section: 5,
-    pos: [3.5, 0, -19],
+    // 卡片與照片下方的空地
+    pos: [1, 0, -15],
     portrait: [0.5, 0, -20],
     scale: 4,
     yaw: 0.5,
@@ -333,7 +334,8 @@ function ReefRock() {
     m.visible = w > 0.002;
     if (!m.visible) return;
     const portrait = size.width < size.height;
-    m.position.set(portrait ? -1 : -10, rigY(pos, 1, 10) + (portrait ? -11.6 : -7.6), -22);
+    // 只露在內文欄的左下角，不壓在段落後面（同色的礁會讓同色的連結對比下降）
+    m.position.set(portrait ? -1 : -14, rigY(pos, 1, 10) + (portrait ? -11.6 : -10), -22);
   });
   return <mesh ref={mesh} geometry={geometry} material={material} scale={[6.5, 3, 4.5]} rotation-y={0.4} />;
 }

@@ -14,11 +14,11 @@ export default function About() {
       id="about"
       ref={scope}
       aria-labelledby="about-title"
-      className="relative px-5 pt-28 pb-24 lg:pt-[22vh] lg:pb-[18vh] sm:px-10 lg:px-16"
+      className="relative px-5 pt-16 pb-24 lg:pt-[12vh] lg:pb-[18vh] sm:px-10 lg:px-16"
     >
       <div className="relative mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
         <div>
-          <SectionHeader id="about" title="從溪流裡的 DNA，到伺服器裡的漏洞" />
+          <SectionHeader id="about" title="從一條溪的 DNA，到一整套資料流程" />
           <div className="mt-8 space-y-5 text-lg text-ink/90">
             {profile.intro.map((p) => (
               <p key={p} data-reveal>
@@ -38,7 +38,7 @@ export default function About() {
           </a>
         </div>
 
-        <aside className="flex flex-col gap-10 lg:pt-24" aria-label="大頭照與證照">
+        <aside className="flex flex-col gap-10 lg:pt-24" aria-label="大頭照、語言成績與證照">
           <figure data-reveal className="relative w-44 sm:w-52">
             <span
               aria-hidden="true"

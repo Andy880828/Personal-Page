@@ -9,7 +9,7 @@ export function Stratum({ color, index, total }: { color: string; index: number;
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute inset-y-0 -right-4 -left-[calc(2rem+1px)] -z-10 border-t border-foam/8 sm:-left-[calc(2.5rem+1px)]"
+      className="pointer-events-none absolute inset-y-0 right-0 -left-[calc(2rem+1px)] max-w-[calc(48rem+2.5rem)] -z-10 border-t border-foam/8 sm:-left-[calc(2.5rem+1px)]"
       style={{
         background: `repeating-linear-gradient(176deg, transparent 0 ${grain}px, rgb(223 243 255 / 0.018) ${grain}px ${grain + 1}px), linear-gradient(90deg, color-mix(in oklab, ${color} ${tint}%, transparent), transparent 85%)`,
       }}

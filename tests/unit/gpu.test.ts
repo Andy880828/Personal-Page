@@ -49,7 +49,14 @@ describe('GPU 分級', () => {
 
 describe('執行模式與亂數', () => {
   it('解析網址參數', () => {
-    expect(parseFlags('?test=1&tier=1&debug')).toEqual({ test: true, tier: 1, debug: true, perf: false, timeScale: 1 });
+    expect(parseFlags('?test=1&tier=1&debug')).toEqual({
+      test: true,
+      tier: 1,
+      debug: true,
+      perf: false,
+      timeScale: 1,
+      noForm: false,
+    });
     expect(parseFlags('?slow=0.1').timeScale).toBe(0.1);
     expect(parseFlags('?tier=9').tier).toBeNull();
   });

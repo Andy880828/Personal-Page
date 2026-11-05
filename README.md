@@ -5,7 +5,7 @@
 - 線上：<https://personal-page-gules.vercel.app>（`/about`、`/project` 會直接捲到對應段落）
 - 設計規範：[`docs/DESIGN.md`](docs/DESIGN.md)；重構計畫：[`docs/PLAN.md`](docs/PLAN.md)；視覺審視紀錄：[`docs/REVIEW.md`](docs/REVIEW.md)
 
-照片版權屬原作者，未經同意請勿轉載。
+照片版權所有，未經同意請勿轉載。
 
 ## 技術棧
 
@@ -34,7 +34,7 @@ npm run lhci           # Lighthouse CI（用 Playwright 附帶的 Chromium）
 | `npm run test:visual:update`               | 畫面有意改變時，更新視覺回歸基準圖（`tests/e2e/__screenshots__`）。基準圖以 CI 為準：commit 訊息加上 `[update-snapshots]`，CI 會重新產生並上傳 `screenshots` artifact，下載後 commit 回 `tests/e2e/__screenshots__`。視覺比對預設只在 CI 跑（字型光柵化依機器而異），本機要跑設 `VISUAL=1` |
 | `npm run fonts`                            | 改了文案之後重新子集化字體（需要 `pip install fonttools brotli`）                                                                                                                                                                                                                          |
 | `npm run images -- <來源> <輸出名> <寬度>` | 產生新的母圖到 `src/assets/img`                                                                                                                                                                                                                                                            |
-| `npm run og`                               | 重新產生社群分享圖 `public/og.jpg`（先 `npm run build`）                                                                                                                                                                                                                                   |
+| `npm run og`                               | 重新產生社群分享圖 `public/og.jpg`（先 `npm run build`）；**改了職稱或首屏就要重產**                                                                                                                                                                                                       |
 | `npm run analyze`                          | 開啟 bundle 視覺化報告                                                                                                                                                                                                                                                                     |
 | `npm run models`                           | 重建 `public/models/*.glb`：原始模型在 Personal-Page release `raw-models-v1`，各自解壓到 `raw/models/<slug>/`（gitignore）；參數在 `scripts/models/models.config.mjs`，授權表 `public/models/LICENSES.md` 會一起重寫                                                                       |
 | `npm run models:preview`                   | 把所有模型畫成一張檢視圖（`test-results/models-preview.png`）                                                                                                                                                                                                                              |
@@ -46,7 +46,7 @@ npm run lhci           # Lighthouse CI（用 Playwright 附帶的 Chromium）
 
 ## 更新內容
 
-所有文案都在 `src/content/`，改完跑 `npm run fonts` 再 `npm run verify`：
+主要文案在 `src/content/`；段落標題與介面文字在 `src/sections/`、`src/components/`，指令列在 `src/lib/console.ts`。改完跑 `npm run fonts` 再 `npm run verify`：
 
 | 檔案            | 內容                                                               |
 | --------------- | ------------------------------------------------------------------ |

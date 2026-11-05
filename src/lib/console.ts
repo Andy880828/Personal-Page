@@ -71,8 +71,8 @@ export const COMMANDS: { name: string; usage: string; help: string }[] = [
     usage: 'ls [sections|projects|skills]',
     help: '不加參數列出這一段能 cat 的項目；加參數列出全部段落、作品或技能',
   },
-  { name: 'goto', usage: 'goto <section>', help: '捲到某段：about、skills、projects、experience、contact、hero' },
-  { name: 'dive', usage: 'dive <公尺>', help: '潛到指定深度（0–4000）' },
+  { name: 'goto', usage: 'goto <section>', help: '捲到某段：hero、about、skills、projects、experience、contact' },
+  { name: 'dive', usage: 'dive <公尺>', help: '潛到指定深度（0–4,000 m）' },
   { name: 'here', usage: 'here', help: '目前深度的壓力、水溫、光量與分層（右側儀表的數值）' },
   { name: 'cat', usage: 'cat <skill|project|zone>', help: '顯示技能、作品，或這段深度帶的說明與來源' },
   { name: 'whoami', usage: 'whoami', help: '這個網站的主人' },
@@ -102,12 +102,21 @@ const SECTION_ALIASES: Record<string, SectionId> = {
   bottom: 'contact',
 };
 
-export function ctdReport(depth: number): string[] {
+const SECTION_NAMES = 'hero、about、skills、projects、experience、contact';
+
+/** 海床段（3,800 m 以下）統一叫「海床」，分層寫深層帶底部；深淵帶只出現在 4,000 m 以下的分層資料裡 */
+function zoneLine(d: number): string {
+  const z = d >= 4000 ? zoneAt(3999) : zoneAt(d);
+  const range = `${formatDepth(z.from)}–${formatDepth(z.to)} m`;
+  if (d >= 3800) return `分層  海床（${z.zh}底部，${z.en} ${range}）`;
+  return `分層  ${z.zh}（${z.en}，${range}）`;
+}
+
+export function ctdReport(depth: number, withDepth = true): string[] {
   const d = Math.max(0, Math.round(depth));
-  const z = zoneAt(d);
   return [
-    `深度  ${formatDepth(d)} m`,
-    `分層  ${z.zh}（${z.en}，${formatDepth(z.from)}–${formatDepth(z.to)} m）`,
+    ...(withDepth ? [`深度  ${formatDepth(d)} m`] : []),
+    zoneLine(d),
     `壓力  ${pressureAtm(d).toFixed(1)} atm`,
     `水溫  ${temperatureC(d).toFixed(1)} °C（西北太平洋典型剖面，概略值）`,
     `光量  海面的 ${formatLight(lightFraction(d))}`,
@@ -142,14 +151,15 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
     case 'goto':
     case 'cd': {
       const target = SECTION_ALIASES[arg];
-      if (!target) return { lines: [`goto: 沒有 ${arg || '這一段'}；可用 ${Object.keys(SECTION_ALIASES).join('、')}`] };
+      if (!arg) return { lines: [`goto: 要去哪一段？可用 ${SECTION_NAMES}`] };
+      if (!target) return { lines: [`goto: 沒有「${arg}」這一段；可用 ${SECTION_NAMES}`] };
       return { lines: [`→ ${target}`], action: { type: 'goto', section: target } };
     }
     case 'dive': {
       const m = Number(arg.replace(/m$/, ''));
-      if (!Number.isFinite(m)) return { lines: ['dive：請輸入公尺數，例如 dive 1200'] };
+      if (!Number.isFinite(m)) return { lines: ['dive: 請輸入公尺數，例如 dive 1200'] };
       const depth = Math.min(4000, Math.max(0, m));
-      return { lines: [`↓ ${formatDepth(depth)} m`, ...ctdReport(depth)], action: { type: 'dive', depth } };
+      return { lines: [`↓ ${formatDepth(depth)} m`, ...ctdReport(depth, false)], action: { type: 'dive', depth } };
     }
     case 'here':
     case 'ctd':
@@ -160,10 +170,10 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
       if (sk)
         return {
           lines: [
-            `# ${sk.name} (${sk.nameEn})`,
+            `# ${sk.name}（${sk.nameEn}）`,
             sk.summary,
             ...sk.strengths.map((t) => `- ${t}`),
-            `tools: ${sk.tools.join(', ')}`,
+            `工具：${sk.tools.join('、')}`,
           ],
         };
       const pj = projects.find((p) => p.slug === arg || p.name.toLowerCase() === arg);
@@ -173,7 +183,7 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
             `# ${pj.name}${pj.nameZh ? `  ${pj.nameZh}` : ''}`,
             pj.summary,
             ...pj.highlights.map((h) => `- ${h}`),
-            `tags: ${pj.tags.join(', ')}`,
+            `技術：${pj.tags.join('、')}`,
             ...(pj.demo ? [`線上展示：${pj.demo}`] : []),
             pj.repo ? `原始碼：${pj.repo}` : '原始碼：未公開',
           ],
@@ -195,7 +205,8 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
           `Email   ${profile.email}`,
           `履歷    ${profile.links.resume}`,
           `GitHub  ${profile.links.github}`,
-          `Facebook  ${profile.links.facebook}`,
+          // 完整網址很長（pfbid…），只印可讀的名稱；要點開請用聯絡段的連結
+          `Facebook  facebook.com/${profile.name}`,
         ],
       };
     case 'resume':
@@ -204,18 +215,20 @@ export function runCommand(input: string, ctx: ConsoleContext): ConsoleResult {
       if (!arg) return { lines: [`目前 3D 等級 ${ctx.tier ?? '（偵測中）'}：0 不用 3D、1 省電、2 標準、3 全效果`] };
       const t = Number(arg);
       if (![0, 1, 2, 3].includes(t)) return { lines: ['tier: 只能是 0–3'] };
-      return { lines: [`切換到 tier ${t}，重新載入…`], action: { type: 'tier', tier: t } };
+      return { lines: [`切換到 3D 等級 ${t}，重新載入…`], action: { type: 'tier', tier: t } };
     }
     case 'motion': {
       if (arg !== 'on' && arg !== 'off')
-        return { lines: [`motion：目前 ${ctx.reduced ? 'off' : 'on'}，用 motion on 或 motion off 切換`] };
+        return { lines: [`motion: 目前 ${ctx.reduced ? 'off' : 'on'}，用 motion on 或 motion off 切換`] };
       return { lines: [`motion ${arg}`], action: { type: 'motion', reduce: arg === 'off' } };
     }
     case 'ascii': {
       if (arg !== 'on' && arg !== 'off')
-        return { lines: [`ascii：目前 ${ctx.ascii ? 'on' : 'off'}，用 ascii on 或 ascii off 切換`] };
-      const note = ctx.tier !== null && ctx.tier < 2 ? '（目前的 3D 等級不支援字元畫）' : '';
-      return { lines: [`ascii ${arg}${note}`], action: { type: 'ascii', on: arg === 'on' } };
+        return { lines: [`ascii: 目前 ${ctx.ascii ? 'on' : 'off'}，用 ascii on 或 ascii off 切換`] };
+      // 不支援的等級不要先說 on
+      if (arg === 'on' && ctx.tier !== null && ctx.tier < 2)
+        return { lines: [`ascii: 目前 3D 等級 ${ctx.tier}，字元畫需要 2 以上（輸入 tier 2）`] };
+      return { lines: [`ascii ${arg}`], action: { type: 'ascii', on: arg === 'on' } };
     }
     case 'clear':
       return { lines: [], action: { type: 'clear' } };
