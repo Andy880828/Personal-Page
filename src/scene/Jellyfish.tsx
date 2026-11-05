@@ -11,6 +11,7 @@ import {
   type Group,
 } from 'three';
 import { createRng, SCENE_SEED } from '@/lib/seed';
+import { smoothstep } from '@/lib/math';
 import { useSiteStore } from '@/store/useSiteStore';
 import { cameraY } from './path';
 import { sceneDelta, sceneTime } from './time';
@@ -155,7 +156,9 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
     const t = sceneTime(state);
     const camY = state.camera.position.y;
     const pos = useSiteStore.getState().pos;
-    if (group.current) group.current.visible = pos > 2.7 && pos < 4.0;
+    // 中層帶的窗：進出都淡入淡出
+    const win = smoothstep(2.7, 3.0, pos) * (1 - smoothstep(3.7, 4.0, pos));
+    if (group.current) group.current.visible = win > 0.002;
     const top = cameraY(3.0);
     const bottom = cameraY(3.95);
     items.forEach((it, i) => {
@@ -163,7 +166,7 @@ export default function Jellyfish({ count = 7 }: { count?: number }) {
       it.uniforms.uTime.value = t;
       it.uniforms.uExcite.value *= Math.exp(-sceneDelta(delta) * 1.4);
       const d = Math.abs(y - camY);
-      it.uniforms.uFade.value = 1 - Math.min(1, Math.max(0, (d - 10) / 12));
+      it.uniforms.uFade.value = (1 - Math.min(1, Math.max(0, (d - 10) / 12))) * win;
       const g = groups.current[i];
       if (g) g.position.set(it.x + Math.sin(t * 0.2 + it.drift) * 0.8, y + Math.sin(t * 0.35 + it.drift) * 1.2, it.z);
     });

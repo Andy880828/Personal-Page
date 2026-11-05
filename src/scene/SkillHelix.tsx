@@ -17,6 +17,8 @@ import { dnaSegment } from '@/lib/dna';
 import { skills } from '@/content/skills';
 import { useSiteStore } from '@/store/useSiteStore';
 import { rigY, sectionWeight } from './path';
+import { addDitherFade } from './fade';
+import { smoothstep } from '@/lib/math';
 import { isFrozen, sceneDelta, sceneTime } from './time';
 
 const SECTION = 2;
@@ -91,11 +93,12 @@ export default function SkillHelix() {
     [],
   );
 
+  const uFade = useMemo(() => ({ value: 1 }), []);
   const segments = useMemo<Segment[]>(
     () =>
       skills.map((s) => {
         const color = new Color(s.color);
-        return {
+        const seg = {
           id: s.id,
           color,
           nodes: new MeshStandardMaterial({
@@ -113,8 +116,12 @@ export default function SkillHelix() {
             roughness: 0.6,
           }),
         };
+        // 進出段落時抖動淡入淡出，不突然出現
+        addDitherFade(seg.nodes, uFade);
+        addDitherFade(seg.rungs, uFade);
+        return seg;
       }),
-    [],
+    [uFade],
   );
 
   /** 寫入某個區段的實例矩陣（1BNA 真實座標）；scale 用來做選取時的「膨脹」 */
@@ -162,14 +169,15 @@ export default function SkillHelix() {
     const { pos, activeSkill, hoverSkill } = useSiteStore.getState();
     // 窄一點：pos 2.0 之後才出現，不壓到關於段的大頭照與證照
     const w = sectionWeight(pos, SECTION, 0.4);
-    g.visible = w > 0.001;
+    uFade.value = smoothstep(0, 0.6, w);
+    g.visible = uFade.value > 0.002;
     if (!g.visible) return;
     const t = sceneTime(state);
     const dt = sceneDelta(delta);
     const portrait = size.width < size.height;
     // 直式螢幕：退到右緣的遠處當背景，不疊在分頁按鈕後面
     g.position.set(portrait ? 3.2 : 4.6, rigY(pos, SECTION, 10) + (portrait ? 1 : -0.4), portrait ? -20 : -13.5);
-    g.scale.setScalar((portrait ? 0.5 : 0.82) * MathUtils.lerp(0.7, 1, w));
+    g.scale.setScalar((portrait ? 0.5 : 0.82) * MathUtils.lerp(0.9, 1, w));
     g.rotation.z = -0.2;
     g.rotation.x = 0.1;
 

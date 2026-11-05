@@ -1,4 +1,5 @@
 import { Color, DoubleSide, ShaderMaterial, UniformsLib, UniformsUtils } from 'three';
+import { DITHER_DISCARD, DITHER_GLSL } from './fade';
 
 /**
  * 「被聲納掃出來」的材質：海床等深線的同一套語言，套在所有生物與礁岩上。
@@ -52,10 +53,15 @@ uniform vec3 uLine;
 uniform float uSpacing;
 uniform float uLines;
 uniform float uOpacity;
+uniform float uFade;
 varying vec3 vN;
 varying vec3 vView;
 varying vec3 vWorld;
+${DITHER_GLSL}
 void main() {
+#ifndef TRANSLUCENT
+  ${DITHER_DISCARD}
+#endif
   vec3 n = normalize(vN);
   vec3 v = normalize(vView);
   float facing = abs(dot(n, v));
@@ -63,7 +69,7 @@ void main() {
   float h = vWorld.y / uSpacing;
   float line = 1.0 - min(abs(fract(h - 0.5) - 0.5) / max(fwidth(h), 1e-4), 1.0);
   vec3 c = uBase * (0.55 + 0.45 * facing) + uLine * (rim * 0.85 + line * uLines * (0.35 + 0.65 * rim));
-  gl_FragColor = vec4(c, uOpacity * (0.75 + 0.25 * rim));
+  gl_FragColor = vec4(c, uOpacity * (0.75 + 0.25 * rim) * uFade);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
   #include <fog_fragment>
@@ -78,6 +84,8 @@ export function scanMaterial(o: ScanOptions = {}) {
     defines.SWAY_TAIL = o.sway.head === 'x-' ? 't' : '(1.0 - t)';
   }
   const transparent = (o.opacity ?? 1) < 1;
+  // 半透明的（管水母）用真的透明度淡出，不透明的用抖動
+  if (transparent) defines.TRANSLUCENT = '';
   return new ShaderMaterial({
     vertexShader: vert,
     fragmentShader: frag,
@@ -96,6 +104,7 @@ export function scanMaterial(o: ScanOptions = {}) {
         uSpacing: { value: o.spacing ?? 0.12 },
         uLines: { value: o.lines ?? 0.6 },
         uOpacity: { value: o.opacity ?? 1 },
+        uFade: { value: 1 },
       },
     ]),
   });

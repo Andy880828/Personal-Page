@@ -52,8 +52,8 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'brain-coral',
     section: 1,
-    pos: [-12, -6.4, -22],
-    portrait: [-3.2, -10.5, -22],
+    pos: [-12, -4.4, -22],
+    portrait: [-3.2, -8.5, -22],
     scale: 3,
     yaw: 0.6,
     motion: 'still',
@@ -61,8 +61,8 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'pavona-coral',
     section: 1,
-    pos: [-7.5, -6.8, -21],
-    portrait: [0.8, -10.8, -21],
+    pos: [-7.5, -4.8, -21],
+    portrait: [0.8, -8.8, -21],
     scale: 3.2,
     yaw: 2.1,
     motion: 'still',
@@ -70,8 +70,8 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'snooty-wrasse',
     section: 1,
-    pos: [-8.5, -3.6, -20],
-    portrait: [-0.8, -7.6, -20],
+    pos: [-8.5, -1.6, -20],
+    portrait: [-0.8, -5.6, -20],
     scale: 2.8,
     motion: 'swim',
     head: 'x-',
@@ -80,8 +80,8 @@ const PLACEMENTS: Placement[] = [
   {
     species: 'red-naped-wrasse',
     section: 1,
-    pos: [-11, -4.6, -18],
-    portrait: [-2, -8.6, -18],
+    pos: [-11, -2.6, -18],
+    portrait: [-2, -6.6, -18],
     scale: 2.1,
     motion: 'swim',
     head: 'x-',
@@ -145,6 +145,16 @@ function reefRock() {
   return g;
 }
 
+/**
+ * 這隻生物現在有多「在」（0–1）：段落權重（平滑進出）× 剛載入時的淡入。
+ * 礁區的窗比較寬：關於段很短，窄窗會讓礁一閃就過；其他段窄一點，段落交界才不會兩段的生物同框。
+ */
+function windowWidth(p: Placement) {
+  return p.floor ? 1.2 : p.section === 1 ? 0.75 : 0.5;
+}
+/** 模型下載完之後的淡入時間（秒），不在某一幀突然冒出來 */
+const LOAD_FADE = 0.9;
+
 const box = new Box3();
 const lurePos = new Vector3();
 const ndc = new Vector3();
@@ -162,6 +172,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
   const scene = useThree((s) => s.scene);
   const invalidate = useThree((s) => s.invalidate);
   const [model, setModel] = useState<Object3D | null>(null);
+  const loadedAt = useRef(-1);
   const bulbMat = useMemo(() => new MeshBasicMaterial({ color: '#ffb86b', toneMapped: false, fog: false }), []);
   const lureLocal = useRef(new Vector3());
   const allowed = tier >= 2 || species.primary === true;
@@ -228,8 +239,13 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     const g = group.current;
     if (!g || !model) return;
     const { pos } = useSiteStore.getState();
-    const w = sectionWeight(pos, p.section, p.floor ? 1.2 : 0.45);
-    g.visible = w > 0.001;
+    const w = sectionWeight(pos, p.section, windowWidth(p));
+    const now = state.clock.elapsedTime;
+    if (loadedAt.current < 0) loadedAt.current = now;
+    const loadFade = isFrozen() ? 1 : MathUtils.smoothstep(now - loadedAt.current, 0, LOAD_FADE);
+    const fade = w * loadFade;
+    g.visible = fade > 0.002;
+    for (const m of mats.current) m.uniforms.uFade!.value = fade;
     // 誘餌小球是模型的兄弟節點（要放在世界座標），要跟著一起藏；
     // 否則它會停在初始位置（原點、剛好在水面上），剛入水抬頭就看到一顆不吃霧的橘色多邊形
     if (lure.current) lure.current.visible = g.visible;
@@ -267,7 +283,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
     }
     g.position.set(px, py, pz);
     g.rotation.set(0, yaw, 0);
-    g.scale.setScalar(p.scale * MathUtils.lerp(0.85, 1, w));
+    g.scale.setScalar(p.scale * MathUtils.lerp(0.94, 1, w));
 
     if (lure.current) {
       // 游標靠近誘餌時變亮：在螢幕空間量距離
@@ -279,7 +295,7 @@ function Creature({ p, enabled, tier }: { p: Placement; enabled: boolean; tier: 
       const near = isFrozen() ? 0 : 1 - MathUtils.smoothstep(d, 0.08, 0.45);
       const flicker = isFrozen() ? 0 : Math.sin(t * 3.1) * 0.08 + Math.sin(t * 7.7) * 0.04;
       // 誘餌：發光的小球（bloom 會讓它暈開），游標靠近時變大變亮
-      lure.current.scale.setScalar(p.scale * (0.022 + 0.016 * near) * (1 + flicker));
+      lure.current.scale.setScalar(p.scale * (0.022 + 0.016 * near) * (1 + flicker) * fade);
       bulbMat.color.setRGB(1.4 + near * 1.6, 0.75 + near * 0.6, 0.35, SRGBColorSpace);
     }
   });
@@ -312,10 +328,12 @@ function ReefRock() {
     const m = mesh.current;
     if (!m) return;
     const { pos } = useSiteStore.getState();
-    m.visible = sectionWeight(pos, 1, 0.45) > 0.001;
+    const w = sectionWeight(pos, 1, 0.75);
+    material.uniforms.uFade!.value = w;
+    m.visible = w > 0.002;
     if (!m.visible) return;
     const portrait = size.width < size.height;
-    m.position.set(portrait ? -1 : -10, rigY(pos, 1, 10) + (portrait ? -13.6 : -9.6), portrait ? -22 : -22);
+    m.position.set(portrait ? -1 : -10, rigY(pos, 1, 10) + (portrait ? -11.6 : -7.6), -22);
   });
   return <mesh ref={mesh} geometry={geometry} material={material} scale={[6.5, 3, 4.5]} rotation-y={0.4} />;
 }

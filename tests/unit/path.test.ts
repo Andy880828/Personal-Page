@@ -26,6 +26,8 @@ describe('相機路徑', () => {
 
   it('跟段落的物件在段落中心時與相機同高', () => {
     expect(rigY(3.5, 3)).toBeCloseTo(cameraY(3.5));
+    // 往下捲時相對於相機往上浮（和文字同方向）
+    expect(rigY(3.8, 3) - cameraY(3.8)).toBeGreaterThan(rigY(3.2, 3) - cameraY(3.2));
   });
 
   it('水色越深越暗，霧越深越濃', () => {

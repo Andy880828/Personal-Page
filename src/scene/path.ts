@@ -120,11 +120,12 @@ export function sectionWeight(pos: number, i: number, width = 0.75): number {
 }
 
 /**
- * 跟段落走的物件 y：以相機為基準，再依與段落中心的距離做視差位移，
- * 讓它比相機慢一點穿過畫面（停留時間比世界座標固定的物件長）。
+ * 跟段落走的物件 y：以相機為基準，再依與段落中心的距離做視差位移。
+ * 往下捲時物件在畫面上往上浮（和文字同方向），但比文字慢，像遠處的東西；段落中心時剛好在設定的位置。
+ * （以前符號寫反了：物件往下沉、而且比文字還快，礁一進關於段就沉出畫面底部。）
  */
 export function rigY(pos: number, i: number, parallax = 9): number {
-  return cameraY(pos) + (i + 0.5 - pos) * parallax;
+  return cameraY(pos) + (pos - (i + 0.5)) * parallax;
 }
 
 /** 水下顏色（同時當霧與背景色），隨 pos 由淺藍漸變到深淵黑 */

@@ -20,6 +20,7 @@ import { categoryColors } from '@/content/projects';
 import type { ProjectCategory } from '@/content/types';
 import { smoothstep } from '@/lib/math';
 import { createSchool, stepSchool, type Gather } from './boids';
+import { injectDither } from './fade';
 import { cameraY, rigY, sectionWeight } from './path';
 import { isFrozen, sceneDelta, sceneTime } from './time';
 
@@ -63,9 +64,11 @@ export default function Fish({ count, kind = 'reef' }: { count: number; kind?: '
     return s;
   }, [count, lanternMode]);
 
+  const uFade = useMemo(() => ({ value: 1 }), []);
   const { geometry, material } = useMemo(() => {
     const m = new MeshStandardMaterial({ color: '#ffffff', metalness: 0.3, roughness: 0.55 });
     m.onBeforeCompile = (shader) => {
+      injectDither(shader, uFade);
       shader.uniforms.uTime = { value: 0 };
       shader.uniforms.uLantern = { value: 0 };
       m.userData.shader = shader;
@@ -102,7 +105,7 @@ export default function Fish({ count, kind = 'reef' }: { count: number; kind?: '
         );
     };
     return { geometry: fishGeometry(), material: m };
-  }, []);
+  }, [uFade]);
 
   const tags = useMemo(() => Uint8Array.from({ length: count }, (_, i) => i % CATEGORIES.length), [count]);
   const gather = useMemo<Gather>(() => ({ tags, tag: 0, target: [0, 0, 0], weight: 0 }), [tags]);
@@ -132,11 +135,17 @@ export default function Fish({ count, kind = 'reef' }: { count: number; kind?: '
     const m = mesh.current;
     if (!m) return;
     const pos = useSiteStore.getState().pos;
-    const visible = lanternMode ? pos > 2.85 && pos < 4.15 : pos > 0.6 && pos < 2.95;
+    // 進出都用淡入淡出（抖動），不在某個捲動位置突然出現或消失
+    const fade = lanternMode
+      ? smoothstep(2.85, 3.15, pos) * (1 - smoothstep(3.85, 4.15, pos))
+      : smoothstep(0.6, 0.9, pos) * (1 - smoothstep(2.5, 2.95, pos));
+    uFade.value = fade;
+    const visible = fade > 0.002;
     m.visible = visible;
     if (!visible) return;
     // 礁區魚群越往下越稀：只畫前面一部分實例
-    m.count = lanternMode ? count : Math.max(8, Math.round(count * (1 - 0.75 * smoothstep(1.9, 2.9, pos))));
+    // 礁區魚群越往下越稀（實例數慢慢減少，配合淡出）
+    m.count = lanternMode ? count : Math.max(8, Math.round(count * (1 - 0.6 * smoothstep(1.9, 2.9, pos))));
     const shader = material.userData.shader as { uniforms: { uTime: { value: number } } } | undefined;
     const lantern = lanternMode ? 1 : 0;
     if (shader) {
