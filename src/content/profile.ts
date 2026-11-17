@@ -17,7 +17,7 @@ export const profile = {
     github: 'https://github.com/Andy880828',
     facebook:
       'https://www.facebook.com/people/%E6%9E%97%E6%95%AC%E5%8B%9B/pfbid0zu3HuzQ6gFtLzC57gRiKSMiQKBY6b5Tj9zJmYn7UvUqx7b2P11smR9yTbqVtA4a3l/',
-    resume: 'https://rxresu.me/andy880828/literary-polite-sparrow',
+    resume: 'https://rx.cv/andy880828/mandarin-version',
   },
   certificates: [
     { name: 'TOEIC Listening & Reading', value: '910' },
