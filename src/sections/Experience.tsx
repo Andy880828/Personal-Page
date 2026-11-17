@@ -50,7 +50,7 @@ export default function Experience() {
       className="relative px-5 py-24 lg:py-[18vh] sm:px-10 lg:px-16"
     >
       <div className="mx-auto max-w-6xl">
-        <SectionHeader id="experience" title="經歷與學歷" lead="由新到舊；次要經歷收成精簡列。" />
+        <SectionHeader id="experience" title="經歷與學歷" />
 
         <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,0.5fr)_minmax(0,1.5fr)]">
           {/* 深度 × 年份計：只給視覺用，內容在右邊的清單 */}

@@ -84,13 +84,10 @@ export default function Skills() {
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           id="skills"
-          title="五個方向的技能"
+          title="我會做的事"
           lead={
-            <>
-              點分頁切換五組技能，每組列出做過的事與常用工具
-              {/* 拖曳雙螺旋只在大螢幕有（手機上螺旋退到背景，不能操作） */}
-              {tier ? <span className="hidden lg:inline">；右邊的雙螺旋也可以拖曳、點選</span> : null}。
-            </>
+            // 拖曳雙螺旋只在大螢幕有（手機上螺旋退到背景，不能操作）；沒有 3D 時不顯示說明
+            tier ? <span className="hidden lg:inline">右邊的雙螺旋可以拖曳、點選。</span> : undefined
           }
         />
 

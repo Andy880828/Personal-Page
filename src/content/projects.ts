@@ -18,7 +18,7 @@ export const projects: Project[] = [
     featured: 3,
     name: 'syssec',
     nameZh: '主機安全稽核工具（CLI）',
-    summary: '一個執行檔：檢查這台主機的安全設定、比對已裝套件有沒有已知漏洞，產出人和程式都讀得懂的報告。',
+    summary: '一個執行檔就能掃完主機的安全設定，和已裝套件的已知漏洞。報告人看得懂，也能直接交給其他程式處理。',
     highlights: [
       '檢查 SSH、核心、防火牆、磁碟加密等 50 多項安全強化設定',
       '用 OSV.dev 比對已安裝套件的已知漏洞，再依「是否已被實際利用」（CISA KEV）與「被利用機率」（EPSS）排出先修哪個',
@@ -66,9 +66,10 @@ export const projects: Project[] = [
     slug: 'scout',
     name: 'scout',
     nameZh: '科技資訊雷達',
-    summary: '抓自選的科技新聞來源、去重、依寫在設定檔裡的規則打分，產出給人看或給程式接手的摘要。',
+    summary:
+      '從我挑的新聞來源抓文章、去掉重複，再照設定檔裡的規則打分。我每天早上的科技簡報，就是它先挑、再交給語言模型寫摘要。',
     highlights: [
-      'Go 寫的單一執行檔，不需另外安裝套件；每個指令都輸出固定格式的 JSON，方便其他程式接手',
+      'Go 寫的單一執行檔，下載就能用；每個指令都輸出 JSON，方便其他程式接手',
       '每個分數都列出加減分的理由',
       '來源和打分規則都是一份看得到的設定檔',
     ],
@@ -88,10 +89,11 @@ export const projects: Project[] = [
   },
   {
     slug: 'homelab',
+    featured: 2,
     name: 'homelab',
     nameZh: '家用小電腦基礎服務',
     summary:
-      '家裡一台小電腦上的基礎服務（網址與 HTTPS、服務監控、統一管理語言模型 API 的入口），寫成從盤點到驗證的架設手冊，照著做就能重建。',
+      '家裡一台小電腦上的基礎服務：網址和 HTTPS、服務監控、統一管理語言模型 API 的入口。從盤點、架設到驗證都寫成手冊，照著做就能重建。',
     highlights: [
       'Caddy 反向代理與自動 HTTPS',
       'LiteLLM：每個用途一把金鑰，各自設用量上限',
@@ -129,20 +131,33 @@ export const projects: Project[] = [
   },
   {
     slug: 'stock-analysis-app',
+    featured: 1,
     name: 'stock-analysis-app',
-    nameZh: '投資紀錄與回顧 App',
-    summary: '記下每一筆買賣與當時的理由，再用圖表回頭檢查決策。',
-    // 實際功能待站主補；在那之前不放亮點，也不放假的終端機封面
-    highlights: [],
-    tags: ['Python', 'Pandas'],
+    nameZh: '選股、資產配置與帳務系統',
+    summary:
+      '我目前的主力專案：把選股、資產配置和帳務放在同一個系統。每筆買賣和轉帳都記下來，算得出到底有沒有贏過大盤，也能回頭驗證選股規則是不是真的有效。',
+    highlights: [
+      '步驟式選股與 19 個財報指標評分；回測只用當時已公布的財報，避免前視偏誤',
+      '依市況分級給資產配置建議，買賣和轉帳在同一筆交易裡完成',
+      '績效算 TWR、XIRR、Alpha、Beta；算不出來就顯示算不出來，不拿 0 充數',
+    ],
+    tags: ['FastAPI', 'PostgreSQL', 'Vue 3', 'Pandas'],
     year: 2026,
-    categories: ['mining', 'viz'],
+    categories: ['mining', 'viz', 'workflow'],
+    // 封面是 `python cli/stock.py --help` 的實際輸出（節錄，2026-11-17：30 組、198 支指令）
+    cover: {
+      prompt: 'python cli/stock.py --help',
+      lines: [
+        'allocation  10 支指令：override, suggestion, execute …',
+        'backtest     4 支指令：run, compare, coverage, trials',
+        'trade        4 支指令：check, execute, sell, simulate',
+      ],
+    },
     status: 'active',
     note: '原始碼未公開',
   },
   {
     slug: 'trim2sort',
-    featured: 2,
     name: 'Trim2Sort',
     nameZh: 'eDNA 序列分析工具（圖形介面）',
     summary: '把 eDNA 原始定序資料一路處理成附中文名的物種名錄，支援 Sanger 與次世代定序（NGS）。',
@@ -160,7 +175,6 @@ export const projects: Project[] = [
   },
   {
     slug: 'fitness-challenge',
-    featured: 1,
     name: 'FORGE',
     nameZh: '12 週減脂增肌挑戰賽',
     summary: '男女分組、即時計分的 12 週減脂增肌比賽平台：用 InBody 量測結果與難度係數，讓起點不同的人公平比。',

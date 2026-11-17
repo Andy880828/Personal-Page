@@ -139,7 +139,7 @@ export default function Contact() {
             {!emailReady ? (
               <div className="panel rounded-3xl p-7 sm:p-9">
                 <h3 className="text-xl font-bold text-foam">聯絡我</h3>
-                <p className="mt-3 text-ink/85">寫信最快。履歷與作品原始碼也在下面。</p>
+                <p className="mt-3 text-ink/85">寫信最快，履歷和 GitHub 在下面。</p>
                 <div className="mt-6">
                   <EmailRow />
                 </div>

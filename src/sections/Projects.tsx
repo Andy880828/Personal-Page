@@ -41,11 +41,7 @@ export default function Projects() {
         <SectionHeader
           id="projects"
           title={filter === 'all' ? '精選作品' : `作品：${categoryLabels[filter]}`}
-          lead={
-            filter === 'all'
-              ? '最前面三個最能代表我現在做的事：用資料計分的活動平台、把 eDNA 定序資料整理成物種名錄的工具，以及替主機查漏洞的指令列工具。其他作品在後面的清單；用分類鈕可以只看某一類。'
-              : `${list.length} 個作品。`
-          }
+          lead={filter === 'all' ? '前三個最能代表我現在在做的事，其他的在下面。' : `${list.length} 個作品。`}
         />
 
         <div role="group" aria-label="依類別篩選作品" className="mt-10 flex flex-wrap gap-2" data-reveal>

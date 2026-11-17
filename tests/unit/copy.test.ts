@@ -8,7 +8,8 @@ import { describe, expect, it } from 'vitest';
  * 寫法原則：動詞具體（抓、去重、比對、輸出）、說給誰用、說怎麼驗證；不形容感受。
  */
 const BANNED: [string, RegExp][] = [
-  ['AI', /(?<![A-Za-z])AI(?![A-Za-z])/],
+  // 例外：「AI agent」是站主指定的說法（2026-11-17）；其他地方仍不准單用 AI
+  ['AI', /(?<![A-Za-z])AI(?![A-Za-z]| agent)/],
   ['LLM', /(?<![A-Za-z])LLM(?![A-Za-z])/],
   ...['大語言模型', '智慧', '賦能', '打造', '探索', '解鎖', '無縫', '強大', '革命', '旅程', '沉浸'].map(
     (w): [string, RegExp] => [w, new RegExp(w)],

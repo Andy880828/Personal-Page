@@ -18,7 +18,7 @@ export default function About() {
     >
       <div className="relative mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.35fr_1fr] lg:gap-20">
         <div>
-          <SectionHeader id="about" title="從一條溪的 DNA，到一整套資料流程" />
+          <SectionHeader id="about" title="從溪流的 DNA，到資料流的 DNA" />
           <div className="mt-8 space-y-5 text-lg text-ink/90">
             {profile.intro.map((p) => (
               <p key={p} data-reveal>

@@ -2,7 +2,7 @@
 
 從海面一路潛到 4,000 m 的單頁作品集：每一段的顏色、光線與 3D 元素都由「深度」決定。
 
-- 線上：<https://personal-page-gules.vercel.app>（`/about`、`/project` 會直接捲到對應段落）
+- 線上：<https://me.chlinandy.com>（`/about`、`/project` 會直接捲到對應段落）
 - 設計規範：[`docs/DESIGN.md`](docs/DESIGN.md)；重構計畫：[`docs/PLAN.md`](docs/PLAN.md)；視覺審視紀錄：[`docs/REVIEW.md`](docs/REVIEW.md)
 
 照片版權所有，未經同意請勿轉載。
